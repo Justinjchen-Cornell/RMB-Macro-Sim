@@ -61,6 +61,43 @@ svg{width:100%;height:auto;display:block}
   font-size:11.5px;color:var(--muted);line-height:1.7}
 .mono{font-family:"Cascadia Mono",Consolas,monospace;font-size:11px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+.sliderwrap{display:flex;align-items:center;gap:12px;background:var(--card);
+  border:1px solid var(--line);border-radius:999px;padding:6px 16px;margin:6px 0 12px;
+  box-shadow:var(--shadow);flex-wrap:wrap}
+.sliderwrap label{font-size:12.5px;font-weight:600;white-space:nowrap}
+.sliderwrap input[type=range]{flex:1;min-width:180px;accent-color:var(--blue)}
+.sliderwrap .val{font-size:15px;font-weight:800;color:var(--blue);min-width:64px;
+  text-align:right;font-variant-numeric:tabular-nums}
+.sliderwrap .note{font-size:11px;color:var(--muted)}
+.tagchip{font-size:11px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;
+  padding:2px 8px;border-radius:999px}
+.hm{width:100%;border-collapse:collapse;font-size:10.5px}
+.hm th{font-weight:600;color:var(--muted);padding:3px 6px;text-align:center;
+  border-bottom:1px solid var(--line2)}
+.hm td{padding:0;text-align:center}
+.hm .rl{text-align:right;padding-right:8px;color:var(--ink);font-weight:500;
+  white-space:nowrap}
+.hm .cell{border-radius:4px;padding:4px 2px;font-variant-numeric:tabular-nums;
+  color:#1f2937}
+.hm .cell b{font-weight:600}
+.legbar{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);
+  margin-top:6px}
+.legbar .grad{height:8px;flex:1;max-width:220px;border-radius:99px;
+  background:linear-gradient(90deg,#dc2626,#f3f4f6,#059669)}
+.riskcard{border-top:3px solid var(--gold)}
+.tier-high{color:#dc2626;font-weight:800}
+.tier-mid{color:#d97706;font-weight:800}
+.tier-low{color:#059669;font-weight:800}
+
+.otbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:4px}
+.otbl th{text-align:left;color:var(--muted);font-weight:600;border-bottom:1.4px solid var(--line2);padding:7px 8px}
+.otbl td{border-bottom:1px solid var(--line);padding:8px;font-variant-numeric:tabular-nums}
+.otbl tr:hover td{background:#f8fafc}
+.ev{display:inline-block;font-size:10.5px;border-radius:999px;padding:3px 10px;margin:2px 4px 2px 0}
+.evp{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
+.evm{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+#outlooknews{margin-top:8px;font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -71,9 +108,18 @@ svg{width:100%;height:auto;display:block}
 <div class="disc">传导链: 汇率 GBM → 输入性通胀 → 出口(Marshall-Lerner) → 11 行业利润 → 资产定价 + 资本流入(融资红利·资本深化)。</div>
 
 <div class="chips" id="chips"></div>
+
+<div class="sliderwrap">
+  <label>🎚️ 升值幅度(年化,拖动实时联动)</label>
+  <input type="range" id="rateSlider" min="0" max="10" step="0.5" value="6">
+  <div class="val" id="sliderVal">6.0%</div>
+  <span class="note">0–10% · 步长0.5% · 600次MC/档 · 松开即显示风险当量</span>
+</div>
 <div class="meta" id="meta"></div>
 
+
 <div class="kpis" id="kpis"></div>
+<div class="kpis" id="mackpis"></div>
 
 <div class="grid">
   <div class="panel">
@@ -92,6 +138,15 @@ svg{width:100%;height:auto;display:block}
   </div>
 </div>
 
+
+<div class="panel full" style="margin-top:14px">
+  <h3>🔮 年度展望: 最可能的人民币升贬路径 <span class="badge" style="margin-left:auto">模型结果 × 国内外新闻事件</span></h3>
+  <div class="hint">最可能幅度 = 现实惯性(FRED 实测) + 新闻/事件评分(见 news_watch.yaml, 可增删);
+  区间为近似 25-75%; "金额"按每 1 万美元等值人民币变动展示</div>
+  <div id="outlooktab"></div>
+  <div id="outlooknews"></div>
+</div>
+
 <div class="row2" id="minis"></div>
 
 <div class="panel full">
@@ -102,7 +157,15 @@ svg{width:100%;height:auto;display:block}
   <div id="indchart"></div>
 </div>
 
+
+<div class="panel full" style="margin-top:14px">
+  <h3>🗺️ 行业 × 年份 冲击热力图 <span class="sorthint" id="hmnote" style="margin-left:auto;cursor:default">Y1–Y5 累计利润冲击(%)</span></h3>
+  <div class="hint">行=行业 · 列=年份(累计升值加深) · 颜色深浅=冲击强度</div>
+  <div id="hmchart"></div>
+  <div class="legbar"><span>受损 -40%</span><div class="grad"></div><span>中性 0</span><div class="grad" style="background:linear-gradient(90deg,#f3f4f6,#059669);max-width:110px"></div><span>受益 +40%</span></div>
+</div>
 <div class="foot">
+
   <div>⚠️ 免责声明: 研究框架, 不构成投资建议。参数为校准假设, 情景为概率模拟而非预测。</div>
   <div>📊 数据源: FRED / 腾讯行情 / akshare(北向), 截至 2026-09 ｜ 生成时间: <span id="gen"></span></div>
   <div class="small">🔁 实时校准: <span id="liveinfo">—</span></div>
@@ -112,67 +175,88 @@ svg{width:100%;height:auto;display:block}
 <script>
 /*__DASH_DATA__*/
 const PRESETS = DASH_DATA.presets;
-let active = "p6";
+const GRID = DASH_DATA.grid || [];
+const MM = DASH_DATA.macro_meta || {};
+let CUR = PRESETS[2];
+let customRate = null;   // null = chip mode; number = slider mode index in GRID
 let sortAsc = true;
 
-const I18N_IND = {
-  export_lowend:"低端制造", export_hightech:"高新出口", domestic_consumption:"消费",
-  real_estate:"地产", infrastructure:"基建", new_energy:"新能源",
-  semiconductor:"半导体", commodity_metals:"工业金属", power_compute:"算力/电力",
-  gold:"黄金", bank_insurance:"银行保险"
-};
-const W = 560, H = 210, PAD = {l:44, r:14, t:12, b:30};
-const W2 = 330, H2 = 250, PAD2 = {l:16, r:16, t:16, b:44};
+const I18N_IND = {export_lowend:"低端制造",export_hightech:"高新出口",
+  domestic_consumption:"消费",real_estate:"地产",infrastructure:"基建",
+  new_energy:"新能源",semiconductor:"半导体",commodity_metals:"工业金属",
+  power_compute:"算力/电力",gold:"黄金",bank_insurance:"银行保险"};
+const W=560,H=210,PAD={l:44,r:14,t:12,b:30};
+const W2=330,H2=250,PAD2={l:16,r:16,t:16,b:44};
 
-function p(t){const d=document.createElement("div");d.innerHTML=t;return d.firstChild}
-function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
-function fmtT(v){return (v>0?"+":"")+v.toFixed(2)+" T$"}
-function svgAttrs(el, attrs){for(const k in attrs)el.setAttribute(k, attrs[k]);return el}
-function newSVG(w,h){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");
-  s.setAttribute("viewBox","0 0 "+w+" "+h);s.setAttribute("preserveAspectRatio","xMidYMid meet");
-  return s}
-function svgEl(tag, attrs){const e=document.createElementNS("http://www.w3.org/2000/svg",tag);
-  for(const k in attrs)e.setAttribute(k,attrs[k]);return e}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function fmtT(v){return (v>0?"+":"")+v.toFixed(2)+" T$";}
+function svgEl(t,a){const e=document.createElementNS("http://www.w3.org/2000/svg",t);
+  for(const k in a)e.setAttribute(k,a[k]);return e;}
+function newSVG(w,h){const s=svgEl("svg",{viewBox:"0 0 "+w+" "+h,
+  preserveAspectRatio:"xMidYMid meet"});return s;}
+function curObj(){return CUR;}
+
 function renderChips(){
-  const box=document.getElementById("chips"); box.innerHTML="";
-  PRESETS.forEach(function(p0){
+  const box=document.getElementById("chips");box.innerHTML="";
+  PRESETS.forEach(function(p){
     const b=document.createElement("button");
-    b.className="chip"+(p0.key===active?" active":"");
-    b.textContent=p0.label;
-    b.onclick=function(){active=p0.key;renderChips();renderAll()};
+    b.className="chip"+(customRate===null&&CUR&&CUR.key===p.key?" active":"");
+    b.textContent=p.label;
+    b.onclick=function(){customRate=null;CUR=p;renderChips();renderAll();};
     box.appendChild(b);
   });
 }
 function renderMeta(){
-  const p0=PRESETS.find(function(x){return x.key===active});
+  const p=CUR;
   document.getElementById("meta").innerHTML=
-    "<b>"+esc(p0.label)+"</b> · "+esc(p0.note)+
-    " ｜ 累计升值 "+(p0.apprec_5y_pct)+"% ｜ USD/CNY 5 年终值 <b>"+p0.fx_5y+"</b>";
+    "<b>"+esc(p.label)+"</b> · "+esc(p.note)+
+    (customRate===null?"":" <span class='tagchip'>滑块模式 · "+p.rate_pct+"%</span>")+
+    " ｜ 累计升值 "+(p.apprec_5y_pct)+"% ｜ USD/CNY 5 年终值 <b>"+p.fx_5y+"</b>";
 }
 function renderKPIs(){
-  const p0=PRESETS.find(function(x){return x.key===active});
-  const w=p0.waterfall; const box=document.getElementById("kpis"); box.innerHTML="";
+  const p=CUR,w=p.waterfall,box=document.getElementById("kpis");box.innerHTML="";
   const cards=[
     {l:"🧭 净效益 (5年)",v:fmtT(w.net),cls:"hl",
      tag:"收益 ≈ 损失的 "+(Math.abs(w.net/w.loss).toFixed(1))+" 倍"},
     {l:"💰 资本净流入",v:fmtT(w.inflow),c:"up",tag:"A股/债市/FDI 融资红利"},
     {l:"🏗️ 资本深化",v:fmtT(w.deepening),c:"up",tag:"GDP 增量贡献"},
-    {l:"📉 出口利润损失",v:fmtT(w.loss),c:"dn",tag:"低端/高新出口承压"}
-  ];
+    {l:"📉 出口利润损失",v:fmtT(w.loss),c:"dn",tag:"低端/高新出口承压"}];
   cards.forEach(function(c){
-    const el=document.createElement("div"); el.className="kpi "+c.cls;
+    const el=document.createElement("div");el.className="kpi "+c.cls;
     el.innerHTML='<div class="lbl">'+c.l+'</div><div class="val '+(c.c||"")+'">'+
       c.v+'</div><div class="tag">'+esc(c.tag)+'</div>';
     box.appendChild(el);
   });
 }
+function tierCls(t){return t==="高"?"tier-high":(t==="中"?"tier-mid":"tier-low");}
+function renderMacro(){
+  const m=CUR.macro,box=document.getElementById("mackpis");box.innerHTML="";
+  const cards=[
+    {l:"🏛️ GDP 当量 (5y累计, 利润口径)",v:m.gdp_cum_pt+" pt",
+     c:(m.gdp_cum_pt<0?"dn":"up"),
+     tag:"负向 "+m.gdp_neg_pt+" / 正向 +"+m.gdp_pos_pt},
+    {l:"👷 就业风险暴露当量 (5y)",v:(m.emp_exposed_wan<0?"-":"+")+
+      Math.abs(m.emp_exposed_wan).toFixed(0)+" 万人",
+     c:(m.emp_exposed_wan<0?"dn":"up"),
+     tag:"利润率8%·就业弹性0.5 假设"},
+    {l:"📊 加权利润冲击指数",v:(m.w_profit_pct>=0?"+":"")+m.w_profit_pct+"%",
+     c:(m.w_profit_pct<0?"dn":"up"),tag:"按增加值权重"},
+    {l:"⚠️ 综合风险等级",v:m.risk_tier,cls:"riskcard",
+     tag:"按负向 GDP 当量: "+(m.gdp_neg_pt>=0.15?"≥0.15pt":(m.gdp_neg_pt>=0.06?"0.06–0.15pt":"<0.06pt"))}];
+  cards.forEach(function(c){
+    const el=document.createElement("div");el.className="kpi "+(c.cls||"");
+    el.innerHTML='<div class="lbl">'+c.l+'</div><div class="val '+(c.c||"")+
+      ' '+(c.l.indexOf("风险")>=0?tierCls(c.v):"")+'">'+c.v+
+      '</div><div class="tag">'+esc(c.tag)+'</div>';
+    box.appendChild(el);
+  });
+}
 function renderMinis(){
-  const p0=PRESETS.find(function(x){return x.key===active});
-  const r=p0.returns, box=document.getElementById("minis"); box.innerHTML="";
+  const r=CUR.returns,box=document.getElementById("minis");box.innerHTML="";
   const items=[["📈 A股加权年化",r.equity,"%"],["🏦 中国国债年化",r.bond,"%"],
     ["🥇 黄金(人民币计价)",r.gold,"%"],["🧱 工业金属年化",r.metal,"%"]];
   items.forEach(function(it){
-    const sgn=it[1]>=0?"up":"dn"; const el=document.createElement("div");
+    const sgn=it[1]>=0?"up":"dn",el=document.createElement("div");
     el.className="mini";
     el.innerHTML='<div class="lbl">'+it[0]+'</div><div class="val '+sgn+'">'+
       (it[1]>=0?"+":"")+it[1]+it[2]+'</div>';
@@ -180,49 +264,45 @@ function renderMinis(){
   });
 }
 function renderFX(){
-  const p0=PRESETS.find(function(x){return x.key===active});
-  const med=p0.fx_median, lo=p0.fx_lo, hi=p0.fx_hi;
+  const p=CUR,med=p.fx_median,lo=p.fx_lo,hi=p.fx_hi;
   const all=lo.concat(hi).concat(med);
-  const ymin=Math.min.apply(null,all)*0.995, ymax=Math.max.apply(null,all)*1.005;
-  const x=function(t){return PAD.l+t*(W-PAD.l-PAD.r)/5};
-  const y=function(v){return PAD.t+(ymax-v)*(H-PAD.t-PAD.b)/(ymax-ymin)};
+  const ymin=Math.min.apply(null,all)*0.995,ymax=Math.max.apply(null,all)*1.005;
+  const x=function(t){return PAD.l+t*(W-PAD.l-PAD.r)/5;};
+  const y=function(v){return PAD.t+(ymax-v)*(H-PAD.t-PAD.b)/(ymax-ymin);};
   const svg=newSVG(W,H);
   for(let t=0;t<=5;t++){
     svg.appendChild(svgEl("line",{x1:x(t),y1:PAD.t,x2:x(t),y2:H-PAD.b,
       stroke:"#e5e9f0","stroke-width":1}));
     const tx=svgEl("text",{x:x(t),y:H-PAD.b+16,"font-size":11,fill:"#6b7280",
-      "text-anchor":"middle"}); tx.textContent="Y"+t; svg.appendChild(tx);
-  }
+      "text-anchor":"middle"});tx.textContent="Y"+t;svg.appendChild(tx);}
   for(let i=0;i<=4;i++){
     const g=svgEl("text",{x:PAD.l-8,y:y(ymin+(ymax-ymin)*i/4)+4,"font-size":10,
       fill:"#6b7280","text-anchor":"end"});
-    g.textContent=(ymin+(ymax-ymin)*i/4).toFixed(2); svg.appendChild(g);
-  }
+    g.textContent=(ymin+(ymax-ymin)*i/4).toFixed(2);svg.appendChild(g);}
   const band=svgEl("polygon",{fill:"#2563eb",opacity:0.15});
   let pts="";
   for(let t=0;t<=5;t++){pts+=x(t)+","+y(hi[t])+" ";}
   for(let t=5;t>=0;t--){pts+=x(t)+","+y(lo[t])+" ";}
-  band.setAttribute("points",pts); svg.appendChild(band);
+  band.setAttribute("points",pts);svg.appendChild(band);
   let line="";
   for(let t=0;t<=5;t++){line+=(t?",":"")+x(t)+","+y(med[t]);}
   svg.appendChild(svgEl("polyline",{points:line,fill:"none",stroke:"#2563eb",
     "stroke-width":2.4,"stroke-linejoin":"round"}));
   svg.appendChild(svgEl("circle",{cx:x(5),cy:y(med[5]),r:3.4,fill:"#d97706"}));
   const lb=svgEl("text",{x:x(5)+8,y:y(med[5])+4,"font-size":11.5,fill:"#d97706",
-    "font-weight":700}); lb.textContent=med[5].toFixed(3); svg.appendChild(lb);
+    "font-weight":700});lb.textContent=med[5].toFixed(3);svg.appendChild(lb);
   document.getElementById("fxchart").innerHTML="";
   document.getElementById("fxchart").appendChild(svg);
 }
 function renderWaterfall(){
-  const p0=PRESETS.find(function(x){return x.key===active});
-  const w=p0.waterfall;
+  const p=CUR,w=p.waterfall;
   const vals=[w.loss,w.inflow,w.deepening,w.net];
   const labels=["出口损失","融资红利","资本深化","净效益"];
   const colors=["#dc2626","#059669","#059669","#d97706"];
-  const vmax=Math.max.apply(null,vals.map(function(v){return Math.abs(v)}));
-  const y1=vmax*1.35, y0=-Math.max(Math.abs(Math.min.apply(null,vals))*1.25,0.3);
-  const x=function(i){return PAD2.l+(i+0.5)*(W2-PAD2.l-PAD2.r)/4};
-  const y=function(v){return PAD2.t+(y1-v)*(H2-PAD2.t-PAD2.b)/(y1-y0)};
+  const vmax=Math.max.apply(null,vals.map(function(v){return Math.abs(v);}));
+  const y1=vmax*1.35,y0=-Math.max(Math.abs(Math.min.apply(null,vals))*1.25,0.3);
+  const x=function(i){return PAD2.l+(i+0.5)*(W2-PAD2.l-PAD2.r)/4;};
+  const y=function(v){return PAD2.t+(y1-v)*(H2-PAD2.t-PAD2.b)/(y1-y0);};
   const svg=newSVG(W2,H2);
   svg.appendChild(svgEl("line",{x1:PAD2.l,y1:y(0),x2:W2-PAD2.r,y2:y(0),
     stroke:"#cbd5e1","stroke-dasharray":"3 3"}));
@@ -230,57 +310,121 @@ function renderWaterfall(){
   let acc=0;
   vals.forEach(function(v,i){
     let base=0;
-    if(i<3){base=acc; acc+=v;}
+    if(i<3){base=acc;acc+=v;}
     const top=v>=0?base+v:base;
     svg.appendChild(svgEl("rect",{x:x(i)-bw/2,y:y(top),width:bw,
       height:Math.max(y(base)-y(top),1),fill:colors[i],rx:3,opacity:0.92}));
     const t=svgEl("text",{x:x(i),y:v>=0?y(top)-5:y(top)+13,"font-size":10.5,
       fill:"#1f2937","font-weight":700,"text-anchor":"middle"});
-    t.textContent=(v>0?"+":"")+v.toFixed(2); svg.appendChild(t);
+    t.textContent=(v>0?"+":"")+v.toFixed(2);svg.appendChild(t);
     const lb=svgEl("text",{x:x(i),y:H2-14,"font-size":10,fill:"#6b7280",
-      "text-anchor":"middle"}); lb.textContent=labels[i]; svg.appendChild(lb);
+      "text-anchor":"middle"});lb.textContent=labels[i];svg.appendChild(lb);
   });
   document.getElementById("wfchart").innerHTML="";
   document.getElementById("wfchart").appendChild(svg);
 }
+function indListSorted(p){
+  const items=Object.keys(p.industry).map(function(k){return {k:k,v:p.industry[k]};});
+  items.sort(function(a,b){return sortAsc? a.v-b.v : b.v-a.v;});
+  return items;
+}
 function renderIndustry(){
-  const p0=PRESETS.find(function(x){return x.key===active});
-  const ind=p0.industry;
-  const items=Object.keys(ind).map(function(k){return {k:k,v:ind[k]}});
-  items.sort(function(a,b){return sortAsc? a.v-b.v : b.v-a.v});
-  const IH=items.length*24+20, IP={l:130,r:64,t:8,b:12};
-  const vmax=Math.max.apply(null,items.map(function(o){return Math.abs(o.v)}));
+  const p=CUR,items=indListSorted(p);
+  const IH=items.length*24+20,IP={l:130,r:64,t:8,b:12};
+  const vmax=Math.max.apply(null,items.map(function(o){return Math.abs(o.v);}));
   const sc=(W-IP.l-IP.r)/vmax;
   const svg=newSVG(W,IH);
   items.forEach(function(o,i){
     const yy=IP.t+i*(IH-IP.t-IP.b)/items.length+7;
     const t1=svgEl("text",{x:IP.l-8,y:yy+4,"font-size":11,fill:"#1f2937",
       "text-anchor":"end"});
-    t1.textContent=I18N_IND[o.k]||o.k; svg.appendChild(t1);
+    t1.textContent=I18N_IND[o.k]||o.k;svg.appendChild(t1);
     const xw=Math.abs(o.v)*sc;
     svg.appendChild(svgEl("rect",{x:o.v>=0?IP.l:IP.l-xw,y:yy-7,
       width:Math.max(xw,1.2),height:14,fill:o.v>=0?"#059669":"#dc2626",rx:3,
       opacity:0.88}));
     const t=svgEl("text",{x:o.v>=0?IP.l+xw+5:IP.l-xw-5,y:yy+4,"font-size":10.5,
       fill:"#1f2937","text-anchor":o.v>=0?"start":"end","font-weight":600});
-    t.textContent=(o.v>0?"+":"")+o.v+"%"; svg.appendChild(t);
+    t.textContent=(o.v>0?"+":"")+o.v+"%";svg.appendChild(t);
   });
   svg.appendChild(svgEl("line",{x1:IP.l,y1:6,x2:IP.l,y2:IH-6,
     stroke:"#cbd5e1","stroke-width":1}));
   document.getElementById("indchart").innerHTML="";
   document.getElementById("indchart").appendChild(svg);
   document.getElementById("sorthint").textContent=
-    sortAsc? "按影响升序 ↓":"按影响降序 ↑";
+    sortAsc?"按影响升序 ↓":"按影响降序 ↑";
+}
+function colorPct(v,maxAbs){
+  if(v===0)return "rgba(226,232,240,0.9)";
+  const a=Math.min(Math.abs(v)/maxAbs,1);
+  if(v>0)return "rgba(5,150,105,"+(0.12+0.78*a).toFixed(2)+")";
+  return "rgba(220,38,38,"+(0.12+0.78*a).toFixed(2)+")";
+}
+function renderHeat(){
+  const p=CUR,ser=p.ind_series,box=document.getElementById("hmchart");
+  const keys=Object.keys(ser);
+  const yrs=ser[keys[0]]?ser[keys[0]].length:0;
+  let maxAbs=1;
+  keys.forEach(function(k){ser[k].forEach(function(v){if(Math.abs(v)>maxAbs)maxAbs=Math.abs(v);});});
+  let html='<table class="hm"><tr><th class="rl">行业 \ Y</th>';
+  for(let y=1;y<=yrs;y++)html+="<th>Y"+y+"</th>";
+  html+="</tr>";
+  const order=[];
+  Object.keys(I18N_IND).forEach(function(k){if(keys.indexOf(k)>=0)order.push(k);});
+  keys.forEach(function(k){if(order.indexOf(k)<0)order.push(k);});
+  order.forEach(function(k){
+    html+='<tr><td class="rl">'+(I18N_IND[k]||k)+'</td>';
+    ser[k].forEach(function(v){
+      const show=Math.abs(v)>=0.5;
+      html+='<td><div class="cell" style="background:'+colorPct(v,maxAbs)+'">'+
+        (show?((v>0?"+":"")+v.toFixed(1)):"")+'</div></td>';
+    });
+    html+="</tr>";
+  });
+  html+="</table>";
+  box.innerHTML=html;
+}
+function renderOutlook(){
+  const o=DASH_DATA.outlook||{rows:[],events:[]},box=document.getElementById("outlooktab");
+  let html='<table class="otbl"><tr><th>年份</th><th>最可能年末 USD/CNY</th><th>年变动 (升值+)</th><th>大概率区间</th><th>每 1 万美元人民币值变动</th><th>节奏</th></tr>';
+  o.rows.forEach(function(r){
+    const cls=r.pace.indexOf("加速")>=0?"tier-high":(r.pace.indexOf("趋缓")>=0||r.pace.indexOf("贬值")>=0?"tier-mid":"tier-low");
+    html+="<tr><td>"+r.year+"</td><td><b>"+r.level.toFixed(3)+"</b></td><td class='"+
+      (r.chg_pct>=0?"up":"dn")+"'>"+r.chg_pct.toFixed(2)+"%</td><td>"+
+      r.band_lo.toFixed(3)+" ~ "+r.band_hi.toFixed(3)+"</td><td>"+
+      (r.usd10k_cny>0?"+":"")+r.usd10k_cny.toFixed(0)+" 元</td><td><span class='"+cls+"'>"+
+      r.pace+"</span></td></tr>";
+  });
+  html+="</table>";
+  box.innerHTML=html;
+  const nb=document.getElementById("outlooknews");
+  if(o.events&&o.events.length){
+    nb.innerHTML="新闻/事件权重: "+o.events.map(function(e){
+      return "<span class='ev "+((e.direction||"").indexOf("+")>=0?"evp":"evm")+"'>"+
+        esc(e.name)+" ("+((e.impact*100)>=0?"+":"")+(e.impact*100).toFixed(1)+"pp)</span>";
+    }).join(" ");
+  }
 }
 function renderAll(){
-  renderMeta();renderKPIs();renderMinis();renderFX();renderWaterfall();renderIndustry();
+  renderMeta();renderKPIs();renderMacro();renderMinis();renderFX();
+  renderWaterfall();renderIndustry();renderHeat();renderOutlook();
 }
+function onSlider(){
+  const v=parseFloat(document.getElementById("rateSlider").value);
+  const idx=Math.max(0,Math.min(GRID.length-1,Math.round(v/0.5)));
+  customRate=idx;
+  CUR=GRID[idx];
+  document.getElementById("sliderVal").textContent=CUR.rate_pct.toFixed(1)+"%";
+  renderChips();renderAll();
+}
+document.getElementById("rateSlider").addEventListener("input",onSlider);
 document.getElementById("sorthint").onclick=function(){sortAsc=!sortAsc;renderIndustry();};
 document.getElementById("gen").textContent=DASH_DATA.generated;
-var LV=DASH_DATA.live||{}; document.getElementById("liveinfo").textContent=
-  (LV.live? "当日抓取":"离线缓存")+" · USD/CNY "+LV.spot+" · 波动率(3y) "+
+var LV=DASH_DATA.live||{};
+document.getElementById("liveinfo").textContent=
+  (LV.live?"当日抓取":"离线缓存")+" · USD/CNY "+LV.spot+" · 波动率(3y) "+
   (LV.vol3y*100).toFixed(2)+"%"+" · 惯性升值 "+(LV.inertia_apprec*100).toFixed(2)+
-  "%"+(LV.as_of? " · FX数据截至 "+LV.as_of:"")+(LV.live?"":" · "+LV.note);
+  "%"+(LV.as_of?" · FX数据截至 "+LV.as_of:"")+(LV.live?"":" · "+LV.note);
 renderChips();renderAll();
 </script>
 </body>

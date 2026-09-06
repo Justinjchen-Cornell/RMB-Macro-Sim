@@ -1,0 +1,62 @@
+# ────────────────────────────────────────────────────────────
+# 新闻/事件观察表 (用于年度汇率展望 outlook.py)
+# 维护: 按国内外新闻与政策事件增删条目。
+# 字段:
+#   name       事件名 (展示用)
+#   date       发生/观测日期
+#   direction  + = 推动人民币升值 | - = 推动贬值
+#   impact     年度漂移贡献 (小数, 如 0.010 = +1个百分点/年)
+#   start_year 生效起始年 (1 = 2026)
+#   end_year   全效截止年 (此后一年线性衰减)
+#   source     信源/依据 (可追溯)
+# ────────────────────────────────────────────────────────────
+events:
+  - name: 美元流动性稀缺窗口 (向心坍缩 Q4'26-Q1'27)
+    date: 2026-09-01
+    direction: "+"
+    impact: 0.012
+    start_year: 1
+    end_year: 2
+    source: Deep-Risk-OPP 资本三流框架 / GOR 周报 #004-005
+  - name: 弱美元强货币财政剧本 (Bessent 防火墙)
+    date: 2026-08-23
+    direction: "+"
+    impact: 0.008
+    start_year: 1
+    end_year: 3
+    source: 美债 $40T 稀释叙事 / LinkedIn 市场展望 (2026-08-23)
+  - name: 人民币资产重估叙事 + 外资预强策略
+    date: 2026-09-01
+    direction: "+"
+    impact: 0.006
+    start_year: 1
+    end_year: 3
+    source: 卢麒元 人民币资产重估框架 / 宏观研究观点
+  - name: 美债长端高位 (30Y 5.25%) -> 美联储宽松/购债压力
+    date: 2026-09-05
+    direction: "+"
+    impact: 0.004
+    start_year: 1
+    end_year: 2
+    source: FRED DGS30 / Deep-Risk-OPP daily 2026-09-05
+  - name: 速冻期短期美元回流风险 (VIX 跳升/全球去杠杆)
+    date: 2026-09-05
+    direction: "-"
+    impact: -0.006
+    start_year: 1
+    end_year: 1
+    source: 向心坍缩三阶段预案 / VIX 14.3 低波动警示
+  - name: 北向资金历史常态支撑 (2015-23 年均流入 0.19T RMB)
+    date: 2026-09-01
+    direction: "+"
+    impact: 0.002
+    start_year: 1
+    end_year: 5
+    source: akshare 北向历史校准 (2024-08 后黑暗期, 审慎)
+  - name: 日美协调干预/联储鹰派反扑
+    date: 2026-08-15
+    direction: "-"
+    impact: -0.004
+    start_year: 1
+    end_year: 1
+    source: 日元干预分析报告 (2026-07) / Jackson Hole 沃什表态

@@ -61,6 +61,43 @@ svg{width:100%;height:auto;display:block}
   font-size:11.5px;color:var(--muted);line-height:1.7}
 .mono{font-family:"Cascadia Mono",Consolas,monospace;font-size:11px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+.sliderwrap{display:flex;align-items:center;gap:12px;background:var(--card);
+  border:1px solid var(--line);border-radius:999px;padding:6px 16px;margin:6px 0 12px;
+  box-shadow:var(--shadow);flex-wrap:wrap}
+.sliderwrap label{font-size:12.5px;font-weight:600;white-space:nowrap}
+.sliderwrap input[type=range]{flex:1;min-width:180px;accent-color:var(--blue)}
+.sliderwrap .val{font-size:15px;font-weight:800;color:var(--blue);min-width:64px;
+  text-align:right;font-variant-numeric:tabular-nums}
+.sliderwrap .note{font-size:11px;color:var(--muted)}
+.tagchip{font-size:11px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;
+  padding:2px 8px;border-radius:999px}
+.hm{width:100%;border-collapse:collapse;font-size:10.5px}
+.hm th{font-weight:600;color:var(--muted);padding:3px 6px;text-align:center;
+  border-bottom:1px solid var(--line2)}
+.hm td{padding:0;text-align:center}
+.hm .rl{text-align:right;padding-right:8px;color:var(--ink);font-weight:500;
+  white-space:nowrap}
+.hm .cell{border-radius:4px;padding:4px 2px;font-variant-numeric:tabular-nums;
+  color:#1f2937}
+.hm .cell b{font-weight:600}
+.legbar{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);
+  margin-top:6px}
+.legbar .grad{height:8px;flex:1;max-width:220px;border-radius:99px;
+  background:linear-gradient(90deg,#dc2626,#f3f4f6,#059669)}
+.riskcard{border-top:3px solid var(--gold)}
+.tier-high{color:#dc2626;font-weight:800}
+.tier-mid{color:#d97706;font-weight:800}
+.tier-low{color:#059669;font-weight:800}
+
+.otbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:4px}
+.otbl th{text-align:left;color:var(--muted);font-weight:600;border-bottom:1.4px solid var(--line2);padding:7px 8px}
+.otbl td{border-bottom:1px solid var(--line);padding:8px;font-variant-numeric:tabular-nums}
+.otbl tr:hover td{background:#f8fafc}
+.ev{display:inline-block;font-size:10.5px;border-radius:999px;padding:3px 10px;margin:2px 4px 2px 0}
+.evp{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
+.evm{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+#outlooknews{margin-top:8px;font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -71,9 +108,18 @@ svg{width:100%;height:auto;display:block}
 <div class="disc">传导链: 汇率 GBM → 输入性通胀 → 出口(Marshall-Lerner) → 11 行业利润 → 资产定价 + 资本流入(融资红利·资本深化)。</div>
 
 <div class="chips" id="chips"></div>
+
+<div class="sliderwrap">
+  <label>🎚️ 升值幅度(年化,拖动实时联动)</label>
+  <input type="range" id="rateSlider" min="0" max="10" step="0.5" value="6">
+  <div class="val" id="sliderVal">6.0%</div>
+  <span class="note">0–10% · 步长0.5% · 600次MC/档 · 松开即显示风险当量</span>
+</div>
 <div class="meta" id="meta"></div>
 
+
 <div class="kpis" id="kpis"></div>
+<div class="kpis" id="mackpis"></div>
 
 <div class="grid">
   <div class="panel">
@@ -92,6 +138,15 @@ svg{width:100%;height:auto;display:block}
   </div>
 </div>
 
+
+<div class="panel full" style="margin-top:14px">
+  <h3>🔮 年度展望: 最可能的人民币升贬路径 <span class="badge" style="margin-left:auto">模型结果 × 国内外新闻事件</span></h3>
+  <div class="hint">最可能幅度 = 现实惯性(FRED 实测) + 新闻/事件评分(见 news_watch.yaml, 可增删);
+  区间为近似 25-75%; "金额"按每 1 万美元等值人民币变动展示</div>
+  <div id="outlooktab"></div>
+  <div id="outlooknews"></div>
+</div>
+
 <div class="row2" id="minis"></div>
 
 <div class="panel full">
@@ -102,7 +157,15 @@ svg{width:100%;height:auto;display:block}
   <div id="indchart"></div>
 </div>
 
+
+<div class="panel full" style="margin-top:14px">
+  <h3>🗺️ 行业 × 年份 冲击热力图 <span class="sorthint" id="hmnote" style="margin-left:auto;cursor:default">Y1–Y5 累计利润冲击(%)</span></h3>
+  <div class="hint">行=行业 · 列=年份(累计升值加深) · 颜色深浅=冲击强度</div>
+  <div id="hmchart"></div>
+  <div class="legbar"><span>受损 -40%</span><div class="grad"></div><span>中性 0</span><div class="grad" style="background:linear-gradient(90deg,#f3f4f6,#059669);max-width:110px"></div><span>受益 +40%</span></div>
+</div>
 <div class="foot">
+
   <div>⚠️ 免责声明: 研究框架, 不构成投资建议。参数为校准假设, 情景为概率模拟而非预测。</div>
   <div>📊 数据源: FRED / 腾讯行情 / akshare(北向), 截至 2026-09 ｜ 生成时间: <span id="gen"></span></div>
   <div class="small">🔁 实时校准: <span id="liveinfo">—</span></div>
@@ -111,530 +174,6371 @@ svg{width:100%;height:auto;display:block}
 
 <script>
 const DASH_DATA = {
- "generated": "2026-09-06 08:37",
+ "generated": "2026-09-06 16:50",
  "n_simulations": 2000,
- "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。",
+ "grid_n": 600,
+ "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。GDP/就业为利润冲击的当量近似(利润率8%、就业弹性0.5), 非预测。",
+ "macro_meta": {
+  "margin": 0.08,
+  "emp_elast": 0.5,
+  "urban_emp_wan": 46000.0,
+  "note": "GDP当量 = 增加值权重×利润冲击×利润率; 就业当量 = 就业权重×冲击×弹性"
+ },
  "presets": [
   {
-   "key": "p0",
-   "label": "不升值 0%",
-   "note": "基准参数, 汇率零漂移对照",
    "fx_median": [
-    6.7108,
-    6.7166,
-    6.7157,
-    6.6968,
-    6.6901,
-    6.6969
+    7.2,
+    7.2071,
+    7.204,
+    7.1738,
+    7.162,
+    7.1707
    ],
    "fx_lo": [
-    6.7108,
-    6.5905,
-    6.5322,
-    6.4753,
-    6.4321,
-    6.4135
+    7.2,
+    7.0173,
+    6.9284,
+    6.842,
+    6.7762,
+    6.7471
    ],
    "fx_hi": [
-    6.7108,
-    6.8395,
-    6.8929,
-    6.9366,
-    6.962,
-    6.9775
+    7.2,
+    7.3935,
+    7.4733,
+    7.5383,
+    7.5754,
+    7.5974
    ],
-   "fx_5y": 6.697,
-   "apprec_5y_pct": 0.2,
+   "fx_5y": 7.171,
+   "apprec_5y_pct": 0.4,
    "industry": {
-    "export_lowend": 0.3,
-    "export_hightech": 0.4,
+    "export_lowend": 0.1,
+    "export_hightech": 0.3,
     "domestic_consumption": 0.0,
     "real_estate": 0.1,
-    "infrastructure": 0.0,
+    "infrastructure": 0.1,
     "new_energy": -0.0,
     "semiconductor": 0.1,
-    "commodity_metals": 0.1,
-    "power_compute": 0.1,
-    "gold": 0.1,
-    "bank_insurance": 0.0
+    "commodity_metals": 0.3,
+    "power_compute": 0.2,
+    "gold": 0.2,
+    "bank_insurance": 0.1
+   },
+   "ind_series": {
+    "export_lowend": [
+     0.38,
+     0.4,
+     0.1,
+     -0.02,
+     0.07
+    ],
+    "export_hightech": [
+     0.53,
+     0.5,
+     0.35,
+     0.29,
+     0.33
+    ],
+    "domestic_consumption": [
+     -0.16,
+     -0.11,
+     0.01,
+     0.04,
+     0.02
+    ],
+    "real_estate": [
+     0.02,
+     0.02,
+     0.09,
+     0.12,
+     0.09
+    ],
+    "infrastructure": [
+     0.03,
+     0.02,
+     0.05,
+     0.06,
+     0.05
+    ],
+    "new_energy": [
+     0.05,
+     0.03,
+     -0.02,
+     -0.04,
+     -0.03
+    ],
+    "semiconductor": [
+     0.02,
+     0.02,
+     0.11,
+     0.14,
+     0.12
+    ],
+    "commodity_metals": [
+     0.18,
+     0.12,
+     0.24,
+     0.29,
+     0.25
+    ],
+    "power_compute": [
+     0.19,
+     0.13,
+     0.18,
+     0.21,
+     0.19
+    ],
+    "gold": [
+     0.18,
+     0.12,
+     0.22,
+     0.26,
+     0.23
+    ],
+    "bank_insurance": [
+     0.03,
+     0.02,
+     0.05,
+     0.06,
+     0.05
+    ]
+   },
+   "macro": {
+    "w_profit_pct": 0.06,
+    "gdp_cum_pt": 0.005,
+    "gdp_neg_pt": 0,
+    "gdp_pos_pt": 0.005,
+    "emp_exposed_wan": 12.0,
+    "risk_tier": "低",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": 0.00048,
+      "emp_wan": 2.07
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": 0.00192,
+      "emp_wan": 4.14
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.0,
+      "emp_wan": 0.0
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.0005200000000000001,
+      "emp_wan": 1.61
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.0004000000000000001,
+      "emp_wan": 1.3800000000000001
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0,
+      "emp_wan": -0.0
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 9.600000000000002e-05,
+      "emp_wan": 0.184
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.0005279999999999999,
+      "emp_wan": 1.035
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.0005600000000000001,
+      "emp_wan": 0.92
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 3.2000000000000005e-05,
+      "emp_wan": 0.046
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.00048,
+      "emp_wan": 0.5750000000000001
+     }
+    }
    },
    "waterfall": {
-    "loss": 0.006,
-    "inflow": 1.849,
+    "loss": 0.004,
+    "inflow": 1.851,
     "deepening": 0.728,
     "net": 2.583
    },
    "returns": {
     "equity": 8.0,
-    "bond": -1.2,
+    "bond": -1.5,
     "gold": 2.9,
     "metal": 3.4
-   }
+   },
+   "key": "p0",
+   "label": "不升值 0%",
+   "note": "基准参数, 汇率零漂移对照"
   },
   {
-   "key": "p3",
-   "label": "慢速升值 3%",
-   "note": "基准参数, 温和升值",
    "fx_median": [
-    6.7108,
-    6.5181,
-    6.3246,
-    6.1204,
-    5.9336,
-    5.7641
+    7.2,
+    6.9941,
+    6.7845,
+    6.5564,
+    6.3522,
+    6.1719
    ],
    "fx_lo": [
-    6.7108,
-    6.3957,
-    6.1518,
-    5.918,
-    5.7048,
-    5.5202
+    7.2,
+    6.8099,
+    6.5249,
+    6.2531,
+    6.01,
+    5.8073
    ],
    "fx_hi": [
-    6.7108,
-    6.6373,
-    6.4915,
-    6.3396,
-    6.1747,
-    6.0056
+    7.2,
+    7.175,
+    7.0381,
+    6.8895,
+    6.7188,
+    6.5392
    ],
-   "fx_5y": 5.764,
-   "apprec_5y_pct": 16.4,
+   "fx_5y": 6.172,
+   "apprec_5y_pct": 16.7,
    "industry": {
-    "export_lowend": -12.5,
-    "export_hightech": -4.9,
+    "export_lowend": -12.7,
+    "export_hightech": -5.0,
     "domestic_consumption": 3.0,
-    "real_estate": 3.1,
+    "real_estate": 3.2,
     "infrastructure": 1.5,
     "new_energy": -1.8,
     "semiconductor": 4.0,
-    "commodity_metals": 6.6,
+    "commodity_metals": 6.7,
     "power_compute": 4.2,
-    "gold": 5.8,
+    "gold": 5.9,
     "bank_insurance": 1.5
    },
+   "ind_series": {
+    "export_lowend": [
+     -1.83,
+     -4.2,
+     -7.1,
+     -9.96,
+     -12.67
+    ],
+    "export_hightech": [
+     -0.52,
+     -1.6,
+     -2.81,
+     -3.94,
+     -4.99
+    ],
+    "domestic_consumption": [
+     0.56,
+     1.27,
+     1.95,
+     2.5,
+     3.0
+    ],
+    "real_estate": [
+     0.55,
+     1.12,
+     1.82,
+     2.52,
+     3.18
+    ],
+    "infrastructure": [
+     0.26,
+     0.51,
+     0.84,
+     1.18,
+     1.52
+    ],
+    "new_energy": [
+     -0.33,
+     -0.72,
+     -1.12,
+     -1.48,
+     -1.82
+    ],
+    "semiconductor": [
+     0.7,
+     1.42,
+     2.31,
+     3.19,
+     4.01
+    ],
+    "commodity_metals": [
+     1.14,
+     2.22,
+     3.71,
+     5.26,
+     6.75
+    ],
+    "power_compute": [
+     0.7,
+     1.31,
+     2.23,
+     3.25,
+     4.25
+    ],
+    "gold": [
+     0.99,
+     1.92,
+     3.22,
+     4.59,
+     5.91
+    ],
+    "bank_insurance": [
+     0.26,
+     0.51,
+     0.84,
+     1.18,
+     1.52
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.12,
+    "gdp_cum_pt": -0.01,
+    "gdp_neg_pt": -0.097,
+    "gdp_pos_pt": 0.087,
+    "emp_exposed_wan": -111.6,
+    "risk_tier": "中",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.06095999999999999,
+      "emp_wan": -262.88999999999993
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.032,
+      "emp_wan": -69.0
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.0288,
+      "emp_wan": 96.60000000000001
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.016640000000000002,
+      "emp_wan": 51.52
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.006000000000000001,
+      "emp_wan": 20.7
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0036000000000000003,
+      "emp_wan": -8.280000000000001
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.00384,
+      "emp_wan": 7.36
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.011792,
+      "emp_wan": 23.114999999999995
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.011760000000000001,
+      "emp_wan": 19.32
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.0009440000000000002,
+      "emp_wan": 1.3570000000000002
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.0072,
+      "emp_wan": 8.625000000000002
+     }
+    }
+   },
    "waterfall": {
-    "loss": -0.139,
-    "inflow": 2.001,
+    "loss": -0.141,
+    "inflow": 2.003,
     "deepening": 0.771,
-    "net": 2.632
+    "net": 2.633
    },
    "returns": {
     "equity": 8.1,
     "bond": -0.7,
-    "gold": -4.8,
+    "gold": -4.7,
     "metal": 2.0
-   }
+   },
+   "key": "p3",
+   "label": "慢速升值 3%",
+   "note": "基准参数, 温和升值"
   },
   {
-   "key": "p6",
-   "label": "基准情景 6%",
-   "note": "基准参数 (config.yaml), 政策驱动升值",
    "fx_median": [
-    6.7108,
-    6.3255,
-    5.9563,
-    5.5936,
-    5.2626,
-    4.9612
+    7.2,
+    6.7874,
+    6.3894,
+    5.9921,
+    5.6339,
+    5.3122
    ],
    "fx_lo": [
-    6.7108,
-    6.2067,
-    5.7936,
-    5.4086,
-    5.0597,
-    4.7513
+    7.2,
+    6.6086,
+    6.145,
+    5.7149,
+    5.3304,
+    4.9984
    ],
    "fx_hi": [
-    6.7108,
-    6.4412,
-    6.1135,
-    5.794,
-    5.4765,
-    5.1691
+    7.2,
+    6.9629,
+    6.6282,
+    6.2965,
+    5.9591,
+    5.6283
    ],
-   "fx_5y": 4.961,
-   "apprec_5y_pct": 35.3,
+   "fx_5y": 5.312,
+   "apprec_5y_pct": 35.5,
    "industry": {
-    "export_lowend": -27.9,
-    "export_hightech": -10.9,
+    "export_lowend": -28.1,
+    "export_hightech": -11.0,
     "domestic_consumption": 5.8,
-    "real_estate": 6.9,
+    "real_estate": 7.0,
     "infrastructure": 3.4,
     "new_energy": -3.7,
     "semiconductor": 8.7,
-    "commodity_metals": 15.1,
-    "power_compute": 9.8,
-    "gold": 13.4,
+    "commodity_metals": 15.2,
+    "power_compute": 9.9,
+    "gold": 13.5,
     "bank_insurance": 3.4
    },
+   "ind_series": {
+    "export_lowend": [
+     -4.13,
+     -9.42,
+     -15.53,
+     -21.78,
+     -28.1
+    ],
+    "export_hightech": [
+     -1.6,
+     -3.73,
+     -6.1,
+     -8.53,
+     -10.98
+    ],
+    "domestic_consumption": [
+     1.3,
+     2.4,
+     3.52,
+     4.67,
+     5.83
+    ],
+    "real_estate": [
+     1.1,
+     2.39,
+     3.88,
+     5.41,
+     6.96
+    ],
+    "infrastructure": [
+     0.49,
+     1.12,
+     1.87,
+     2.63,
+     3.4
+    ],
+    "new_energy": [
+     -0.72,
+     -1.42,
+     -2.17,
+     -2.93,
+     -3.7
+    ],
+    "semiconductor": [
+     1.4,
+     3.02,
+     4.89,
+     6.8,
+     8.73
+    ],
+    "commodity_metals": [
+     2.16,
+     4.96,
+     8.32,
+     11.76,
+     15.24
+    ],
+    "power_compute": [
+     1.25,
+     3.06,
+     5.3,
+     7.59,
+     9.91
+    ],
+    "gold": [
+     1.85,
+     4.32,
+     7.31,
+     10.37,
+     13.46
+    ],
+    "bank_insurance": [
+     0.49,
+     1.12,
+     1.87,
+     2.63,
+     3.4
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.32,
+    "gdp_cum_pt": -0.026,
+    "gdp_neg_pt": -0.213,
+    "gdp_pos_pt": 0.187,
+    "emp_exposed_wan": -267.5,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.13488,
+      "emp_wan": -581.67
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.0704,
+      "emp_wan": -151.79999999999998
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.05568,
+      "emp_wan": 186.76000000000002
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.0364,
+      "emp_wan": 112.70000000000002
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.013600000000000001,
+      "emp_wan": 46.919999999999995
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.007400000000000001,
+      "emp_wan": -17.020000000000003
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.008352,
+      "emp_wan": 16.008
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.026751999999999998,
+      "emp_wan": 52.44
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.02772,
+      "emp_wan": 45.54
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.00216,
+      "emp_wan": 3.105
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.016319999999999998,
+      "emp_wan": 19.55
+     }
+    }
+   },
    "waterfall": {
-    "loss": -0.31,
-    "inflow": 2.171,
-    "deepening": 0.817,
-    "net": 2.679
+    "loss": -0.312,
+    "inflow": 2.173,
+    "deepening": 0.818,
+    "net": 2.678
    },
    "returns": {
     "equity": 8.2,
     "bond": -0.7,
     "gold": -5.0,
     "metal": 2.0
-   }
+   },
+   "key": "p6",
+   "label": "基准情景 6%",
+   "note": "基准参数 (config.yaml), 政策驱动升值"
   },
   {
-   "key": "p10",
-   "label": "快速升值 10%",
-   "note": "激进升值, 转型加速情景",
    "fx_median": [
-    6.7108,
-    6.0774,
-    5.4983,
-    4.9611,
-    4.4845,
-    4.0619
+    7.2,
+    6.5213,
+    5.8982,
+    5.3145,
+    4.8009,
+    4.3493
    ],
    "fx_lo": [
-    6.7108,
-    5.9633,
-    5.3481,
-    4.797,
-    4.3116,
-    3.89
+    7.2,
+    6.3495,
+    5.6725,
+    5.0687,
+    4.5422,
+    4.0923
    ],
    "fx_hi": [
-    6.7108,
-    6.1886,
-    5.6435,
-    5.1388,
-    4.6668,
-    4.2321
+    7.2,
+    6.6899,
+    6.1186,
+    5.5845,
+    5.078,
+    4.6081
    ],
-   "fx_5y": 4.062,
-   "apprec_5y_pct": 65.2,
+   "fx_5y": 4.349,
+   "apprec_5y_pct": 65.5,
    "industry": {
     "export_lowend": -30.0,
-    "export_hightech": -20.4,
+    "export_hightech": -20.5,
     "domestic_consumption": 10.3,
-    "real_estate": 12.9,
+    "real_estate": 13.0,
     "infrastructure": 6.4,
     "new_energy": -6.7,
     "semiconductor": 16.2,
-    "commodity_metals": 28.6,
-    "power_compute": 18.8,
-    "gold": 25.3,
+    "commodity_metals": 28.7,
+    "power_compute": 18.9,
+    "gold": 25.5,
     "bank_insurance": 6.4
    },
+   "ind_series": {
+    "export_lowend": [
+     -7.56,
+     -17.09,
+     -28.05,
+     -30.0,
+     -30.0
+    ],
+    "export_hightech": [
+     -3.0,
+     -6.71,
+     -10.96,
+     -15.57,
+     -20.51
+    ],
+    "domestic_consumption": [
+     2.06,
+     3.81,
+     5.82,
+     8.0,
+     10.33
+    ],
+    "real_estate": [
+     1.93,
+     4.26,
+     6.95,
+     9.84,
+     12.96
+    ],
+    "infrastructure": [
+     0.89,
+     2.06,
+     3.4,
+     4.85,
+     6.4
+    ],
+    "new_energy": [
+     -1.19,
+     -2.36,
+     -3.7,
+     -5.15,
+     -6.7
+    ],
+    "semiconductor": [
+     2.45,
+     5.37,
+     8.72,
+     12.34,
+     16.24
+    ],
+    "commodity_metals": [
+     3.93,
+     9.18,
+     15.22,
+     21.74,
+     28.75
+    ],
+    "power_compute": [
+     2.37,
+     5.87,
+     9.89,
+     14.24,
+     18.91
+    ],
+    "gold": [
+     3.41,
+     8.08,
+     13.44,
+     19.24,
+     25.47
+    ],
+    "bank_insurance": [
+     0.89,
+     2.06,
+     3.4,
+     4.85,
+     6.4
+    ]
+   },
+   "macro": {
+    "w_profit_pct": 0.72,
+    "gdp_cum_pt": 0.057,
+    "gdp_neg_pt": -0.289,
+    "gdp_pos_pt": 0.346,
+    "emp_exposed_wan": -47.0,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.144,
+      "emp_wan": -620.9999999999999
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.1312,
+      "emp_wan": -282.9
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.09888,
+      "emp_wan": 331.66
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.0676,
+      "emp_wan": 209.30000000000004
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.025600000000000005,
+      "emp_wan": 88.32000000000001
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0134,
+      "emp_wan": -30.82
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.015552,
+      "emp_wan": 29.807999999999996
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.050512,
+      "emp_wan": 99.015
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.05292,
+      "emp_wan": 86.94
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.00408,
+      "emp_wan": 5.865
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.03072,
+      "emp_wan": 36.800000000000004
+     }
+    }
+   },
    "waterfall": {
-    "loss": -0.424,
+    "loss": -0.425,
     "inflow": 2.301,
     "deepening": 0.87,
-    "net": 2.747
+    "net": 2.745
    },
    "returns": {
     "equity": 8.7,
     "bond": -0.7,
     "gold": -5.0,
     "metal": 2.0
-   }
+   },
+   "key": "p10",
+   "label": "快速升值 10%",
+   "note": "激进升值, 转型加速情景"
   },
   {
+   "fx_median": [
+    7.2,
+    6.7874,
+    6.3894,
+    5.9921,
+    5.6339,
+    5.3122
+   ],
+   "fx_lo": [
+    7.2,
+    6.6086,
+    6.145,
+    5.7149,
+    5.3304,
+    4.9984
+   ],
+   "fx_hi": [
+    7.2,
+    6.9629,
+    6.6282,
+    6.2965,
+    5.9591,
+    5.6283
+   ],
+   "fx_5y": 5.312,
+   "apprec_5y_pct": 35.5,
+   "industry": {
+    "export_lowend": -28.1,
+    "export_hightech": -11.0,
+    "domestic_consumption": 5.8,
+    "real_estate": 7.0,
+    "infrastructure": 3.4,
+    "new_energy": -3.7,
+    "semiconductor": 8.7,
+    "commodity_metals": 15.2,
+    "power_compute": 9.9,
+    "gold": 13.5,
+    "bank_insurance": 3.4
+   },
+   "ind_series": {
+    "export_lowend": [
+     -4.13,
+     -9.42,
+     -15.53,
+     -21.78,
+     -28.1
+    ],
+    "export_hightech": [
+     -1.6,
+     -3.73,
+     -6.1,
+     -8.53,
+     -10.98
+    ],
+    "domestic_consumption": [
+     1.3,
+     2.4,
+     3.52,
+     4.67,
+     5.83
+    ],
+    "real_estate": [
+     1.1,
+     2.39,
+     3.88,
+     5.41,
+     6.96
+    ],
+    "infrastructure": [
+     0.49,
+     1.12,
+     1.87,
+     2.63,
+     3.4
+    ],
+    "new_energy": [
+     -0.72,
+     -1.42,
+     -2.17,
+     -2.93,
+     -3.7
+    ],
+    "semiconductor": [
+     1.4,
+     3.02,
+     4.89,
+     6.8,
+     8.73
+    ],
+    "commodity_metals": [
+     2.16,
+     4.96,
+     8.32,
+     11.76,
+     15.24
+    ],
+    "power_compute": [
+     1.25,
+     3.06,
+     5.3,
+     7.59,
+     9.91
+    ],
+    "gold": [
+     1.85,
+     4.32,
+     7.31,
+     10.37,
+     13.46
+    ],
+    "bank_insurance": [
+     0.49,
+     1.12,
+     1.87,
+     2.63,
+     3.4
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.32,
+    "gdp_cum_pt": -0.026,
+    "gdp_neg_pt": -0.213,
+    "gdp_pos_pt": 0.187,
+    "emp_exposed_wan": -267.5,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.13488,
+      "emp_wan": -581.67
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.0704,
+      "emp_wan": -151.79999999999998
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.05568,
+      "emp_wan": 186.76000000000002
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.0364,
+      "emp_wan": 112.70000000000002
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.013600000000000001,
+      "emp_wan": 46.919999999999995
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.007400000000000001,
+      "emp_wan": -17.020000000000003
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.008352,
+      "emp_wan": 16.008
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.026751999999999998,
+      "emp_wan": 52.44
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.02772,
+      "emp_wan": 45.54
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.00216,
+      "emp_wan": 3.105
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.016319999999999998,
+      "emp_wan": 19.55
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.312,
+    "inflow": 1.678,
+    "deepening": 0.624,
+    "net": 1.99
+   },
+   "returns": {
+    "equity": 8.2,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
    "key": "p6c",
    "label": "6% + 保守资本",
-   "note": "资本流入按北向历史常态 (6.5%/年, 弱美元荒)",
+   "note": "资本流入按北向历史常态 (6.5%/年, 弱美元荒)"
+  },
+  {
    "fx_median": [
-    6.7108,
-    6.3255,
-    5.9563,
-    5.5936,
-    5.2626,
-    4.9612
+    7.2,
+    6.7874,
+    6.3894,
+    5.9921,
+    5.6339,
+    5.3122
    ],
    "fx_lo": [
-    6.7108,
-    6.2067,
-    5.7936,
-    5.4086,
-    5.0597,
-    4.7513
+    7.2,
+    6.6086,
+    6.145,
+    5.7149,
+    5.3304,
+    4.9984
    ],
    "fx_hi": [
-    6.7108,
-    6.4412,
-    6.1135,
-    5.794,
-    5.4765,
-    5.1691
+    7.2,
+    6.9629,
+    6.6282,
+    6.2965,
+    5.9591,
+    5.6283
    ],
-   "fx_5y": 4.961,
-   "apprec_5y_pct": 35.3,
+   "fx_5y": 5.312,
+   "apprec_5y_pct": 35.5,
    "industry": {
-    "export_lowend": -27.9,
-    "export_hightech": -10.9,
+    "export_lowend": -28.1,
+    "export_hightech": -11.0,
     "domestic_consumption": 5.8,
-    "real_estate": 6.9,
+    "real_estate": 7.0,
     "infrastructure": 3.4,
     "new_energy": -3.7,
     "semiconductor": 8.7,
-    "commodity_metals": 15.1,
-    "power_compute": 9.8,
-    "gold": 13.4,
+    "commodity_metals": 15.2,
+    "power_compute": 9.9,
+    "gold": 13.5,
     "bank_insurance": 3.4
    },
+   "ind_series": {
+    "export_lowend": [
+     -4.13,
+     -9.42,
+     -15.53,
+     -21.78,
+     -28.1
+    ],
+    "export_hightech": [
+     -1.6,
+     -3.73,
+     -6.1,
+     -8.53,
+     -10.98
+    ],
+    "domestic_consumption": [
+     1.3,
+     2.4,
+     3.52,
+     4.67,
+     5.83
+    ],
+    "real_estate": [
+     1.1,
+     2.39,
+     3.88,
+     5.41,
+     6.96
+    ],
+    "infrastructure": [
+     0.49,
+     1.12,
+     1.87,
+     2.63,
+     3.4
+    ],
+    "new_energy": [
+     -0.72,
+     -1.42,
+     -2.17,
+     -2.93,
+     -3.7
+    ],
+    "semiconductor": [
+     1.4,
+     3.02,
+     4.89,
+     6.8,
+     8.73
+    ],
+    "commodity_metals": [
+     2.16,
+     4.96,
+     8.32,
+     11.76,
+     15.24
+    ],
+    "power_compute": [
+     1.25,
+     3.06,
+     5.3,
+     7.59,
+     9.91
+    ],
+    "gold": [
+     1.85,
+     4.32,
+     7.31,
+     10.37,
+     13.46
+    ],
+    "bank_insurance": [
+     0.49,
+     1.12,
+     1.87,
+     2.63,
+     3.4
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.32,
+    "gdp_cum_pt": -0.026,
+    "gdp_neg_pt": -0.213,
+    "gdp_pos_pt": 0.187,
+    "emp_exposed_wan": -267.5,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.13488,
+      "emp_wan": -581.67
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.0704,
+      "emp_wan": -151.79999999999998
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.05568,
+      "emp_wan": 186.76000000000002
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.0364,
+      "emp_wan": 112.70000000000002
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.013600000000000001,
+      "emp_wan": 46.919999999999995
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.007400000000000001,
+      "emp_wan": -17.020000000000003
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.008352,
+      "emp_wan": 16.008
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.026751999999999998,
+      "emp_wan": 52.44
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.02772,
+      "emp_wan": 45.54
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.00216,
+      "emp_wan": 3.105
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.016319999999999998,
+      "emp_wan": 19.55
+     }
+    }
+   },
    "waterfall": {
-    "loss": -0.31,
-    "inflow": 1.677,
-    "deepening": 0.624,
-    "net": 1.991
+    "loss": -0.312,
+    "inflow": 3.066,
+    "deepening": 1.152,
+    "net": 3.907
    },
    "returns": {
     "equity": 8.2,
     "bond": -0.7,
     "gold": -5.0,
     "metal": 2.0
-   }
-  },
-  {
+   },
    "key": "p6x",
    "label": "6% + 激进美元荒",
-   "note": "美元流动性稀缺峰值情景 (15%/年, 强美元荒)",
+   "note": "美元流动性稀缺峰值情景 (15%/年, 强美元荒)"
+  },
+  {
    "fx_median": [
-    6.7108,
-    6.3255,
-    5.9563,
-    5.5936,
-    5.2626,
-    4.9612
+    7.2,
+    6.7874,
+    6.3894,
+    5.9921,
+    5.6339,
+    5.3122
    ],
    "fx_lo": [
-    6.7108,
-    6.2067,
-    5.7936,
-    5.4086,
-    5.0597,
-    4.7513
+    7.2,
+    6.6086,
+    6.145,
+    5.7149,
+    5.3304,
+    4.9984
    ],
    "fx_hi": [
-    6.7108,
-    6.4412,
-    6.1135,
-    5.794,
-    5.4765,
-    5.1691
+    7.2,
+    6.9629,
+    6.6282,
+    6.2965,
+    5.9591,
+    5.6283
    ],
-   "fx_5y": 4.961,
-   "apprec_5y_pct": 35.3,
+   "fx_5y": 5.312,
+   "apprec_5y_pct": 35.5,
    "industry": {
-    "export_lowend": -27.9,
-    "export_hightech": -10.9,
+    "export_lowend": -28.1,
+    "export_hightech": -11.0,
     "domestic_consumption": 5.8,
-    "real_estate": 6.9,
+    "real_estate": 7.0,
     "infrastructure": 3.4,
     "new_energy": -3.7,
     "semiconductor": 8.7,
-    "commodity_metals": 15.1,
-    "power_compute": 9.8,
-    "gold": 13.4,
+    "commodity_metals": 15.2,
+    "power_compute": 9.9,
+    "gold": 13.5,
     "bank_insurance": 3.4
    },
+   "ind_series": {
+    "export_lowend": [
+     -4.13,
+     -9.42,
+     -15.53,
+     -21.78,
+     -28.1
+    ],
+    "export_hightech": [
+     -1.6,
+     -3.73,
+     -6.1,
+     -8.53,
+     -10.98
+    ],
+    "domestic_consumption": [
+     1.3,
+     2.4,
+     3.52,
+     4.67,
+     5.83
+    ],
+    "real_estate": [
+     1.1,
+     2.39,
+     3.88,
+     5.41,
+     6.96
+    ],
+    "infrastructure": [
+     0.49,
+     1.12,
+     1.87,
+     2.63,
+     3.4
+    ],
+    "new_energy": [
+     -0.72,
+     -1.42,
+     -2.17,
+     -2.93,
+     -3.7
+    ],
+    "semiconductor": [
+     1.4,
+     3.02,
+     4.89,
+     6.8,
+     8.73
+    ],
+    "commodity_metals": [
+     2.16,
+     4.96,
+     8.32,
+     11.76,
+     15.24
+    ],
+    "power_compute": [
+     1.25,
+     3.06,
+     5.3,
+     7.59,
+     9.91
+    ],
+    "gold": [
+     1.85,
+     4.32,
+     7.31,
+     10.37,
+     13.46
+    ],
+    "bank_insurance": [
+     0.49,
+     1.12,
+     1.87,
+     2.63,
+     3.4
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.32,
+    "gdp_cum_pt": -0.026,
+    "gdp_neg_pt": -0.213,
+    "gdp_pos_pt": 0.187,
+    "emp_exposed_wan": -267.5,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.13488,
+      "emp_wan": -581.67
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.0704,
+      "emp_wan": -151.79999999999998
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.05568,
+      "emp_wan": 186.76000000000002
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.0364,
+      "emp_wan": 112.70000000000002
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.013600000000000001,
+      "emp_wan": 46.919999999999995
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.007400000000000001,
+      "emp_wan": -17.020000000000003
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.008352,
+      "emp_wan": 16.008
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.026751999999999998,
+      "emp_wan": 52.44
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.02772,
+      "emp_wan": 45.54
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.00216,
+      "emp_wan": 3.105
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.016319999999999998,
+      "emp_wan": 19.55
+     }
+    }
+   },
    "waterfall": {
-    "loss": -0.31,
-    "inflow": 3.064,
-    "deepening": 1.151,
-    "net": 3.906
+    "loss": -0.312,
+    "inflow": 2.173,
+    "deepening": 0.818,
+    "net": 2.678
    },
    "returns": {
     "equity": 8.2,
     "bond": -0.7,
     "gold": -5.0,
     "metal": 2.0
-   }
-  },
-  {
+   },
    "key": "p6r",
    "label": "实测校准 6%",
-   "note": "实测: 即期6.71 + 3y波动2.84%, 6%情景",
-   "fx_median": [
-    6.7108,
-    6.3255,
-    5.9563,
-    5.5936,
-    5.2626,
-    4.9612
-   ],
-   "fx_lo": [
-    6.7108,
-    6.2067,
-    5.7936,
-    5.4086,
-    5.0597,
-    4.7513
-   ],
-   "fx_hi": [
-    6.7108,
-    6.4412,
-    6.1135,
-    5.794,
-    5.4765,
-    5.1691
-   ],
-   "fx_5y": 4.961,
-   "apprec_5y_pct": 35.3,
-   "industry": {
-    "export_lowend": -27.9,
-    "export_hightech": -10.9,
-    "domestic_consumption": 5.8,
-    "real_estate": 6.9,
-    "infrastructure": 3.4,
-    "new_energy": -3.7,
-    "semiconductor": 8.7,
-    "commodity_metals": 15.1,
-    "power_compute": 9.8,
-    "gold": 13.4,
-    "bank_insurance": 3.4
-   },
-   "waterfall": {
-    "loss": -0.31,
-    "inflow": 2.171,
-    "deepening": 0.817,
-    "net": 2.679
-   },
-   "returns": {
-    "equity": 8.2,
-    "bond": -0.7,
-    "gold": -5.0,
-    "metal": 2.0
-   }
+   "note": "实测: 即期6.71 + 3y波动2.84%, 6%情景"
   },
   {
-   "key": "piv",
-   "label": "现实惯性 2.7%",
-   "note": "实测: 近3年实际升值漂移 2.7%/年",
    "fx_median": [
-    6.7108,
-    6.5377,
-    6.3627,
-    6.1757,
-    6.0052,
-    5.8512
+    7.2,
+    7.0151,
+    6.8253,
+    6.6157,
+    6.4289,
+    6.2652
    ],
    "fx_lo": [
-    6.7108,
-    6.415,
-    6.1888,
-    5.9715,
-    5.7737,
-    5.6036
+    7.2,
+    6.8303,
+    6.5642,
+    6.3096,
+    6.0825,
+    5.895
    ],
    "fx_hi": [
-    6.7108,
-    6.6573,
-    6.5306,
-    6.3969,
-    6.2493,
-    6.0963
+    7.2,
+    7.1965,
+    7.0804,
+    6.9518,
+    6.7999,
+    6.638
    ],
-   "fx_5y": 5.851,
-   "apprec_5y_pct": 14.7,
+   "fx_5y": 6.265,
+   "apprec_5y_pct": 14.9,
    "industry": {
-    "export_lowend": -11.1,
+    "export_lowend": -11.3,
     "export_hightech": -4.4,
     "domestic_consumption": 2.7,
     "real_estate": 2.8,
     "infrastructure": 1.3,
     "new_energy": -1.6,
-    "semiconductor": 3.5,
-    "commodity_metals": 5.9,
-    "power_compute": 3.7,
-    "gold": 5.1,
+    "semiconductor": 3.6,
+    "commodity_metals": 6.0,
+    "power_compute": 3.8,
+    "gold": 5.3,
     "bank_insurance": 1.3
    },
+   "ind_series": {
+    "export_lowend": [
+     -1.61,
+     -3.73,
+     -6.34,
+     -8.88,
+     -11.27
+    ],
+    "export_hightech": [
+     -0.42,
+     -1.39,
+     -2.48,
+     -3.5,
+     -4.43
+    ],
+    "domestic_consumption": [
+     0.49,
+     1.13,
+     1.75,
+     2.27,
+     2.72
+    ],
+    "real_estate": [
+     0.5,
+     1.0,
+     1.64,
+     2.26,
+     2.84
+    ],
+    "infrastructure": [
+     0.23,
+     0.46,
+     0.76,
+     1.06,
+     1.35
+    ],
+    "new_energy": [
+     -0.29,
+     -0.64,
+     -1.01,
+     -1.34,
+     -1.64
+    ],
+    "semiconductor": [
+     0.63,
+     1.28,
+     2.08,
+     2.86,
+     3.59
+    ],
+    "commodity_metals": [
+     1.04,
+     2.01,
+     3.34,
+     4.69,
+     6.0
+    ],
+    "power_compute": [
+     0.65,
+     1.18,
+     2.01,
+     2.89,
+     3.76
+    ],
+    "gold": [
+     0.91,
+     1.73,
+     2.89,
+     4.09,
+     5.25
+    ],
+    "bank_insurance": [
+     0.23,
+     0.46,
+     0.76,
+     1.06,
+     1.35
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.1,
+    "gdp_cum_pt": -0.008,
+    "gdp_neg_pt": -0.086,
+    "gdp_pos_pt": 0.077,
+    "emp_exposed_wan": -98.5,
+    "risk_tier": "中",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.054240000000000003,
+      "emp_wan": -233.91000000000005
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.028160000000000004,
+      "emp_wan": -60.72
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.025920000000000002,
+      "emp_wan": 86.94000000000001
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.01456,
+      "emp_wan": 45.08
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.005200000000000001,
+      "emp_wan": 17.94
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0032000000000000006,
+      "emp_wan": -7.36
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.0034560000000000003,
+      "emp_wan": 6.6240000000000006
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.01056,
+      "emp_wan": 20.7
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.01064,
+      "emp_wan": 17.479999999999997
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.000848,
+      "emp_wan": 1.219
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.00624,
+      "emp_wan": 7.475
+     }
+    }
+   },
    "waterfall": {
-    "loss": -0.123,
-    "inflow": 1.985,
-    "deepening": 0.766,
-    "net": 2.627
+    "loss": -0.125,
+    "inflow": 1.987,
+    "deepening": 0.767,
+    "net": 2.628
    },
    "returns": {
     "equity": 8.1,
     "bond": -0.7,
-    "gold": -4.4,
+    "gold": -4.3,
     "metal": 2.0
-   }
+   },
+   "key": "piv",
+   "label": "现实惯性 2.7%",
+   "note": "实测: 近3年实际升值漂移 2.7%/年"
   }
  ],
+ "grid": [
+  {
+   "fx_median": [
+    7.2,
+    7.1776,
+    7.1701,
+    7.1546,
+    7.1438,
+    7.1402
+   ],
+   "fx_lo": [
+    7.2,
+    6.996,
+    6.9273,
+    6.8228,
+    6.8146,
+    6.7584
+   ],
+   "fx_hi": [
+    7.2,
+    7.3706,
+    7.4349,
+    7.4666,
+    7.5072,
+    7.5664
+   ],
+   "fx_5y": 7.14,
+   "apprec_5y_pct": 0.8,
+   "industry": {
+    "export_lowend": -0.3,
+    "export_hightech": 0.2,
+    "domestic_consumption": 0.1,
+    "real_estate": 0.2,
+    "infrastructure": 0.1,
+    "new_energy": -0.1,
+    "semiconductor": 0.2,
+    "commodity_metals": 0.4,
+    "power_compute": 0.3,
+    "gold": 0.4,
+    "bank_insurance": 0.1
+   },
+   "ind_series": {
+    "export_lowend": [
+     0.08,
+     0.03,
+     -0.13,
+     -0.23,
+     -0.27
+    ],
+    "export_hightech": [
+     0.38,
+     0.34,
+     0.27,
+     0.21,
+     0.19
+    ],
+    "domestic_consumption": [
+     -0.06,
+     -0.01,
+     0.04,
+     0.09,
+     0.09
+    ],
+    "real_estate": [
+     0.1,
+     0.11,
+     0.14,
+     0.17,
+     0.18
+    ],
+    "infrastructure": [
+     0.06,
+     0.06,
+     0.08,
+     0.09,
+     0.09
+    ],
+    "new_energy": [
+     0.0,
+     -0.02,
+     -0.05,
+     -0.07,
+     -0.07
+    ],
+    "semiconductor": [
+     0.11,
+     0.13,
+     0.18,
+     0.21,
+     0.22
+    ],
+    "commodity_metals": [
+     0.31,
+     0.3,
+     0.37,
+     0.4,
+     0.42
+    ],
+    "power_compute": [
+     0.26,
+     0.24,
+     0.28,
+     0.28,
+     0.3
+    ],
+    "gold": [
+     0.29,
+     0.28,
+     0.34,
+     0.36,
+     0.38
+    ],
+    "bank_insurance": [
+     0.06,
+     0.06,
+     0.08,
+     0.09,
+     0.09
+    ]
+   },
+   "macro": {
+    "w_profit_pct": 0.05,
+    "gdp_cum_pt": 0.004,
+    "gdp_neg_pt": -0.002,
+    "gdp_pos_pt": 0.006,
+    "emp_exposed_wan": 7.7,
+    "risk_tier": "低",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.0014399999999999999,
+      "emp_wan": -6.21
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": 0.00128,
+      "emp_wan": 2.7600000000000002
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.00096,
+      "emp_wan": 3.22
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.0010400000000000001,
+      "emp_wan": 3.22
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.0004000000000000001,
+      "emp_wan": 1.3800000000000001
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.00020000000000000004,
+      "emp_wan": -0.46
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.00019200000000000003,
+      "emp_wan": 0.368
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.0007040000000000001,
+      "emp_wan": 1.3800000000000001
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.00084,
+      "emp_wan": 1.3800000000000001
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 6.400000000000001e-05,
+      "emp_wan": 0.092
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.00048,
+      "emp_wan": 0.5750000000000001
+     }
+    }
+   },
+   "waterfall": {
+    "loss": 0.0,
+    "inflow": 1.857,
+    "deepening": 0.731,
+    "net": 2.588
+   },
+   "returns": {
+    "equity": 8.0,
+    "bond": -1.3,
+    "gold": 2.7,
+    "metal": 3.3
+   },
+   "key": "custom",
+   "rate_pct": 0.0,
+   "label": "自定义 0.0%",
+   "note": "基准参数 + 升值速度 0.0% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    7.1418,
+    7.0988,
+    7.0481,
+    7.0023,
+    6.9639
+   ],
+   "fx_lo": [
+    7.2,
+    6.9611,
+    6.8584,
+    6.7212,
+    6.6796,
+    6.5916
+   ],
+   "fx_hi": [
+    7.2,
+    7.3339,
+    7.3609,
+    7.3555,
+    7.3586,
+    7.3796
+   ],
+   "fx_5y": 6.964,
+   "apprec_5y_pct": 3.4,
+   "industry": {
+    "export_lowend": -2.2,
+    "export_hightech": -0.7,
+    "domestic_consumption": 0.6,
+    "real_estate": 0.7,
+    "infrastructure": 0.3,
+    "new_energy": -0.4,
+    "semiconductor": 0.8,
+    "commodity_metals": 1.4,
+    "power_compute": 0.9,
+    "gold": 1.2,
+    "bank_insurance": 0.3
+   },
+   "ind_series": {
+    "export_lowend": [
+     -0.28,
+     -0.71,
+     -1.28,
+     -1.78,
+     -2.23
+    ],
+    "export_hightech": [
+     0.21,
+     -0.0,
+     -0.25,
+     -0.47,
+     -0.65
+    ],
+    "domestic_consumption": [
+     0.06,
+     0.22,
+     0.36,
+     0.5,
+     0.6
+    ],
+    "real_estate": [
+     0.18,
+     0.28,
+     0.42,
+     0.54,
+     0.65
+    ],
+    "infrastructure": [
+     0.1,
+     0.14,
+     0.2,
+     0.26,
+     0.31
+    ],
+    "new_energy": [
+     -0.06,
+     -0.14,
+     -0.23,
+     -0.3,
+     -0.37
+    ],
+    "semiconductor": [
+     0.22,
+     0.36,
+     0.53,
+     0.68,
+     0.82
+    ],
+    "commodity_metals": [
+     0.47,
+     0.64,
+     0.91,
+     1.16,
+     1.39
+    ],
+    "power_compute": [
+     0.34,
+     0.42,
+     0.59,
+     0.74,
+     0.88
+    ],
+    "gold": [
+     0.42,
+     0.57,
+     0.81,
+     1.02,
+     1.22
+    ],
+    "bank_insurance": [
+     0.1,
+     0.14,
+     0.2,
+     0.26,
+     0.31
+    ]
+   },
+   "macro": {
+    "w_profit_pct": 0.03,
+    "gdp_cum_pt": 0.002,
+    "gdp_neg_pt": -0.016,
+    "gdp_pos_pt": 0.018,
+    "emp_exposed_wan": -9.9,
+    "risk_tier": "低",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.01056,
+      "emp_wan": -45.54
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.00448,
+      "emp_wan": -9.659999999999998
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.0057599999999999995,
+      "emp_wan": 19.32
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.00364,
+      "emp_wan": 11.27
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.0012,
+      "emp_wan": 4.14
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0008000000000000001,
+      "emp_wan": -1.84
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.0007680000000000001,
+      "emp_wan": 1.472
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.002464,
+      "emp_wan": 4.829999999999999
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.0025200000000000005,
+      "emp_wan": 4.140000000000001
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.00019199999999999998,
+      "emp_wan": 0.27599999999999997
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.0014399999999999999,
+      "emp_wan": 1.7249999999999999
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.022,
+    "inflow": 1.881,
+    "deepening": 0.738,
+    "net": 2.596
+   },
+   "returns": {
+    "equity": 8.0,
+    "bond": -0.7,
+    "gold": 1.2,
+    "metal": 2.9
+   },
+   "key": "custom",
+   "rate_pct": 0.5,
+   "label": "自定义 0.5%",
+   "note": "基准参数 + 升值速度 0.5% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    7.1062,
+    7.0281,
+    6.9431,
+    6.8637,
+    6.7919
+   ],
+   "fx_lo": [
+    7.2,
+    6.9264,
+    6.7901,
+    6.6212,
+    6.5474,
+    6.4288
+   ],
+   "fx_hi": [
+    7.2,
+    7.2973,
+    7.2877,
+    7.2459,
+    7.2129,
+    7.1974
+   ],
+   "fx_5y": 6.792,
+   "apprec_5y_pct": 6.0,
+   "industry": {
+    "export_lowend": -4.3,
+    "export_hightech": -1.5,
+    "domestic_consumption": 1.1,
+    "real_estate": 1.1,
+    "infrastructure": 0.5,
+    "new_energy": -0.7,
+    "semiconductor": 1.4,
+    "commodity_metals": 2.4,
+    "power_compute": 1.5,
+    "gold": 2.1,
+    "bank_insurance": 0.5
+   },
+   "ind_series": {
+    "export_lowend": [
+     -0.65,
+     -1.47,
+     -2.44,
+     -3.39,
+     -4.27
+    ],
+    "export_hightech": [
+     0.04,
+     -0.35,
+     -0.77,
+     -1.16,
+     -1.52
+    ],
+    "domestic_consumption": [
+     0.18,
+     0.44,
+     0.69,
+     0.91,
+     1.09
+    ],
+    "real_estate": [
+     0.27,
+     0.47,
+     0.7,
+     0.93,
+     1.14
+    ],
+    "infrastructure": [
+     0.14,
+     0.22,
+     0.33,
+     0.44,
+     0.54
+    ],
+    "new_energy": [
+     -0.13,
+     -0.27,
+     -0.41,
+     -0.54,
+     -0.66
+    ],
+    "semiconductor": [
+     0.34,
+     0.59,
+     0.88,
+     1.17,
+     1.44
+    ],
+    "commodity_metals": [
+     0.62,
+     0.98,
+     1.46,
+     1.95,
+     2.42
+    ],
+    "power_compute": [
+     0.43,
+     0.62,
+     0.91,
+     1.21,
+     1.51
+    ],
+    "gold": [
+     0.56,
+     0.86,
+     1.28,
+     1.7,
+     2.12
+    ],
+    "bank_insurance": [
+     0.14,
+     0.22,
+     0.33,
+     0.44,
+     0.54
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.01,
+    "gdp_cum_pt": -0.001,
+    "gdp_neg_pt": -0.032,
+    "gdp_pos_pt": 0.031,
+    "emp_exposed_wan": -31.8,
+    "risk_tier": "低",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.020640000000000002,
+      "emp_wan": -89.00999999999999
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.0096,
+      "emp_wan": -20.7
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.01056,
+      "emp_wan": 35.42000000000001
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.005720000000000001,
+      "emp_wan": 17.710000000000004
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.002,
+      "emp_wan": 6.8999999999999995
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0014,
+      "emp_wan": -3.2199999999999998
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.001344,
+      "emp_wan": 2.576
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.0042239999999999995,
+      "emp_wan": 8.28
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.004200000000000001,
+      "emp_wan": 6.8999999999999995
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.00033600000000000004,
+      "emp_wan": 0.48300000000000004
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.0024,
+      "emp_wan": 2.875
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.046,
+    "inflow": 1.906,
+    "deepening": 0.745,
+    "net": 2.605
+   },
+   "returns": {
+    "equity": 8.0,
+    "bond": -0.7,
+    "gold": -0.3,
+    "metal": 2.5
+   },
+   "key": "custom",
+   "rate_pct": 1.0,
+   "label": "自定义 1.0%",
+   "note": "基准参数 + 升值速度 1.0% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    7.0707,
+    6.9582,
+    6.8398,
+    6.7278,
+    6.6242
+   ],
+   "fx_lo": [
+    7.2,
+    6.8919,
+    6.7226,
+    6.5226,
+    6.4177,
+    6.2701
+   ],
+   "fx_hi": [
+    7.2,
+    7.2609,
+    7.2151,
+    7.1381,
+    7.07,
+    7.0197
+   ],
+   "fx_5y": 6.624,
+   "apprec_5y_pct": 8.7,
+   "industry": {
+    "export_lowend": -6.4,
+    "export_hightech": -2.4,
+    "domestic_consumption": 1.6,
+    "real_estate": 1.7,
+    "infrastructure": 0.8,
+    "new_energy": -1.0,
+    "semiconductor": 2.1,
+    "commodity_metals": 3.5,
+    "power_compute": 2.2,
+    "gold": 3.1,
+    "bank_insurance": 0.8
+   },
+   "ind_series": {
+    "export_lowend": [
+     -1.02,
+     -2.24,
+     -3.63,
+     -5.03,
+     -6.38
+    ],
+    "export_hightech": [
+     -0.14,
+     -0.7,
+     -1.29,
+     -1.85,
+     -2.39
+    ],
+    "domestic_consumption": [
+     0.3,
+     0.68,
+     1.02,
+     1.31,
+     1.58
+    ],
+    "real_estate": [
+     0.36,
+     0.65,
+     0.98,
+     1.33,
+     1.66
+    ],
+    "infrastructure": [
+     0.18,
+     0.3,
+     0.46,
+     0.63,
+     0.79
+    ],
+    "new_energy": [
+     -0.19,
+     -0.39,
+     -0.6,
+     -0.78,
+     -0.95
+    ],
+    "semiconductor": [
+     0.45,
+     0.82,
+     1.25,
+     1.68,
+     2.09
+    ],
+    "commodity_metals": [
+     0.79,
+     1.33,
+     2.03,
+     2.78,
+     3.49
+    ],
+    "power_compute": [
+     0.51,
+     0.81,
+     1.24,
+     1.73,
+     2.19
+    ],
+    "gold": [
+     0.69,
+     1.16,
+     1.76,
+     2.43,
+     3.06
+    ],
+    "bank_insurance": [
+     0.18,
+     0.3,
+     0.46,
+     0.63,
+     0.79
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.03,
+    "gdp_cum_pt": -0.002,
+    "gdp_neg_pt": -0.048,
+    "gdp_pos_pt": 0.046,
+    "emp_exposed_wan": -48.9,
+    "risk_tier": "低",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.03072,
+      "emp_wan": -132.48
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.01536,
+      "emp_wan": -33.12
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.01536,
+      "emp_wan": 51.52
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.00884,
+      "emp_wan": 27.37
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.0032000000000000006,
+      "emp_wan": 11.040000000000001
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.002,
+      "emp_wan": -4.6000000000000005
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.002016,
+      "emp_wan": 3.8640000000000003
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.00616,
+      "emp_wan": 12.075
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.006160000000000001,
+      "emp_wan": 10.120000000000001
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.000496,
+      "emp_wan": 0.7130000000000001
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.00384,
+      "emp_wan": 4.6000000000000005
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.07,
+    "inflow": 1.931,
+    "deepening": 0.752,
+    "net": 2.613
+   },
+   "returns": {
+    "equity": 8.1,
+    "bond": -0.7,
+    "gold": -1.7,
+    "metal": 2.1
+   },
+   "key": "custom",
+   "rate_pct": 1.5,
+   "label": "自定义 1.5%",
+   "note": "基准参数 + 升值速度 1.5% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    7.0355,
+    6.889,
+    6.7379,
+    6.5945,
+    6.4607
+   ],
+   "fx_lo": [
+    7.2,
+    6.8575,
+    6.6557,
+    6.4255,
+    6.2906,
+    6.1153
+   ],
+   "fx_hi": [
+    7.2,
+    7.2247,
+    7.1434,
+    7.0318,
+    6.93,
+    6.8463
+   ],
+   "fx_5y": 6.461,
+   "apprec_5y_pct": 11.4,
+   "industry": {
+    "export_lowend": -8.5,
+    "export_hightech": -3.3,
+    "domestic_consumption": 2.1,
+    "real_estate": 2.2,
+    "infrastructure": 1.0,
+    "new_energy": -1.3,
+    "semiconductor": 2.7,
+    "commodity_metals": 4.6,
+    "power_compute": 2.9,
+    "gold": 4.0,
+    "bank_insurance": 1.0
+   },
+   "ind_series": {
+    "export_lowend": [
+     -1.39,
+     -3.01,
+     -4.84,
+     -6.71,
+     -8.53
+    ],
+    "export_hightech": [
+     -0.31,
+     -1.05,
+     -1.82,
+     -2.57,
+     -3.29
+    ],
+    "domestic_consumption": [
+     0.42,
+     0.9,
+     1.34,
+     1.72,
+     2.09
+    ],
+    "real_estate": [
+     0.45,
+     0.83,
+     1.28,
+     1.73,
+     2.18
+    ],
+    "infrastructure": [
+     0.21,
+     0.38,
+     0.59,
+     0.82,
+     1.03
+    ],
+    "new_energy": [
+     -0.25,
+     -0.52,
+     -0.78,
+     -1.02,
+     -1.26
+    ],
+    "semiconductor": [
+     0.56,
+     1.06,
+     1.62,
+     2.19,
+     2.75
+    ],
+    "commodity_metals": [
+     0.95,
+     1.69,
+     2.61,
+     3.62,
+     4.59
+    ],
+    "power_compute": [
+     0.6,
+     1.01,
+     1.58,
+     2.24,
+     2.88
+    ],
+    "gold": [
+     0.83,
+     1.47,
+     2.27,
+     3.16,
+     4.02
+    ],
+    "bank_insurance": [
+     0.21,
+     0.38,
+     0.59,
+     0.82,
+     1.03
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.06,
+    "gdp_cum_pt": -0.005,
+    "gdp_neg_pt": -0.065,
+    "gdp_pos_pt": 0.06,
+    "emp_exposed_wan": -69.8,
+    "risk_tier": "中",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.0408,
+      "emp_wan": -175.95000000000002
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.02112,
+      "emp_wan": -45.54
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.02016,
+      "emp_wan": 67.62
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.011440000000000002,
+      "emp_wan": 35.42000000000001
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.004,
+      "emp_wan": 13.799999999999999
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0026000000000000003,
+      "emp_wan": -5.98
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.0025920000000000006,
+      "emp_wan": 4.968000000000001
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.008095999999999999,
+      "emp_wan": 15.87
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.00812,
+      "emp_wan": 13.34
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.00064,
+      "emp_wan": 0.92
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.0048,
+      "emp_wan": 5.75
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.094,
+    "inflow": 1.957,
+    "deepening": 0.759,
+    "net": 2.621
+   },
+   "returns": {
+    "equity": 8.1,
+    "bond": -0.7,
+    "gold": -3.1,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 2.0,
+   "label": "自定义 2.0%",
+   "note": "基准参数 + 升值速度 2.0% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    7.0004,
+    6.8204,
+    6.6376,
+    6.464,
+    6.3012
+   ],
+   "fx_lo": [
+    7.2,
+    6.8233,
+    6.5895,
+    6.3298,
+    6.1661,
+    5.9643
+   ],
+   "fx_hi": [
+    7.2,
+    7.1886,
+    7.0723,
+    6.9271,
+    6.7928,
+    6.6773
+   ],
+   "fx_5y": 6.301,
+   "apprec_5y_pct": 14.3,
+   "industry": {
+    "export_lowend": -10.8,
+    "export_hightech": -4.2,
+    "domestic_consumption": 2.6,
+    "real_estate": 2.7,
+    "infrastructure": 1.3,
+    "new_energy": -1.6,
+    "semiconductor": 3.4,
+    "commodity_metals": 5.7,
+    "power_compute": 3.6,
+    "gold": 5.0,
+    "bank_insurance": 1.3
+   },
+   "ind_series": {
+    "export_lowend": [
+     -1.77,
+     -3.8,
+     -6.08,
+     -8.42,
+     -10.76
+    ],
+    "export_hightech": [
+     -0.49,
+     -1.41,
+     -2.36,
+     -3.3,
+     -4.21
+    ],
+    "domestic_consumption": [
+     0.54,
+     1.14,
+     1.67,
+     2.15,
+     2.59
+    ],
+    "real_estate": [
+     0.54,
+     1.02,
+     1.58,
+     2.15,
+     2.72
+    ],
+    "infrastructure": [
+     0.25,
+     0.47,
+     0.73,
+     1.01,
+     1.29
+    ],
+    "new_energy": [
+     -0.32,
+     -0.65,
+     -0.97,
+     -1.27,
+     -1.56
+    ],
+    "semiconductor": [
+     0.68,
+     1.3,
+     2.0,
+     2.72,
+     3.43
+    ],
+    "commodity_metals": [
+     1.11,
+     2.05,
+     3.22,
+     4.47,
+     5.74
+    ],
+    "power_compute": [
+     0.68,
+     1.22,
+     1.94,
+     2.76,
+     3.61
+    ],
+    "gold": [
+     0.97,
+     1.77,
+     2.79,
+     3.9,
+     5.03
+    ],
+    "bank_insurance": [
+     0.25,
+     0.47,
+     0.73,
+     1.01,
+     1.29
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.09,
+    "gdp_cum_pt": -0.007,
+    "gdp_neg_pt": -0.082,
+    "gdp_pos_pt": 0.075,
+    "emp_exposed_wan": -92.6,
+    "risk_tier": "中",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.051840000000000004,
+      "emp_wan": -223.55999999999997
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.02688,
+      "emp_wan": -57.96
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.02496,
+      "emp_wan": 83.72000000000001
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.014040000000000002,
+      "emp_wan": 43.470000000000006
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.005200000000000001,
+      "emp_wan": 17.94
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0032000000000000006,
+      "emp_wan": -7.36
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.0032640000000000004,
+      "emp_wan": 6.256
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.010032,
+      "emp_wan": 19.665
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.010080000000000002,
+      "emp_wan": 16.560000000000002
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.0008,
+      "emp_wan": 1.1500000000000001
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.00624,
+      "emp_wan": 7.475
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.12,
+    "inflow": 1.983,
+    "deepening": 0.766,
+    "net": 2.629
+   },
+   "returns": {
+    "equity": 8.1,
+    "bond": -0.7,
+    "gold": -4.3,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 2.5,
+   "label": "自定义 2.5%",
+   "note": "基准参数 + 升值速度 2.5% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.9655,
+    6.7526,
+    6.5388,
+    6.336,
+    6.1456
+   ],
+   "fx_lo": [
+    7.2,
+    6.7893,
+    6.5239,
+    6.2356,
+    6.044,
+    5.817
+   ],
+   "fx_hi": [
+    7.2,
+    7.1528,
+    7.0019,
+    6.824,
+    6.6583,
+    6.5124
+   ],
+   "fx_5y": 6.146,
+   "apprec_5y_pct": 17.2,
+   "industry": {
+    "export_lowend": -13.1,
+    "export_hightech": -5.1,
+    "domestic_consumption": 3.1,
+    "real_estate": 3.3,
+    "infrastructure": 1.6,
+    "new_energy": -1.9,
+    "semiconductor": 4.1,
+    "commodity_metals": 7.0,
+    "power_compute": 4.4,
+    "gold": 6.1,
+    "bank_insurance": 1.6
+   },
+   "ind_series": {
+    "export_lowend": [
+     -2.14,
+     -4.59,
+     -7.33,
+     -10.2,
+     -13.08
+    ],
+    "export_hightech": [
+     -0.67,
+     -1.77,
+     -2.91,
+     -4.03,
+     -5.15
+    ],
+    "domestic_consumption": [
+     0.66,
+     1.37,
+     2.0,
+     2.55,
+     3.07
+    ],
+    "real_estate": [
+     0.63,
+     1.21,
+     1.88,
+     2.58,
+     3.28
+    ],
+    "infrastructure": [
+     0.29,
+     0.55,
+     0.87,
+     1.21,
+     1.57
+    ],
+    "new_energy": [
+     -0.38,
+     -0.77,
+     -1.16,
+     -1.51,
+     -1.87
+    ],
+    "semiconductor": [
+     0.79,
+     1.54,
+     2.38,
+     3.26,
+     4.14
+    ],
+    "commodity_metals": [
+     1.28,
+     2.42,
+     3.82,
+     5.39,
+     6.97
+    ],
+    "power_compute": [
+     0.77,
+     1.43,
+     2.31,
+     3.34,
+     4.4
+    ],
+    "gold": [
+     1.11,
+     2.09,
+     3.32,
+     4.7,
+     6.11
+    ],
+    "bank_insurance": [
+     0.29,
+     0.55,
+     0.87,
+     1.21,
+     1.57
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.11,
+    "gdp_cum_pt": -0.009,
+    "gdp_neg_pt": -0.099,
+    "gdp_pos_pt": 0.091,
+    "emp_exposed_wan": -112.7,
+    "risk_tier": "中",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.06287999999999999,
+      "emp_wan": -271.16999999999996
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.032639999999999995,
+      "emp_wan": -70.38
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.02976,
+      "emp_wan": 99.82000000000001
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.01716,
+      "emp_wan": 53.13
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.006400000000000001,
+      "emp_wan": 22.080000000000002
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0038,
+      "emp_wan": -8.739999999999998
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.003935999999999999,
+      "emp_wan": 7.543999999999999
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.01232,
+      "emp_wan": 24.15
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.012320000000000003,
+      "emp_wan": 20.240000000000002
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.000976,
+      "emp_wan": 1.4029999999999998
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.00768,
+      "emp_wan": 9.200000000000001
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.146,
+    "inflow": 2.009,
+    "deepening": 0.774,
+    "net": 2.637
+   },
+   "returns": {
+    "equity": 8.1,
+    "bond": -0.7,
+    "gold": -4.9,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 3.0,
+   "label": "自定义 3.0%",
+   "note": "基准参数 + 升值速度 3.0% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.9307,
+    6.6854,
+    6.4414,
+    6.2105,
+    5.9939
+   ],
+   "fx_lo": [
+    7.2,
+    6.7554,
+    6.459,
+    6.1427,
+    5.9243,
+    5.6734
+   ],
+   "fx_hi": [
+    7.2,
+    7.1171,
+    6.9322,
+    6.7224,
+    6.5265,
+    6.3516
+   ],
+   "fx_5y": 5.994,
+   "apprec_5y_pct": 20.1,
+   "industry": {
+    "export_lowend": -15.5,
+    "export_hightech": -6.1,
+    "domestic_consumption": 3.5,
+    "real_estate": 3.9,
+    "infrastructure": 1.9,
+    "new_energy": -2.2,
+    "semiconductor": 4.9,
+    "commodity_metals": 8.3,
+    "power_compute": 5.3,
+    "gold": 7.3,
+    "bank_insurance": 1.9
+   },
+   "ind_series": {
+    "export_lowend": [
+     -2.52,
+     -5.4,
+     -8.68,
+     -12.08,
+     -15.5
+    ],
+    "export_hightech": [
+     -0.84,
+     -2.13,
+     -3.44,
+     -4.76,
+     -6.09
+    ],
+    "domestic_consumption": [
+     0.79,
+     1.6,
+     2.27,
+     2.89,
+     3.52
+    ],
+    "real_estate": [
+     0.72,
+     1.41,
+     2.21,
+     3.04,
+     3.87
+    ],
+    "infrastructure": [
+     0.33,
+     0.64,
+     1.03,
+     1.44,
+     1.86
+    ],
+    "new_energy": [
+     -0.45,
+     -0.9,
+     -1.33,
+     -1.74,
+     -2.16
+    ],
+    "semiconductor": [
+     0.91,
+     1.79,
+     2.79,
+     3.83,
+     4.88
+    ],
+    "commodity_metals": [
+     1.44,
+     2.8,
+     4.55,
+     6.42,
+     8.31
+    ],
+    "power_compute": [
+     0.86,
+     1.65,
+     2.78,
+     4.03,
+     5.29
+    ],
+    "gold": [
+     1.25,
+     2.41,
+     3.96,
+     5.62,
+     7.3
+    ],
+    "bank_insurance": [
+     0.33,
+     0.64,
+     1.03,
+     1.44,
+     1.86
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.15,
+    "gdp_cum_pt": -0.012,
+    "gdp_neg_pt": -0.118,
+    "gdp_pos_pt": 0.106,
+    "emp_exposed_wan": -138.8,
+    "risk_tier": "中",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.0744,
+      "emp_wan": -320.85
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.03904,
+      "emp_wan": -84.18
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.0336,
+      "emp_wan": 112.70000000000002
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.02028,
+      "emp_wan": 62.790000000000006
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.0076,
+      "emp_wan": 26.22
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0044,
+      "emp_wan": -10.120000000000001
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.004704000000000001,
+      "emp_wan": 9.016000000000002
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.014608000000000001,
+      "emp_wan": 28.635
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.01484,
+      "emp_wan": 24.38
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.001168,
+      "emp_wan": 1.679
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.00912,
+      "emp_wan": 10.925
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.172,
+    "inflow": 2.037,
+    "deepening": 0.781,
+    "net": 2.645
+   },
+   "returns": {
+    "equity": 8.1,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 3.5,
+   "label": "自定义 3.5%",
+   "note": "基准参数 + 升值速度 3.5% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.8962,
+    6.6189,
+    6.3455,
+    6.0875,
+    5.8459
+   ],
+   "fx_lo": [
+    7.2,
+    6.7217,
+    6.3947,
+    6.0513,
+    5.807,
+    5.5333
+   ],
+   "fx_hi": [
+    7.2,
+    7.0816,
+    6.8633,
+    6.6223,
+    6.3972,
+    6.1948
+   ],
+   "fx_5y": 5.846,
+   "apprec_5y_pct": 23.2,
+   "industry": {
+    "export_lowend": -18.0,
+    "export_hightech": -7.1,
+    "domestic_consumption": 4.0,
+    "real_estate": 4.5,
+    "infrastructure": 2.2,
+    "new_energy": -2.5,
+    "semiconductor": 5.6,
+    "commodity_metals": 9.7,
+    "power_compute": 6.2,
+    "gold": 8.5,
+    "bank_insurance": 2.2
+   },
+   "ind_series": {
+    "export_lowend": [
+     -2.91,
+     -6.23,
+     -10.06,
+     -13.99,
+     -17.99
+    ],
+    "export_hightech": [
+     -1.02,
+     -2.49,
+     -3.98,
+     -5.5,
+     -7.05
+    ],
+    "domestic_consumption": [
+     0.91,
+     1.82,
+     2.52,
+     3.24,
+     3.97
+    ],
+    "real_estate": [
+     0.81,
+     1.61,
+     2.54,
+     3.5,
+     4.48
+    ],
+    "infrastructure": [
+     0.37,
+     0.73,
+     1.2,
+     1.68,
+     2.17
+    ],
+    "new_energy": [
+     -0.51,
+     -1.03,
+     -1.5,
+     -1.98,
+     -2.47
+    ],
+    "semiconductor": [
+     1.03,
+     2.05,
+     3.22,
+     4.42,
+     5.64
+    ],
+    "commodity_metals": [
+     1.61,
+     3.2,
+     5.31,
+     7.47,
+     9.67
+    ],
+    "power_compute": [
+     0.95,
+     1.88,
+     3.29,
+     4.73,
+     6.2
+    ],
+    "gold": [
+     1.39,
+     2.76,
+     4.64,
+     6.56,
+     8.52
+    ],
+    "bank_insurance": [
+     0.37,
+     0.73,
+     1.2,
+     1.68,
+     2.17
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.18,
+    "gdp_cum_pt": -0.015,
+    "gdp_neg_pt": -0.137,
+    "gdp_pos_pt": 0.122,
+    "emp_exposed_wan": -163.6,
+    "risk_tier": "中",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.0864,
+      "emp_wan": -372.59999999999997
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.045439999999999994,
+      "emp_wan": -97.98
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.0384,
+      "emp_wan": 128.8
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.0234,
+      "emp_wan": 72.45000000000002
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.0088,
+      "emp_wan": 30.36
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.005,
+      "emp_wan": -11.5
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.005376,
+      "emp_wan": 10.304
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.017072,
+      "emp_wan": 33.464999999999996
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.017360000000000004,
+      "emp_wan": 28.520000000000007
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.00136,
+      "emp_wan": 1.955
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.01056,
+      "emp_wan": 12.65
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.2,
+    "inflow": 2.064,
+    "deepening": 0.789,
+    "net": 2.653
+   },
+   "returns": {
+    "equity": 8.1,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 4.0,
+   "label": "自定义 4.0%",
+   "note": "基准参数 + 升值速度 4.0% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.8618,
+    6.553,
+    6.2511,
+    5.967,
+    5.7015
+   ],
+   "fx_lo": [
+    7.2,
+    6.6882,
+    6.3311,
+    5.9612,
+    5.692,
+    5.3967
+   ],
+   "fx_hi": [
+    7.2,
+    7.0463,
+    6.795,
+    6.5237,
+    6.2706,
+    6.0419
+   ],
+   "fx_5y": 5.702,
+   "apprec_5y_pct": 26.3,
+   "industry": {
+    "export_lowend": -20.5,
+    "export_hightech": -8.0,
+    "domestic_consumption": 4.4,
+    "real_estate": 5.1,
+    "infrastructure": 2.5,
+    "new_energy": -2.8,
+    "semiconductor": 6.4,
+    "commodity_metals": 11.1,
+    "power_compute": 7.1,
+    "gold": 9.8,
+    "bank_insurance": 2.5
+   },
+   "ind_series": {
+    "export_lowend": [
+     -3.29,
+     -7.12,
+     -11.46,
+     -15.94,
+     -20.54
+    ],
+    "export_hightech": [
+     -1.2,
+     -2.83,
+     -4.52,
+     -6.26,
+     -8.04
+    ],
+    "domestic_consumption": [
+     1.03,
+     1.98,
+     2.78,
+     3.6,
+     4.44
+    ],
+    "real_estate": [
+     0.9,
+     1.82,
+     2.89,
+     3.98,
+     5.11
+    ],
+    "infrastructure": [
+     0.41,
+     0.84,
+     1.37,
+     1.92,
+     2.48
+    ],
+    "new_energy": [
+     -0.58,
+     -1.14,
+     -1.67,
+     -2.22,
+     -2.78
+    ],
+    "semiconductor": [
+     1.15,
+     2.32,
+     3.65,
+     5.02,
+     6.42
+    ],
+    "commodity_metals": [
+     1.78,
+     3.69,
+     6.08,
+     8.55,
+     11.08
+    ],
+    "power_compute": [
+     1.04,
+     2.21,
+     3.8,
+     5.45,
+     7.13
+    ],
+    "gold": [
+     1.54,
+     3.2,
+     5.32,
+     7.52,
+     9.76
+    ],
+    "bank_insurance": [
+     0.41,
+     0.84,
+     1.37,
+     1.92,
+     2.48
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.22,
+    "gdp_cum_pt": -0.017,
+    "gdp_neg_pt": -0.155,
+    "gdp_pos_pt": 0.138,
+    "emp_exposed_wan": -190.0,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.0984,
+      "emp_wan": -424.35
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.0512,
+      "emp_wan": -110.39999999999999
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.04224,
+      "emp_wan": 141.68000000000004
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.02652,
+      "emp_wan": 82.11
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.01,
+      "emp_wan": 34.5
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0056,
+      "emp_wan": -12.879999999999999
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.006144000000000001,
+      "emp_wan": 11.776
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.019535999999999998,
+      "emp_wan": 38.294999999999995
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.019880000000000002,
+      "emp_wan": 32.66
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.0015680000000000002,
+      "emp_wan": 2.2540000000000004
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.012,
+      "emp_wan": 14.375
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.228,
+    "inflow": 2.093,
+    "deepening": 0.797,
+    "net": 2.661
+   },
+   "returns": {
+    "equity": 8.2,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 4.5,
+   "label": "自定义 4.5%",
+   "note": "基准参数 + 升值速度 4.5% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.8275,
+    6.4878,
+    6.158,
+    5.8488,
+    5.5608
+   ],
+   "fx_lo": [
+    7.2,
+    6.6548,
+    6.2681,
+    5.8724,
+    5.5793,
+    5.2635
+   ],
+   "fx_hi": [
+    7.2,
+    7.0111,
+    6.7274,
+    6.4266,
+    6.1464,
+    5.8927
+   ],
+   "fx_5y": 5.561,
+   "apprec_5y_pct": 29.5,
+   "industry": {
+    "export_lowend": -23.1,
+    "export_hightech": -9.1,
+    "domestic_consumption": 4.9,
+    "real_estate": 5.7,
+    "infrastructure": 2.8,
+    "new_energy": -3.1,
+    "semiconductor": 7.2,
+    "commodity_metals": 12.5,
+    "power_compute": 8.1,
+    "gold": 11.0,
+    "bank_insurance": 2.8
+   },
+   "ind_series": {
+    "export_lowend": [
+     -3.68,
+     -8.02,
+     -12.88,
+     -17.94,
+     -23.15
+    ],
+    "export_hightech": [
+     -1.38,
+     -3.19,
+     -5.07,
+     -7.03,
+     -9.06
+    ],
+    "domestic_consumption": [
+     1.15,
+     2.15,
+     3.04,
+     3.97,
+     4.92
+    ],
+    "real_estate": [
+     0.99,
+     2.05,
+     3.23,
+     4.47,
+     5.75
+    ],
+    "infrastructure": [
+     0.45,
+     0.95,
+     1.54,
+     2.16,
+     2.8
+    ],
+    "new_energy": [
+     -0.65,
+     -1.25,
+     -1.84,
+     -2.46,
+     -3.1
+    ],
+    "semiconductor": [
+     1.26,
+     2.59,
+     4.08,
+     5.63,
+     7.22
+    ],
+    "commodity_metals": [
+     1.95,
+     4.19,
+     6.86,
+     9.65,
+     12.52
+    ],
+    "power_compute": [
+     1.14,
+     2.54,
+     4.33,
+     6.18,
+     8.09
+    ],
+    "gold": [
+     1.68,
+     3.64,
+     6.02,
+     8.49,
+     11.04
+    ],
+    "bank_insurance": [
+     0.45,
+     0.95,
+     1.54,
+     2.16,
+     2.8
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.26,
+    "gdp_cum_pt": -0.021,
+    "gdp_neg_pt": -0.175,
+    "gdp_pos_pt": 0.155,
+    "emp_exposed_wan": -217.6,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.11088,
+      "emp_wan": -478.1700000000001
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.05824,
+      "emp_wan": -125.57999999999998
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.04704,
+      "emp_wan": 157.78000000000003
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.029640000000000003,
+      "emp_wan": 91.77000000000001
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.0112,
+      "emp_wan": 38.63999999999999
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0062000000000000015,
+      "emp_wan": -14.260000000000003
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.006912000000000001,
+      "emp_wan": 13.248000000000001
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.022,
+      "emp_wan": 43.125
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.022680000000000002,
+      "emp_wan": 37.260000000000005
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.0017599999999999998,
+      "emp_wan": 2.53
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.013439999999999999,
+      "emp_wan": 16.099999999999998
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.257,
+    "inflow": 2.122,
+    "deepening": 0.804,
+    "net": 2.669
+   },
+   "returns": {
+    "equity": 8.2,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 5.0,
+   "label": "自定义 5.0%",
+   "note": "基准参数 + 升值速度 5.0% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.7935,
+    6.4232,
+    6.0663,
+    5.733,
+    5.4235
+   ],
+   "fx_lo": [
+    7.2,
+    6.6216,
+    6.2057,
+    5.785,
+    5.4688,
+    5.1335
+   ],
+   "fx_hi": [
+    7.2,
+    6.9762,
+    6.6604,
+    6.3309,
+    6.0247,
+    5.7472
+   ],
+   "fx_5y": 5.423,
+   "apprec_5y_pct": 32.8,
+   "industry": {
+    "export_lowend": -25.8,
+    "export_hightech": -10.1,
+    "domestic_consumption": 5.4,
+    "real_estate": 6.4,
+    "infrastructure": 3.1,
+    "new_energy": -3.4,
+    "semiconductor": 8.0,
+    "commodity_metals": 14.0,
+    "power_compute": 9.1,
+    "gold": 12.4,
+    "bank_insurance": 3.1
+   },
+   "ind_series": {
+    "export_lowend": [
+     -4.06,
+     -8.94,
+     -14.33,
+     -19.97,
+     -25.83
+    ],
+    "export_hightech": [
+     -1.56,
+     -3.54,
+     -5.63,
+     -7.82,
+     -10.1
+    ],
+    "domestic_consumption": [
+     1.28,
+     2.31,
+     3.3,
+     4.34,
+     5.41
+    ],
+    "real_estate": [
+     1.08,
+     2.27,
+     3.59,
+     4.97,
+     6.4
+    ],
+    "infrastructure": [
+     0.49,
+     1.06,
+     1.72,
+     2.41,
+     3.13
+    ],
+    "new_energy": [
+     -0.71,
+     -1.36,
+     -2.02,
+     -2.71,
+     -3.43
+    ],
+    "semiconductor": [
+     1.38,
+     2.87,
+     4.52,
+     6.25,
+     8.04
+    ],
+    "commodity_metals": [
+     2.13,
+     4.69,
+     7.66,
+     10.76,
+     13.99
+    ],
+    "power_compute": [
+     1.23,
+     2.88,
+     4.86,
+     6.93,
+     9.08
+    ],
+    "gold": [
+     1.83,
+     4.09,
+     6.73,
+     9.49,
+     12.35
+    ],
+    "bank_insurance": [
+     0.49,
+     1.06,
+     1.72,
+     2.41,
+     3.13
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.29,
+    "gdp_cum_pt": -0.023,
+    "gdp_neg_pt": -0.195,
+    "gdp_pos_pt": 0.172,
+    "emp_exposed_wan": -243.8,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.12384,
+      "emp_wan": -534.0600000000001
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.06464,
+      "emp_wan": -139.38
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.051840000000000004,
+      "emp_wan": 173.88000000000002
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.033280000000000004,
+      "emp_wan": 103.04
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.012400000000000003,
+      "emp_wan": 42.779999999999994
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0068000000000000005,
+      "emp_wan": -15.64
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.00768,
+      "emp_wan": 14.72
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.02464,
+      "emp_wan": 48.3
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.025480000000000003,
+      "emp_wan": 41.86
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.001984,
+      "emp_wan": 2.8520000000000003
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.01488,
+      "emp_wan": 17.825000000000003
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.287,
+    "inflow": 2.151,
+    "deepening": 0.813,
+    "net": 2.677
+   },
+   "returns": {
+    "equity": 8.2,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 5.5,
+   "label": "自定义 5.5%",
+   "note": "基准参数 + 升值速度 5.5% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.7596,
+    6.3593,
+    5.976,
+    5.6195,
+    5.2896
+   ],
+   "fx_lo": [
+    7.2,
+    6.5886,
+    6.144,
+    5.6989,
+    5.3605,
+    5.0068
+   ],
+   "fx_hi": [
+    7.2,
+    6.9414,
+    6.5941,
+    6.2366,
+    5.9054,
+    5.6053
+   ],
+   "fx_5y": 5.29,
+   "apprec_5y_pct": 36.1,
+   "industry": {
+    "export_lowend": -28.6,
+    "export_hightech": -11.2,
+    "domestic_consumption": 5.9,
+    "real_estate": 7.1,
+    "infrastructure": 3.5,
+    "new_energy": -3.8,
+    "semiconductor": 8.9,
+    "commodity_metals": 15.5,
+    "power_compute": 10.1,
+    "gold": 13.7,
+    "bank_insurance": 3.5
+   },
+   "ind_series": {
+    "export_lowend": [
+     -4.46,
+     -9.86,
+     -15.79,
+     -22.04,
+     -28.58
+    ],
+    "export_hightech": [
+     -1.74,
+     -3.9,
+     -6.2,
+     -8.63,
+     -11.17
+    ],
+    "domestic_consumption": [
+     1.4,
+     2.48,
+     3.57,
+     4.72,
+     5.92
+    ],
+    "real_estate": [
+     1.18,
+     2.49,
+     3.95,
+     5.48,
+     7.07
+    ],
+    "infrastructure": [
+     0.53,
+     1.17,
+     1.9,
+     2.66,
+     3.46
+    ],
+    "new_energy": [
+     -0.78,
+     -1.47,
+     -2.2,
+     -2.96,
+     -3.76
+    ],
+    "semiconductor": [
+     1.5,
+     3.15,
+     4.97,
+     6.88,
+     8.88
+    ],
+    "commodity_metals": [
+     2.3,
+     5.2,
+     8.47,
+     11.91,
+     15.5
+    ],
+    "power_compute": [
+     1.32,
+     3.22,
+     5.39,
+     7.69,
+     10.09
+    ],
+    "gold": [
+     1.98,
+     4.54,
+     7.44,
+     10.5,
+     13.7
+    ],
+    "bank_insurance": [
+     0.53,
+     1.17,
+     1.9,
+     2.66,
+     3.46
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.32,
+    "gdp_cum_pt": -0.026,
+    "gdp_neg_pt": -0.217,
+    "gdp_pos_pt": 0.191,
+    "emp_exposed_wan": -271.9,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.13728,
+      "emp_wan": -592.02
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.07168,
+      "emp_wan": -154.55999999999997
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.056639999999999996,
+      "emp_wan": 189.98000000000005
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.03692,
+      "emp_wan": 114.30999999999999
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.014000000000000002,
+      "emp_wan": 48.3
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0076,
+      "emp_wan": -17.479999999999997
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.008544000000000001,
+      "emp_wan": 16.375999999999998
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.02728,
+      "emp_wan": 53.474999999999994
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.028280000000000003,
+      "emp_wan": 46.459999999999994
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.002192,
+      "emp_wan": 3.151
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.0168,
+      "emp_wan": 20.125000000000004
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.317,
+    "inflow": 2.178,
+    "deepening": 0.82,
+    "net": 2.682
+   },
+   "returns": {
+    "equity": 8.2,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 6.0,
+   "label": "自定义 6.0%",
+   "note": "基准参数 + 升值速度 6.0% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.7259,
+    6.296,
+    5.887,
+    5.5082,
+    5.159
+   ],
+   "fx_lo": [
+    7.2,
+    6.5558,
+    6.0828,
+    5.614,
+    5.2544,
+    4.8831
+   ],
+   "fx_hi": [
+    7.2,
+    6.9068,
+    6.5285,
+    6.1438,
+    5.7885,
+    5.4669
+   ],
+   "fx_5y": 5.159,
+   "apprec_5y_pct": 39.6,
+   "industry": {
+    "export_lowend": -30.0,
+    "export_hightech": -12.3,
+    "domestic_consumption": 6.4,
+    "real_estate": 7.8,
+    "infrastructure": 3.8,
+    "new_energy": -4.1,
+    "semiconductor": 9.7,
+    "commodity_metals": 17.1,
+    "power_compute": 11.1,
+    "gold": 15.1,
+    "bank_insurance": 3.8
+   },
+   "ind_series": {
+    "export_lowend": [
+     -4.85,
+     -10.79,
+     -17.28,
+     -24.16,
+     -30.0
+    ],
+    "export_hightech": [
+     -1.93,
+     -4.26,
+     -6.78,
+     -9.45,
+     -12.26
+    ],
+    "domestic_consumption": [
+     1.52,
+     2.65,
+     3.85,
+     5.11,
+     6.43
+    ],
+    "real_estate": [
+     1.27,
+     2.72,
+     4.31,
+     5.99,
+     7.76
+    ],
+    "infrastructure": [
+     0.57,
+     1.29,
+     2.08,
+     2.92,
+     3.81
+    ],
+    "new_energy": [
+     -0.84,
+     -1.59,
+     -2.38,
+     -3.22,
+     -4.11
+    ],
+    "semiconductor": [
+     1.62,
+     3.44,
+     5.43,
+     7.53,
+     9.74
+    ],
+    "commodity_metals": [
+     2.48,
+     5.71,
+     9.29,
+     13.07,
+     17.05
+    ],
+    "power_compute": [
+     1.42,
+     3.56,
+     5.94,
+     8.46,
+     11.12
+    ],
+    "gold": [
+     2.12,
+     4.99,
+     8.17,
+     11.54,
+     15.08
+    ],
+    "bank_insurance": [
+     0.57,
+     1.29,
+     2.08,
+     2.92,
+     3.81
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.28,
+    "gdp_cum_pt": -0.023,
+    "gdp_neg_pt": -0.231,
+    "gdp_pos_pt": 0.208,
+    "emp_exposed_wan": -272.3,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.144,
+      "emp_wan": -620.9999999999999
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.07872000000000001,
+      "emp_wan": -169.74
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.06144,
+      "emp_wan": 206.08
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.04056,
+      "emp_wan": 125.58000000000001
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.0152,
+      "emp_wan": 52.44
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.008199999999999999,
+      "emp_wan": -18.859999999999996
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.009311999999999999,
+      "emp_wan": 17.848
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.030096000000000005,
+      "emp_wan": 58.995
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.03108,
+      "emp_wan": 51.06
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.002416,
+      "emp_wan": 3.4730000000000003
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.01824,
+      "emp_wan": 21.85
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.339,
+    "inflow": 2.199,
+    "deepening": 0.828,
+    "net": 2.688
+   },
+   "returns": {
+    "equity": 8.2,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 6.5,
+   "label": "自定义 6.5%",
+   "note": "基准参数 + 升值速度 6.5% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.6923,
+    6.2334,
+    5.7994,
+    5.3991,
+    5.0316
+   ],
+   "fx_lo": [
+    7.2,
+    6.5231,
+    6.0223,
+    5.5305,
+    5.1503,
+    4.7626
+   ],
+   "fx_hi": [
+    7.2,
+    6.8723,
+    6.4636,
+    6.0523,
+    5.6738,
+    5.3319
+   ],
+   "fx_5y": 5.032,
+   "apprec_5y_pct": 43.1,
+   "industry": {
+    "export_lowend": -30.0,
+    "export_hightech": -13.4,
+    "domestic_consumption": 7.0,
+    "real_estate": 8.5,
+    "infrastructure": 4.2,
+    "new_energy": -4.5,
+    "semiconductor": 10.6,
+    "commodity_metals": 18.6,
+    "power_compute": 12.2,
+    "gold": 16.5,
+    "bank_insurance": 4.2
+   },
+   "ind_series": {
+    "export_lowend": [
+     -5.25,
+     -11.73,
+     -18.79,
+     -26.32,
+     -30.0
+    ],
+    "export_hightech": [
+     -2.11,
+     -4.62,
+     -7.37,
+     -10.29,
+     -13.38
+    ],
+    "domestic_consumption": [
+     1.64,
+     2.83,
+     4.12,
+     5.5,
+     6.96
+    ],
+    "real_estate": [
+     1.37,
+     2.95,
+     4.68,
+     6.52,
+     8.47
+    ],
+    "infrastructure": [
+     0.61,
+     1.4,
+     2.27,
+     3.19,
+     4.16
+    ],
+    "new_energy": [
+     -0.91,
+     -1.7,
+     -2.57,
+     -3.49,
+     -4.46
+    ],
+    "semiconductor": [
+     1.75,
+     3.73,
+     5.89,
+     8.19,
+     10.62
+    ],
+    "commodity_metals": [
+     2.66,
+     6.23,
+     10.12,
+     14.26,
+     18.64
+    ],
+    "power_compute": [
+     1.53,
+     3.9,
+     6.5,
+     9.26,
+     12.18
+    ],
+    "gold": [
+     2.28,
+     5.45,
+     8.91,
+     12.59,
+     16.49
+    ],
+    "bank_insurance": [
+     0.61,
+     1.4,
+     2.27,
+     3.19,
+     4.16
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.13,
+    "gdp_cum_pt": -0.011,
+    "gdp_neg_pt": -0.239,
+    "gdp_pos_pt": 0.228,
+    "emp_exposed_wan": -238.7,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.144,
+      "emp_wan": -620.9999999999999
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.08576,
+      "emp_wan": -184.91999999999996
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.0672,
+      "emp_wan": 225.40000000000003
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.0442,
+      "emp_wan": 136.85000000000002
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.016800000000000002,
+      "emp_wan": 57.96
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.009000000000000001,
+      "emp_wan": -20.7
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.010176000000000001,
+      "emp_wan": 19.504
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.032736,
+      "emp_wan": 64.17
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.03416,
+      "emp_wan": 56.12
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.00264,
+      "emp_wan": 3.795
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.02016,
+      "emp_wan": 24.150000000000002
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.351,
+    "inflow": 2.22,
+    "deepening": 0.836,
+    "net": 2.705
+   },
+   "returns": {
+    "equity": 8.3,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 7.0,
+   "label": "自定义 7.0%",
+   "note": "基准参数 + 升值速度 7.0% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.659,
+    6.1714,
+    5.713,
+    5.2922,
+    4.9074
+   ],
+   "fx_lo": [
+    7.2,
+    6.4905,
+    5.9624,
+    5.4481,
+    5.0483,
+    4.645
+   ],
+   "fx_hi": [
+    7.2,
+    6.838,
+    6.3993,
+    5.9622,
+    5.5615,
+    5.2003
+   ],
+   "fx_5y": 4.907,
+   "apprec_5y_pct": 46.7,
+   "industry": {
+    "export_lowend": -30.0,
+    "export_hightech": -14.5,
+    "domestic_consumption": 7.5,
+    "real_estate": 9.2,
+    "infrastructure": 4.5,
+    "new_energy": -4.8,
+    "semiconductor": 11.5,
+    "commodity_metals": 20.3,
+    "power_compute": 13.3,
+    "gold": 17.9,
+    "bank_insurance": 4.5
+   },
+   "ind_series": {
+    "export_lowend": [
+     -5.69,
+     -12.68,
+     -20.33,
+     -28.52,
+     -30.0
+    ],
+    "export_hightech": [
+     -2.28,
+     -4.99,
+     -7.96,
+     -11.15,
+     -14.53
+    ],
+    "domestic_consumption": [
+     1.72,
+     3.0,
+     4.4,
+     5.91,
+     7.51
+    ],
+    "real_estate": [
+     1.47,
+     3.18,
+     5.06,
+     7.06,
+     9.19
+    ],
+    "infrastructure": [
+     0.66,
+     1.52,
+     2.45,
+     3.45,
+     4.52
+    ],
+    "new_energy": [
+     -0.96,
+     -1.82,
+     -2.75,
+     -3.75,
+     -4.82
+    ],
+    "semiconductor": [
+     1.88,
+     4.02,
+     6.36,
+     8.86,
+     11.53
+    ],
+    "commodity_metals": [
+     2.91,
+     6.75,
+     10.96,
+     15.47,
+     20.27
+    ],
+    "power_compute": [
+     1.69,
+     4.25,
+     7.06,
+     10.06,
+     13.27
+    ],
+    "gold": [
+     2.5,
+     5.92,
+     9.66,
+     13.67,
+     17.94
+    ],
+    "bank_insurance": [
+     0.66,
+     1.52,
+     2.45,
+     3.45,
+     4.52
+    ]
+   },
+   "macro": {
+    "w_profit_pct": -0.0,
+    "gdp_cum_pt": -0.0,
+    "gdp_neg_pt": -0.246,
+    "gdp_pos_pt": 0.246,
+    "emp_exposed_wan": -209.1,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.144,
+      "emp_wan": -620.9999999999999
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.0928,
+      "emp_wan": -200.1
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.072,
+      "emp_wan": 241.50000000000003
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.04784,
+      "emp_wan": 148.12
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.018000000000000002,
+      "emp_wan": 62.1
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0096,
+      "emp_wan": -22.080000000000002
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.011040000000000001,
+      "emp_wan": 21.16
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.035728,
+      "emp_wan": 70.035
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.03724000000000001,
+      "emp_wan": 61.18
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.002864,
+      "emp_wan": 4.117
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.0216,
+      "emp_wan": 25.875000000000004
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.363,
+    "inflow": 2.238,
+    "deepening": 0.843,
+    "net": 2.718
+   },
+   "returns": {
+    "equity": 8.4,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 7.5,
+   "label": "自定义 7.5%",
+   "note": "基准参数 + 升值速度 7.5% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.6258,
+    6.11,
+    5.628,
+    5.1874,
+    4.7862
+   ],
+   "fx_lo": [
+    7.2,
+    6.4581,
+    5.9031,
+    5.367,
+    4.9484,
+    4.5303
+   ],
+   "fx_hi": [
+    7.2,
+    6.8039,
+    6.3356,
+    5.8734,
+    5.4514,
+    5.0719
+   ],
+   "fx_5y": 4.786,
+   "apprec_5y_pct": 50.4,
+   "industry": {
+    "export_lowend": -30.0,
+    "export_hightech": -15.7,
+    "domestic_consumption": 8.1,
+    "real_estate": 9.9,
+    "infrastructure": 4.9,
+    "new_energy": -5.2,
+    "semiconductor": 12.5,
+    "commodity_metals": 21.9,
+    "power_compute": 14.4,
+    "gold": 19.4,
+    "bank_insurance": 4.9
+   },
+   "ind_series": {
+    "export_lowend": [
+     -6.14,
+     -13.63,
+     -21.88,
+     -30.0,
+     -30.0
+    ],
+    "export_hightech": [
+     -2.45,
+     -5.36,
+     -8.57,
+     -12.02,
+     -15.71
+    ],
+    "domestic_consumption": [
+     1.8,
+     3.18,
+     4.69,
+     6.32,
+     8.06
+    ],
+    "real_estate": [
+     1.58,
+     3.42,
+     5.44,
+     7.61,
+     9.94
+    ],
+    "infrastructure": [
+     0.72,
+     1.63,
+     2.64,
+     3.73,
+     4.89
+    ],
+    "new_energy": [
+     -1.02,
+     -1.93,
+     -2.94,
+     -4.03,
+     -5.19
+    ],
+    "semiconductor": [
+     2.02,
+     4.31,
+     6.83,
+     9.55,
+     12.46
+    ],
+    "commodity_metals": [
+     3.15,
+     7.28,
+     11.82,
+     16.71,
+     21.94
+    ],
+    "power_compute": [
+     1.85,
+     4.6,
+     7.63,
+     10.89,
+     14.38
+    ],
+    "gold": [
+     2.72,
+     6.39,
+     10.42,
+     14.77,
+     19.42
+    ],
+    "bank_insurance": [
+     0.72,
+     1.63,
+     2.64,
+     3.73,
+     4.89
+    ]
+   },
+   "macro": {
+    "w_profit_pct": 0.14,
+    "gdp_cum_pt": 0.011,
+    "gdp_neg_pt": -0.255,
+    "gdp_pos_pt": 0.266,
+    "emp_exposed_wan": -176.3,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.144,
+      "emp_wan": -620.9999999999999
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.10048,
+      "emp_wan": -216.66
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.07776,
+      "emp_wan": 260.82000000000005
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.051480000000000005,
+      "emp_wan": 159.39000000000001
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.019600000000000003,
+      "emp_wan": 67.62
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.010400000000000001,
+      "emp_wan": -23.92
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.012,
+      "emp_wan": 23.0
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.038543999999999995,
+      "emp_wan": 75.55499999999999
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.04032000000000001,
+      "emp_wan": 66.24000000000001
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.003104,
+      "emp_wan": 4.462
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.02352,
+      "emp_wan": 28.175000000000004
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.375,
+    "inflow": 2.252,
+    "deepening": 0.849,
+    "net": 2.726
+   },
+   "returns": {
+    "equity": 8.4,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 8.0,
+   "label": "自定义 8.0%",
+   "note": "基准参数 + 升值速度 8.0% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.5927,
+    6.0492,
+    5.5442,
+    5.0847,
+    4.668
+   ],
+   "fx_lo": [
+    7.2,
+    6.4259,
+    5.8443,
+    5.2871,
+    4.8504,
+    4.4185
+   ],
+   "fx_hi": [
+    7.2,
+    6.77,
+    6.2725,
+    5.786,
+    5.3434,
+    4.9467
+   ],
+   "fx_5y": 4.668,
+   "apprec_5y_pct": 54.2,
+   "industry": {
+    "export_lowend": -30.0,
+    "export_hightech": -16.9,
+    "domestic_consumption": 8.6,
+    "real_estate": 10.7,
+    "infrastructure": 5.3,
+    "new_energy": -5.6,
+    "semiconductor": 13.4,
+    "commodity_metals": 23.7,
+    "power_compute": 15.5,
+    "gold": 20.9,
+    "bank_insurance": 5.3
+   },
+   "ind_series": {
+    "export_lowend": [
+     -6.58,
+     -14.6,
+     -23.46,
+     -30.0,
+     -30.0
+    ],
+    "export_hightech": [
+     -2.62,
+     -5.74,
+     -9.18,
+     -12.91,
+     -16.92
+    ],
+    "domestic_consumption": [
+     1.88,
+     3.35,
+     4.98,
+     6.74,
+     8.64
+    ],
+    "real_estate": [
+     1.69,
+     3.65,
+     5.82,
+     8.17,
+     10.7
+    ],
+    "infrastructure": [
+     0.77,
+     1.75,
+     2.84,
+     4.01,
+     5.27
+    ],
+    "new_energy": [
+     -1.07,
+     -2.05,
+     -3.14,
+     -4.31,
+     -5.57
+    ],
+    "semiconductor": [
+     2.15,
+     4.61,
+     7.32,
+     10.25,
+     13.41
+    ],
+    "commodity_metals": [
+     3.4,
+     7.81,
+     12.69,
+     17.97,
+     23.66
+    ],
+    "power_compute": [
+     2.01,
+     4.96,
+     8.21,
+     11.73,
+     15.52
+    ],
+    "gold": [
+     2.93,
+     6.86,
+     11.2,
+     15.89,
+     20.95
+    ],
+    "bank_insurance": [
+     0.77,
+     1.75,
+     2.84,
+     4.01,
+     5.27
+    ]
+   },
+   "macro": {
+    "w_profit_pct": 0.29,
+    "gdp_cum_pt": 0.023,
+    "gdp_neg_pt": -0.263,
+    "gdp_pos_pt": 0.286,
+    "emp_exposed_wan": -144.6,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.144,
+      "emp_wan": -620.9999999999999
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.10815999999999999,
+      "emp_wan": -233.21999999999994
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.08256000000000001,
+      "emp_wan": 276.92
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.05564,
+      "emp_wan": 172.27
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.0212,
+      "emp_wan": 73.14
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.0112,
+      "emp_wan": -25.759999999999998
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.012864,
+      "emp_wan": 24.656000000000002
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.041712,
+      "emp_wan": 81.765
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.04340000000000001,
+      "emp_wan": 71.3
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.0033439999999999998,
+      "emp_wan": 4.8069999999999995
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.02544,
+      "emp_wan": 30.475
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.388,
+    "inflow": 2.266,
+    "deepening": 0.855,
+    "net": 2.733
+   },
+   "returns": {
+    "equity": 8.5,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 8.5,
+   "label": "自定义 8.5%",
+   "note": "基准参数 + 升值速度 8.5% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.5598,
+    5.989,
+    5.4617,
+    4.984,
+    4.5528
+   ],
+   "fx_lo": [
+    7.2,
+    6.3939,
+    5.7862,
+    5.2084,
+    4.7544,
+    4.3094
+   ],
+   "fx_hi": [
+    7.2,
+    6.7362,
+    6.2101,
+    5.6999,
+    5.2376,
+    4.8245
+   ],
+   "fx_5y": 4.553,
+   "apprec_5y_pct": 58.1,
+   "industry": {
+    "export_lowend": -30.0,
+    "export_hightech": -18.2,
+    "domestic_consumption": 9.2,
+    "real_estate": 11.5,
+    "infrastructure": 5.7,
+    "new_energy": -6.0,
+    "semiconductor": 14.4,
+    "commodity_metals": 25.4,
+    "power_compute": 16.7,
+    "gold": 22.5,
+    "bank_insurance": 5.7
+   },
+   "ind_series": {
+    "export_lowend": [
+     -7.03,
+     -15.58,
+     -25.07,
+     -30.0,
+     -30.0
+    ],
+    "export_hightech": [
+     -2.8,
+     -6.12,
+     -9.81,
+     -13.82,
+     -18.16
+    ],
+    "domestic_consumption": [
+     1.96,
+     3.53,
+     5.27,
+     7.17,
+     9.22
+    ],
+    "real_estate": [
+     1.8,
+     3.89,
+     6.22,
+     8.74,
+     11.48
+    ],
+    "infrastructure": [
+     0.83,
+     1.87,
+     3.03,
+     4.3,
+     5.66
+    ],
+    "new_energy": [
+     -1.13,
+     -2.17,
+     -3.33,
+     -4.6,
+     -5.96
+    ],
+    "semiconductor": [
+     2.29,
+     4.91,
+     7.81,
+     10.97,
+     14.39
+    ],
+    "commodity_metals": [
+     3.64,
+     8.35,
+     13.57,
+     19.26,
+     25.42
+    ],
+    "power_compute": [
+     2.18,
+     5.32,
+     8.8,
+     12.59,
+     16.69
+    ],
+    "gold": [
+     3.15,
+     7.34,
+     11.98,
+     17.03,
+     22.51
+    ],
+    "bank_insurance": [
+     0.83,
+     1.87,
+     3.03,
+     4.3,
+     5.66
+    ]
+   },
+   "macro": {
+    "w_profit_pct": 0.43,
+    "gdp_cum_pt": 0.035,
+    "gdp_neg_pt": -0.272,
+    "gdp_pos_pt": 0.307,
+    "emp_exposed_wan": -110.8,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.144,
+      "emp_wan": -620.9999999999999
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.11648,
+      "emp_wan": -251.15999999999997
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.08832,
+      "emp_wan": 296.24
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.059800000000000006,
+      "emp_wan": 185.15
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.022800000000000004,
+      "emp_wan": 78.66
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.012000000000000002,
+      "emp_wan": -27.599999999999998
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.013824000000000001,
+      "emp_wan": 26.496000000000002
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.044704,
+      "emp_wan": 87.63
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.04676,
+      "emp_wan": 76.82000000000001
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.0036,
+      "emp_wan": 5.175
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.02736,
+      "emp_wan": 32.775
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.401,
+    "inflow": 2.28,
+    "deepening": 0.861,
+    "net": 2.74
+   },
+   "returns": {
+    "equity": 8.6,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 9.0,
+   "label": "自定义 9.0%",
+   "note": "基准参数 + 升值速度 9.0% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.5271,
+    5.9294,
+    5.3803,
+    4.8853,
+    4.4404
+   ],
+   "fx_lo": [
+    7.2,
+    6.362,
+    5.7286,
+    5.1308,
+    4.6602,
+    4.203
+   ],
+   "fx_hi": [
+    7.2,
+    6.7026,
+    6.1483,
+    5.615,
+    5.1339,
+    4.7054
+   ],
+   "fx_5y": 4.44,
+   "apprec_5y_pct": 62.1,
+   "industry": {
+    "export_lowend": -30.0,
+    "export_hightech": -19.4,
+    "domestic_consumption": 9.8,
+    "real_estate": 12.3,
+    "infrastructure": 6.1,
+    "new_energy": -6.4,
+    "semiconductor": 15.4,
+    "commodity_metals": 27.2,
+    "power_compute": 17.9,
+    "gold": 24.1,
+    "bank_insurance": 6.1
+   },
+   "ind_series": {
+    "export_lowend": [
+     -7.48,
+     -16.57,
+     -26.7,
+     -30.0,
+     -30.0
+    ],
+    "export_hightech": [
+     -2.97,
+     -6.5,
+     -10.44,
+     -14.74,
+     -19.43
+    ],
+    "domestic_consumption": [
+     2.05,
+     3.71,
+     5.57,
+     7.61,
+     9.82
+    ],
+    "real_estate": [
+     1.91,
+     4.14,
+     6.61,
+     9.33,
+     12.28
+    ],
+    "infrastructure": [
+     0.88,
+     1.99,
+     3.23,
+     4.59,
+     6.06
+    ],
+    "new_energy": [
+     -1.18,
+     -2.29,
+     -3.53,
+     -4.89,
+     -6.36
+    ],
+    "semiconductor": [
+     2.43,
+     5.21,
+     8.31,
+     11.69,
+     15.39
+    ],
+    "commodity_metals": [
+     3.89,
+     8.89,
+     14.47,
+     20.57,
+     27.22
+    ],
+    "power_compute": [
+     2.34,
+     5.68,
+     9.4,
+     13.46,
+     17.89
+    ],
+    "gold": [
+     3.37,
+     7.82,
+     12.78,
+     18.2,
+     24.11
+    ],
+    "bank_insurance": [
+     0.88,
+     1.99,
+     3.23,
+     4.59,
+     6.06
+    ]
+   },
+   "macro": {
+    "w_profit_pct": 0.59,
+    "gdp_cum_pt": 0.047,
+    "gdp_neg_pt": -0.281,
+    "gdp_pos_pt": 0.328,
+    "emp_exposed_wan": -75.3,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.144,
+      "emp_wan": -620.9999999999999
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.12415999999999999,
+      "emp_wan": -267.71999999999997
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.09408,
+      "emp_wan": 315.56000000000006
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.06396,
+      "emp_wan": 198.03000000000003
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.0244,
+      "emp_wan": 84.18
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.012800000000000002,
+      "emp_wan": -29.44
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.014784000000000002,
+      "emp_wan": 28.336000000000002
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.047872,
+      "emp_wan": 93.83999999999999
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.050120000000000005,
+      "emp_wan": 82.34
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.0038560000000000005,
+      "emp_wan": 5.543000000000001
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.02928,
+      "emp_wan": 35.074999999999996
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.414,
+    "inflow": 2.294,
+    "deepening": 0.867,
+    "net": 2.747
+   },
+   "returns": {
+    "equity": 8.6,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 9.5,
+   "label": "自定义 9.5%",
+   "note": "基准参数 + 升值速度 9.5% (600 次 MC)"
+  },
+  {
+   "fx_median": [
+    7.2,
+    6.4946,
+    5.8704,
+    5.3002,
+    4.7886,
+    4.3307
+   ],
+   "fx_lo": [
+    7.2,
+    6.3303,
+    5.6716,
+    5.0545,
+    4.5679,
+    4.0992
+   ],
+   "fx_hi": [
+    7.2,
+    6.6692,
+    6.0872,
+    5.5314,
+    5.0322,
+    4.5892
+   ],
+   "fx_5y": 4.331,
+   "apprec_5y_pct": 66.3,
+   "industry": {
+    "export_lowend": -30.0,
+    "export_hightech": -20.7,
+    "domestic_consumption": 10.4,
+    "real_estate": 13.1,
+    "infrastructure": 6.5,
+    "new_energy": -6.8,
+    "semiconductor": 16.4,
+    "commodity_metals": 29.1,
+    "power_compute": 19.1,
+    "gold": 25.8,
+    "bank_insurance": 6.5
+   },
+   "ind_series": {
+    "export_lowend": [
+     -7.93,
+     -17.57,
+     -28.35,
+     -30.0,
+     -30.0
+    ],
+    "export_hightech": [
+     -3.15,
+     -6.89,
+     -11.08,
+     -15.69,
+     -20.74
+    ],
+    "domestic_consumption": [
+     2.13,
+     3.9,
+     5.88,
+     8.05,
+     10.44
+    ],
+    "real_estate": [
+     2.02,
+     4.38,
+     7.02,
+     9.92,
+     13.1
+    ],
+    "infrastructure": [
+     0.94,
+     2.11,
+     3.43,
+     4.89,
+     6.48
+    ],
+    "new_energy": [
+     -1.24,
+     -2.41,
+     -3.73,
+     -5.19,
+     -6.78
+    ],
+    "semiconductor": [
+     2.57,
+     5.51,
+     8.81,
+     12.44,
+     16.41
+    ],
+    "commodity_metals": [
+     4.14,
+     9.44,
+     15.38,
+     21.91,
+     29.06
+    ],
+    "power_compute": [
+     2.51,
+     6.04,
+     10.0,
+     14.36,
+     19.13
+    ],
+    "gold": [
+     3.59,
+     8.31,
+     13.59,
+     19.39,
+     25.75
+    ],
+    "bank_insurance": [
+     0.94,
+     2.11,
+     3.43,
+     4.89,
+     6.48
+    ]
+   },
+   "macro": {
+    "w_profit_pct": 0.75,
+    "gdp_cum_pt": 0.06,
+    "gdp_neg_pt": -0.29,
+    "gdp_pos_pt": 0.35,
+    "emp_exposed_wan": -40.7,
+    "risk_tier": "高",
+    "detail": {
+     "export_lowend": {
+      "va": 0.06,
+      "emp": 0.09,
+      "gdp_pt": -0.144,
+      "emp_wan": -620.9999999999999
+     },
+     "export_hightech": {
+      "va": 0.08,
+      "emp": 0.06,
+      "gdp_pt": -0.13248,
+      "emp_wan": -285.66
+     },
+     "domestic_consumption": {
+      "va": 0.12,
+      "emp": 0.14,
+      "gdp_pt": 0.09984,
+      "emp_wan": 334.88000000000005
+     },
+     "real_estate": {
+      "va": 0.065,
+      "emp": 0.07,
+      "gdp_pt": 0.06812,
+      "emp_wan": 210.91000000000003
+     },
+     "infrastructure": {
+      "va": 0.05,
+      "emp": 0.06,
+      "gdp_pt": 0.026000000000000002,
+      "emp_wan": 89.7
+     },
+     "new_energy": {
+      "va": 0.025,
+      "emp": 0.02,
+      "gdp_pt": -0.013600000000000001,
+      "emp_wan": -31.28
+     },
+     "semiconductor": {
+      "va": 0.012,
+      "emp": 0.008,
+      "gdp_pt": 0.015743999999999998,
+      "emp_wan": 30.175999999999995
+     },
+     "commodity_metals": {
+      "va": 0.022,
+      "emp": 0.015,
+      "gdp_pt": 0.051216,
+      "emp_wan": 100.395
+     },
+     "power_compute": {
+      "va": 0.035,
+      "emp": 0.02,
+      "gdp_pt": 0.05348000000000001,
+      "emp_wan": 87.86000000000001
+     },
+     "gold": {
+      "va": 0.002,
+      "emp": 0.001,
+      "gdp_pt": 0.004128,
+      "emp_wan": 5.933999999999999
+     },
+     "bank_insurance": {
+      "va": 0.06,
+      "emp": 0.025,
+      "gdp_pt": 0.031200000000000002,
+      "emp_wan": 37.375
+     }
+    }
+   },
+   "waterfall": {
+    "loss": -0.428,
+    "inflow": 2.305,
+    "deepening": 0.872,
+    "net": 2.749
+   },
+   "returns": {
+    "equity": 8.7,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   },
+   "key": "custom",
+   "rate_pct": 10.0,
+   "label": "自定义 10.0%",
+   "note": "基准参数 + 升值速度 10.0% (600 次 MC)"
+  }
+ ],
+ "outlook": {
+  "rows": [
+   {
+    "year": 2026,
+    "drift": 4.9,
+    "level": 6.3899,
+    "chg_pct": 4.78,
+    "usd10k_cny": 3209.0,
+    "band_lo": 6.2671,
+    "band_hi": 6.5126,
+    "pace": "升值平稳"
+   },
+   {
+    "year": 2027,
+    "drift": 5.9,
+    "level": 6.0238,
+    "chg_pct": 5.73,
+    "usd10k_cny": 3661.0,
+    "band_lo": 5.8595,
+    "band_hi": 6.1881,
+    "pace": "升值加速"
+   },
+   {
+    "year": 2028,
+    "drift": 4.3,
+    "level": 5.7703,
+    "chg_pct": 4.21,
+    "usd10k_cny": 2535.0,
+    "band_lo": 5.5769,
+    "band_hi": 5.9636,
+    "pace": "升值平稳"
+   },
+   {
+    "year": 2029,
+    "drift": 2.9,
+    "level": 5.6053,
+    "chg_pct": 2.86,
+    "usd10k_cny": 1649.0,
+    "band_lo": 5.3879,
+    "band_hi": 5.8228,
+    "pace": "升值平稳"
+   },
+   {
+    "year": 2030,
+    "drift": 2.9,
+    "level": 5.4451,
+    "chg_pct": 2.86,
+    "usd10k_cny": 1602.0,
+    "band_lo": 5.2084,
+    "band_hi": 5.6818,
+    "pace": "升值平稳"
+   }
+  ],
+  "events": [
+   {
+    "name": "美元流动性稀缺窗口 (向心坍缩 Q4'26-Q1'27)",
+    "date": "2026-09-01",
+    "direction": "+",
+    "impact": 0.012,
+    "start_year": 1,
+    "end_year": 2,
+    "source": "Deep-Risk-OPP 资本三流框架 / GOR 周报"
+   },
+   {
+    "name": "弱美元强货币财政剧本 (Bessent 防火墙)",
+    "date": "2026-08-23",
+    "direction": "+",
+    "impact": 0.008,
+    "start_year": 1,
+    "end_year": 3,
+    "source": "美债 $40T 稀释叙事 / LinkedIn 市场展望 (2026-08-23)"
+   },
+   {
+    "name": "人民币资产重估叙事 + 外资预强策略",
+    "date": "2026-09-01",
+    "direction": "+",
+    "impact": 0.006,
+    "start_year": 1,
+    "end_year": 3,
+    "source": "卢麒元 人民币资产重估框架 / 宏观研究观点"
+   },
+   {
+    "name": "美债长端高位 (30Y 5.25%) -> 美联储宽松/购债压力",
+    "date": "2026-09-05",
+    "direction": "+",
+    "impact": 0.004,
+    "start_year": 1,
+    "end_year": 2,
+    "source": "FRED DGS30 / Deep-Risk-OPP daily 2026-09-05"
+   },
+   {
+    "name": "速冻期短期美元回流风险 (VIX 跳升/全球去杠杆)",
+    "date": "2026-09-05",
+    "direction": "-",
+    "impact": -0.006,
+    "start_year": 1,
+    "end_year": 1,
+    "source": "向心坍缩三阶段预案 / VIX 14.3 低波动警示"
+   },
+   {
+    "name": "北向资金历史常态支撑 (2015-23 年均流入 0.19T RMB)",
+    "date": "2026-09-01",
+    "direction": "+",
+    "impact": 0.002,
+    "start_year": 1,
+    "end_year": 5,
+    "source": "akshare 北向历史校准 (2024-08 后黑暗期, 审慎)"
+   },
+   {
+    "name": "日美协调干预/联储鹰派反扑",
+    "date": "2026-08-15",
+    "direction": "-",
+    "impact": -0.004,
+    "start_year": 1,
+    "end_year": 1,
+    "source": "日元干预分析报告 (2026-07) / Jackson Hole 沃什表态"
+   }
+  ],
+  "note": "最可能幅度 = 现实惯性 + 新闻事件评分(线性衰减); 区间为近似 25-75%。新闻表见 news_watch.yaml, 可自行增删。"
+ },
  "live": {
   "spot": 6.7108,
   "vol3y": 0.0284,
   "inertia_apprec": 0.027,
-  "as_of": null,
   "live": false,
-  "note": "live failed (RuntimeError) - offline defaults"
+  "note": "offline defaults"
  }
 };
 const PRESETS = DASH_DATA.presets;
-let active = "p6";
+const GRID = DASH_DATA.grid || [];
+const MM = DASH_DATA.macro_meta || {};
+let CUR = PRESETS[2];
+let customRate = null;   // null = chip mode; number = slider mode index in GRID
 let sortAsc = true;
 
-const I18N_IND = {
-  export_lowend:"低端制造", export_hightech:"高新出口", domestic_consumption:"消费",
-  real_estate:"地产", infrastructure:"基建", new_energy:"新能源",
-  semiconductor:"半导体", commodity_metals:"工业金属", power_compute:"算力/电力",
-  gold:"黄金", bank_insurance:"银行保险"
-};
-const W = 560, H = 210, PAD = {l:44, r:14, t:12, b:30};
-const W2 = 330, H2 = 250, PAD2 = {l:16, r:16, t:16, b:44};
+const I18N_IND = {export_lowend:"低端制造",export_hightech:"高新出口",
+  domestic_consumption:"消费",real_estate:"地产",infrastructure:"基建",
+  new_energy:"新能源",semiconductor:"半导体",commodity_metals:"工业金属",
+  power_compute:"算力/电力",gold:"黄金",bank_insurance:"银行保险"};
+const W=560,H=210,PAD={l:44,r:14,t:12,b:30};
+const W2=330,H2=250,PAD2={l:16,r:16,t:16,b:44};
 
-function p(t){const d=document.createElement("div");d.innerHTML=t;return d.firstChild}
-function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
-function fmtT(v){return (v>0?"+":"")+v.toFixed(2)+" T$"}
-function svgAttrs(el, attrs){for(const k in attrs)el.setAttribute(k, attrs[k]);return el}
-function newSVG(w,h){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");
-  s.setAttribute("viewBox","0 0 "+w+" "+h);s.setAttribute("preserveAspectRatio","xMidYMid meet");
-  return s}
-function svgEl(tag, attrs){const e=document.createElementNS("http://www.w3.org/2000/svg",tag);
-  for(const k in attrs)e.setAttribute(k,attrs[k]);return e}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function fmtT(v){return (v>0?"+":"")+v.toFixed(2)+" T$";}
+function svgEl(t,a){const e=document.createElementNS("http://www.w3.org/2000/svg",t);
+  for(const k in a)e.setAttribute(k,a[k]);return e;}
+function newSVG(w,h){const s=svgEl("svg",{viewBox:"0 0 "+w+" "+h,
+  preserveAspectRatio:"xMidYMid meet"});return s;}
+function curObj(){return CUR;}
+
 function renderChips(){
-  const box=document.getElementById("chips"); box.innerHTML="";
-  PRESETS.forEach(function(p0){
+  const box=document.getElementById("chips");box.innerHTML="";
+  PRESETS.forEach(function(p){
     const b=document.createElement("button");
-    b.className="chip"+(p0.key===active?" active":"");
-    b.textContent=p0.label;
-    b.onclick=function(){active=p0.key;renderChips();renderAll()};
+    b.className="chip"+(customRate===null&&CUR&&CUR.key===p.key?" active":"");
+    b.textContent=p.label;
+    b.onclick=function(){customRate=null;CUR=p;renderChips();renderAll();};
     box.appendChild(b);
   });
 }
 function renderMeta(){
-  const p0=PRESETS.find(function(x){return x.key===active});
+  const p=CUR;
   document.getElementById("meta").innerHTML=
-    "<b>"+esc(p0.label)+"</b> · "+esc(p0.note)+
-    " ｜ 累计升值 "+(p0.apprec_5y_pct)+"% ｜ USD/CNY 5 年终值 <b>"+p0.fx_5y+"</b>";
+    "<b>"+esc(p.label)+"</b> · "+esc(p.note)+
+    (customRate===null?"":" <span class='tagchip'>滑块模式 · "+p.rate_pct+"%</span>")+
+    " ｜ 累计升值 "+(p.apprec_5y_pct)+"% ｜ USD/CNY 5 年终值 <b>"+p.fx_5y+"</b>";
 }
 function renderKPIs(){
-  const p0=PRESETS.find(function(x){return x.key===active});
-  const w=p0.waterfall; const box=document.getElementById("kpis"); box.innerHTML="";
+  const p=CUR,w=p.waterfall,box=document.getElementById("kpis");box.innerHTML="";
   const cards=[
     {l:"🧭 净效益 (5年)",v:fmtT(w.net),cls:"hl",
      tag:"收益 ≈ 损失的 "+(Math.abs(w.net/w.loss).toFixed(1))+" 倍"},
     {l:"💰 资本净流入",v:fmtT(w.inflow),c:"up",tag:"A股/债市/FDI 融资红利"},
     {l:"🏗️ 资本深化",v:fmtT(w.deepening),c:"up",tag:"GDP 增量贡献"},
-    {l:"📉 出口利润损失",v:fmtT(w.loss),c:"dn",tag:"低端/高新出口承压"}
-  ];
+    {l:"📉 出口利润损失",v:fmtT(w.loss),c:"dn",tag:"低端/高新出口承压"}];
   cards.forEach(function(c){
-    const el=document.createElement("div"); el.className="kpi "+c.cls;
+    const el=document.createElement("div");el.className="kpi "+c.cls;
     el.innerHTML='<div class="lbl">'+c.l+'</div><div class="val '+(c.c||"")+'">'+
       c.v+'</div><div class="tag">'+esc(c.tag)+'</div>';
     box.appendChild(el);
   });
 }
+function tierCls(t){return t==="高"?"tier-high":(t==="中"?"tier-mid":"tier-low");}
+function renderMacro(){
+  const m=CUR.macro,box=document.getElementById("mackpis");box.innerHTML="";
+  const cards=[
+    {l:"🏛️ GDP 当量 (5y累计, 利润口径)",v:m.gdp_cum_pt+" pt",
+     c:(m.gdp_cum_pt<0?"dn":"up"),
+     tag:"负向 "+m.gdp_neg_pt+" / 正向 +"+m.gdp_pos_pt},
+    {l:"👷 就业风险暴露当量 (5y)",v:(m.emp_exposed_wan<0?"-":"+")+
+      Math.abs(m.emp_exposed_wan).toFixed(0)+" 万人",
+     c:(m.emp_exposed_wan<0?"dn":"up"),
+     tag:"利润率8%·就业弹性0.5 假设"},
+    {l:"📊 加权利润冲击指数",v:(m.w_profit_pct>=0?"+":"")+m.w_profit_pct+"%",
+     c:(m.w_profit_pct<0?"dn":"up"),tag:"按增加值权重"},
+    {l:"⚠️ 综合风险等级",v:m.risk_tier,cls:"riskcard",
+     tag:"按负向 GDP 当量: "+(m.gdp_neg_pt>=0.15?"≥0.15pt":(m.gdp_neg_pt>=0.06?"0.06–0.15pt":"<0.06pt"))}];
+  cards.forEach(function(c){
+    const el=document.createElement("div");el.className="kpi "+(c.cls||"");
+    el.innerHTML='<div class="lbl">'+c.l+'</div><div class="val '+(c.c||"")+
+      ' '+(c.l.indexOf("风险")>=0?tierCls(c.v):"")+'">'+c.v+
+      '</div><div class="tag">'+esc(c.tag)+'</div>';
+    box.appendChild(el);
+  });
+}
 function renderMinis(){
-  const p0=PRESETS.find(function(x){return x.key===active});
-  const r=p0.returns, box=document.getElementById("minis"); box.innerHTML="";
+  const r=CUR.returns,box=document.getElementById("minis");box.innerHTML="";
   const items=[["📈 A股加权年化",r.equity,"%"],["🏦 中国国债年化",r.bond,"%"],
     ["🥇 黄金(人民币计价)",r.gold,"%"],["🧱 工业金属年化",r.metal,"%"]];
   items.forEach(function(it){
-    const sgn=it[1]>=0?"up":"dn"; const el=document.createElement("div");
+    const sgn=it[1]>=0?"up":"dn",el=document.createElement("div");
     el.className="mini";
     el.innerHTML='<div class="lbl">'+it[0]+'</div><div class="val '+sgn+'">'+
       (it[1]>=0?"+":"")+it[1]+it[2]+'</div>';
@@ -642,49 +6546,45 @@ function renderMinis(){
   });
 }
 function renderFX(){
-  const p0=PRESETS.find(function(x){return x.key===active});
-  const med=p0.fx_median, lo=p0.fx_lo, hi=p0.fx_hi;
+  const p=CUR,med=p.fx_median,lo=p.fx_lo,hi=p.fx_hi;
   const all=lo.concat(hi).concat(med);
-  const ymin=Math.min.apply(null,all)*0.995, ymax=Math.max.apply(null,all)*1.005;
-  const x=function(t){return PAD.l+t*(W-PAD.l-PAD.r)/5};
-  const y=function(v){return PAD.t+(ymax-v)*(H-PAD.t-PAD.b)/(ymax-ymin)};
+  const ymin=Math.min.apply(null,all)*0.995,ymax=Math.max.apply(null,all)*1.005;
+  const x=function(t){return PAD.l+t*(W-PAD.l-PAD.r)/5;};
+  const y=function(v){return PAD.t+(ymax-v)*(H-PAD.t-PAD.b)/(ymax-ymin);};
   const svg=newSVG(W,H);
   for(let t=0;t<=5;t++){
     svg.appendChild(svgEl("line",{x1:x(t),y1:PAD.t,x2:x(t),y2:H-PAD.b,
       stroke:"#e5e9f0","stroke-width":1}));
     const tx=svgEl("text",{x:x(t),y:H-PAD.b+16,"font-size":11,fill:"#6b7280",
-      "text-anchor":"middle"}); tx.textContent="Y"+t; svg.appendChild(tx);
-  }
+      "text-anchor":"middle"});tx.textContent="Y"+t;svg.appendChild(tx);}
   for(let i=0;i<=4;i++){
     const g=svgEl("text",{x:PAD.l-8,y:y(ymin+(ymax-ymin)*i/4)+4,"font-size":10,
       fill:"#6b7280","text-anchor":"end"});
-    g.textContent=(ymin+(ymax-ymin)*i/4).toFixed(2); svg.appendChild(g);
-  }
+    g.textContent=(ymin+(ymax-ymin)*i/4).toFixed(2);svg.appendChild(g);}
   const band=svgEl("polygon",{fill:"#2563eb",opacity:0.15});
   let pts="";
   for(let t=0;t<=5;t++){pts+=x(t)+","+y(hi[t])+" ";}
   for(let t=5;t>=0;t--){pts+=x(t)+","+y(lo[t])+" ";}
-  band.setAttribute("points",pts); svg.appendChild(band);
+  band.setAttribute("points",pts);svg.appendChild(band);
   let line="";
   for(let t=0;t<=5;t++){line+=(t?",":"")+x(t)+","+y(med[t]);}
   svg.appendChild(svgEl("polyline",{points:line,fill:"none",stroke:"#2563eb",
     "stroke-width":2.4,"stroke-linejoin":"round"}));
   svg.appendChild(svgEl("circle",{cx:x(5),cy:y(med[5]),r:3.4,fill:"#d97706"}));
   const lb=svgEl("text",{x:x(5)+8,y:y(med[5])+4,"font-size":11.5,fill:"#d97706",
-    "font-weight":700}); lb.textContent=med[5].toFixed(3); svg.appendChild(lb);
+    "font-weight":700});lb.textContent=med[5].toFixed(3);svg.appendChild(lb);
   document.getElementById("fxchart").innerHTML="";
   document.getElementById("fxchart").appendChild(svg);
 }
 function renderWaterfall(){
-  const p0=PRESETS.find(function(x){return x.key===active});
-  const w=p0.waterfall;
+  const p=CUR,w=p.waterfall;
   const vals=[w.loss,w.inflow,w.deepening,w.net];
   const labels=["出口损失","融资红利","资本深化","净效益"];
   const colors=["#dc2626","#059669","#059669","#d97706"];
-  const vmax=Math.max.apply(null,vals.map(function(v){return Math.abs(v)}));
-  const y1=vmax*1.35, y0=-Math.max(Math.abs(Math.min.apply(null,vals))*1.25,0.3);
-  const x=function(i){return PAD2.l+(i+0.5)*(W2-PAD2.l-PAD2.r)/4};
-  const y=function(v){return PAD2.t+(y1-v)*(H2-PAD2.t-PAD2.b)/(y1-y0)};
+  const vmax=Math.max.apply(null,vals.map(function(v){return Math.abs(v);}));
+  const y1=vmax*1.35,y0=-Math.max(Math.abs(Math.min.apply(null,vals))*1.25,0.3);
+  const x=function(i){return PAD2.l+(i+0.5)*(W2-PAD2.l-PAD2.r)/4;};
+  const y=function(v){return PAD2.t+(y1-v)*(H2-PAD2.t-PAD2.b)/(y1-y0);};
   const svg=newSVG(W2,H2);
   svg.appendChild(svgEl("line",{x1:PAD2.l,y1:y(0),x2:W2-PAD2.r,y2:y(0),
     stroke:"#cbd5e1","stroke-dasharray":"3 3"}));
@@ -692,57 +6592,121 @@ function renderWaterfall(){
   let acc=0;
   vals.forEach(function(v,i){
     let base=0;
-    if(i<3){base=acc; acc+=v;}
+    if(i<3){base=acc;acc+=v;}
     const top=v>=0?base+v:base;
     svg.appendChild(svgEl("rect",{x:x(i)-bw/2,y:y(top),width:bw,
       height:Math.max(y(base)-y(top),1),fill:colors[i],rx:3,opacity:0.92}));
     const t=svgEl("text",{x:x(i),y:v>=0?y(top)-5:y(top)+13,"font-size":10.5,
       fill:"#1f2937","font-weight":700,"text-anchor":"middle"});
-    t.textContent=(v>0?"+":"")+v.toFixed(2); svg.appendChild(t);
+    t.textContent=(v>0?"+":"")+v.toFixed(2);svg.appendChild(t);
     const lb=svgEl("text",{x:x(i),y:H2-14,"font-size":10,fill:"#6b7280",
-      "text-anchor":"middle"}); lb.textContent=labels[i]; svg.appendChild(lb);
+      "text-anchor":"middle"});lb.textContent=labels[i];svg.appendChild(lb);
   });
   document.getElementById("wfchart").innerHTML="";
   document.getElementById("wfchart").appendChild(svg);
 }
+function indListSorted(p){
+  const items=Object.keys(p.industry).map(function(k){return {k:k,v:p.industry[k]};});
+  items.sort(function(a,b){return sortAsc? a.v-b.v : b.v-a.v;});
+  return items;
+}
 function renderIndustry(){
-  const p0=PRESETS.find(function(x){return x.key===active});
-  const ind=p0.industry;
-  const items=Object.keys(ind).map(function(k){return {k:k,v:ind[k]}});
-  items.sort(function(a,b){return sortAsc? a.v-b.v : b.v-a.v});
-  const IH=items.length*24+20, IP={l:130,r:64,t:8,b:12};
-  const vmax=Math.max.apply(null,items.map(function(o){return Math.abs(o.v)}));
+  const p=CUR,items=indListSorted(p);
+  const IH=items.length*24+20,IP={l:130,r:64,t:8,b:12};
+  const vmax=Math.max.apply(null,items.map(function(o){return Math.abs(o.v);}));
   const sc=(W-IP.l-IP.r)/vmax;
   const svg=newSVG(W,IH);
   items.forEach(function(o,i){
     const yy=IP.t+i*(IH-IP.t-IP.b)/items.length+7;
     const t1=svgEl("text",{x:IP.l-8,y:yy+4,"font-size":11,fill:"#1f2937",
       "text-anchor":"end"});
-    t1.textContent=I18N_IND[o.k]||o.k; svg.appendChild(t1);
+    t1.textContent=I18N_IND[o.k]||o.k;svg.appendChild(t1);
     const xw=Math.abs(o.v)*sc;
     svg.appendChild(svgEl("rect",{x:o.v>=0?IP.l:IP.l-xw,y:yy-7,
       width:Math.max(xw,1.2),height:14,fill:o.v>=0?"#059669":"#dc2626",rx:3,
       opacity:0.88}));
     const t=svgEl("text",{x:o.v>=0?IP.l+xw+5:IP.l-xw-5,y:yy+4,"font-size":10.5,
       fill:"#1f2937","text-anchor":o.v>=0?"start":"end","font-weight":600});
-    t.textContent=(o.v>0?"+":"")+o.v+"%"; svg.appendChild(t);
+    t.textContent=(o.v>0?"+":"")+o.v+"%";svg.appendChild(t);
   });
   svg.appendChild(svgEl("line",{x1:IP.l,y1:6,x2:IP.l,y2:IH-6,
     stroke:"#cbd5e1","stroke-width":1}));
   document.getElementById("indchart").innerHTML="";
   document.getElementById("indchart").appendChild(svg);
   document.getElementById("sorthint").textContent=
-    sortAsc? "按影响升序 ↓":"按影响降序 ↑";
+    sortAsc?"按影响升序 ↓":"按影响降序 ↑";
+}
+function colorPct(v,maxAbs){
+  if(v===0)return "rgba(226,232,240,0.9)";
+  const a=Math.min(Math.abs(v)/maxAbs,1);
+  if(v>0)return "rgba(5,150,105,"+(0.12+0.78*a).toFixed(2)+")";
+  return "rgba(220,38,38,"+(0.12+0.78*a).toFixed(2)+")";
+}
+function renderHeat(){
+  const p=CUR,ser=p.ind_series,box=document.getElementById("hmchart");
+  const keys=Object.keys(ser);
+  const yrs=ser[keys[0]]?ser[keys[0]].length:0;
+  let maxAbs=1;
+  keys.forEach(function(k){ser[k].forEach(function(v){if(Math.abs(v)>maxAbs)maxAbs=Math.abs(v);});});
+  let html='<table class="hm"><tr><th class="rl">行业 \ Y</th>';
+  for(let y=1;y<=yrs;y++)html+="<th>Y"+y+"</th>";
+  html+="</tr>";
+  const order=[];
+  Object.keys(I18N_IND).forEach(function(k){if(keys.indexOf(k)>=0)order.push(k);});
+  keys.forEach(function(k){if(order.indexOf(k)<0)order.push(k);});
+  order.forEach(function(k){
+    html+='<tr><td class="rl">'+(I18N_IND[k]||k)+'</td>';
+    ser[k].forEach(function(v){
+      const show=Math.abs(v)>=0.5;
+      html+='<td><div class="cell" style="background:'+colorPct(v,maxAbs)+'">'+
+        (show?((v>0?"+":"")+v.toFixed(1)):"")+'</div></td>';
+    });
+    html+="</tr>";
+  });
+  html+="</table>";
+  box.innerHTML=html;
+}
+function renderOutlook(){
+  const o=DASH_DATA.outlook||{rows:[],events:[]},box=document.getElementById("outlooktab");
+  let html='<table class="otbl"><tr><th>年份</th><th>最可能年末 USD/CNY</th><th>年变动 (升值+)</th><th>大概率区间</th><th>每 1 万美元人民币值变动</th><th>节奏</th></tr>';
+  o.rows.forEach(function(r){
+    const cls=r.pace.indexOf("加速")>=0?"tier-high":(r.pace.indexOf("趋缓")>=0||r.pace.indexOf("贬值")>=0?"tier-mid":"tier-low");
+    html+="<tr><td>"+r.year+"</td><td><b>"+r.level.toFixed(3)+"</b></td><td class='"+
+      (r.chg_pct>=0?"up":"dn")+"'>"+r.chg_pct.toFixed(2)+"%</td><td>"+
+      r.band_lo.toFixed(3)+" ~ "+r.band_hi.toFixed(3)+"</td><td>"+
+      (r.usd10k_cny>0?"+":"")+r.usd10k_cny.toFixed(0)+" 元</td><td><span class='"+cls+"'>"+
+      r.pace+"</span></td></tr>";
+  });
+  html+="</table>";
+  box.innerHTML=html;
+  const nb=document.getElementById("outlooknews");
+  if(o.events&&o.events.length){
+    nb.innerHTML="新闻/事件权重: "+o.events.map(function(e){
+      return "<span class='ev "+((e.direction||"").indexOf("+")>=0?"evp":"evm")+"'>"+
+        esc(e.name)+" ("+((e.impact*100)>=0?"+":"")+(e.impact*100).toFixed(1)+"pp)</span>";
+    }).join(" ");
+  }
 }
 function renderAll(){
-  renderMeta();renderKPIs();renderMinis();renderFX();renderWaterfall();renderIndustry();
+  renderMeta();renderKPIs();renderMacro();renderMinis();renderFX();
+  renderWaterfall();renderIndustry();renderHeat();renderOutlook();
 }
+function onSlider(){
+  const v=parseFloat(document.getElementById("rateSlider").value);
+  const idx=Math.max(0,Math.min(GRID.length-1,Math.round(v/0.5)));
+  customRate=idx;
+  CUR=GRID[idx];
+  document.getElementById("sliderVal").textContent=CUR.rate_pct.toFixed(1)+"%";
+  renderChips();renderAll();
+}
+document.getElementById("rateSlider").addEventListener("input",onSlider);
 document.getElementById("sorthint").onclick=function(){sortAsc=!sortAsc;renderIndustry();};
 document.getElementById("gen").textContent=DASH_DATA.generated;
-var LV=DASH_DATA.live||{}; document.getElementById("liveinfo").textContent=
-  (LV.live? "当日抓取":"离线缓存")+" · USD/CNY "+LV.spot+" · 波动率(3y) "+
+var LV=DASH_DATA.live||{};
+document.getElementById("liveinfo").textContent=
+  (LV.live?"当日抓取":"离线缓存")+" · USD/CNY "+LV.spot+" · 波动率(3y) "+
   (LV.vol3y*100).toFixed(2)+"%"+" · 惯性升值 "+(LV.inertia_apprec*100).toFixed(2)+
-  "%"+(LV.as_of? " · FX数据截至 "+LV.as_of:"")+(LV.live?"":" · "+LV.note);
+  "%"+(LV.as_of?" · FX数据截至 "+LV.as_of:"")+(LV.live?"":" · "+LV.note);
 renderChips();renderAll();
 </script>
 </body>

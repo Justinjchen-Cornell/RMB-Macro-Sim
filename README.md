@@ -1,6 +1,15 @@
 # RMB-Macro-Sim · 人民币升值宏观模拟
 
-**Macro scenario simulation: RMB appreciation → inflation / exports / industry profits / capital inflows → asset repricing.**
+<p align="center">
+  <a href="https://justinjchen-cornell.github.io/RMB-Macro-Sim/"><img src="https://img.shields.io/badge/交互仪表盘-LIVE-2563eb?logo=github" alt="dashboard"></a>
+  <img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="license">
+  <img src="https://img.shields.io/badge/tests-20%2F20-green" alt="tests">
+  <a href="README_EN.md"><img src="https://img.shields.io/badge/English-README_EN.md-gray?logo=readme" alt="EN"></a>
+</p>
+
+<p align="center"><b>Macro scenario simulation: RMB appreciation → inflation / exports / industry profits / capital inflows → asset repricing.</b></p>
+
+<p align="center"><img src="assets/dashboard_preview.png" alt="dashboard preview" width="85%"></p>
 
 > 🧭 This repository simulates the macro impact of a controlled RMB (CNY) appreciation path:
 > FX (GBM, real-calibrated) → import inflation → export competitiveness (Marshall-Lerner) →
@@ -141,12 +150,14 @@ macro_sim/
 ├── config.yaml         # ★ 参数唯一真源 (被 run_all/run_real 读取)
 ├── run_all.py          # 一键: 多情景 + 图表 + 瀑布摘要
 ├── run_real.py         # 真实数据管线: 校准 → A/B/C 三情景
-├── export_dashboard.py # 8 预设 → dashboard.html (单文件交互)
+├── export_dashboard.py # 8 预设 + 21档滑块网格 + 宏观风险 + 展望 → dashboard.html
+├── outlook.py / news_watch.yaml # 年度展望: 惯性漂移 + 新闻事件评分
 ├── build_report.py     # 中文研报 → report/*.html + *.pdf
 ├── test_model.py       # 17 项单元测试
 ├── test_real_calib.py  # 3 项校准离线测试
 ├── dashboard.html      # 交互仪表盘 (数据内嵌, 离线可用)  [Pages: index.html]
 ├── docs/               # code_review / superpowers spec
+├── README_EN.md         # English edition
 ├── report/             # 研究报告 HTML + PDF (中文)
 └── charts/             # 一键生成的图表 (浅色研报风)
     ├── 01_fx_scenarios.png        # 多情景汇率路径
