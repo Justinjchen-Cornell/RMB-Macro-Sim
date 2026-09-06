@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RMB-Macro-Sim · 人民币升值宏观情景模拟</title>
+<style>
+:root{
+  --bg:#f5f7fa; --card:#ffffff; --line:#e5e9f0; --line2:#cbd5e1;
+  --ink:#1f2937; --muted:#6b7280; --blue:#2563eb; --green:#059669;
+  --red:#dc2626; --gold:#d97706; --violet:#7c3aed; --cyan:#0891b2;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 10px 30px -14px rgba(16,24,40,.18);
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);padding:22px;max-width:1240px;margin:0 auto}
+.header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+h1{font-size:22px;font-weight:800;letter-spacing:.2px}
+h1 .sub{font-weight:400;color:var(--muted);font-size:14px}
+.badge{font-size:11px;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;
+  padding:3px 9px;border-radius:999px;font-weight:600}
+.disc{color:var(--muted);font-size:12px;margin:4px 0 14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+.chip{border:1px solid var(--line2);background:var(--card);color:var(--ink);
+  padding:7px 14px;border-radius:999px;font-size:13px;cursor:pointer;
+  transition:all .15s;font-weight:500}
+.chip:hover{border-color:var(--blue);color:var(--blue)}
+.chip.active{background:var(--blue);border-color:var(--blue);color:#fff;
+  box-shadow:0 4px 12px -4px rgba(37,99,235,.5)}
+.meta{font-size:12px;color:var(--muted);margin:2px 0 14px;min-height:16px}
+.meta b{color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 16px;box-shadow:var(--shadow)}
+.kpi .lbl{font-size:12px;color:var(--muted);margin-bottom:6px}
+.kpi .val{font-size:24px;font-weight:800;line-height:1.1}
+.kpi .tag{font-size:11px;color:var(--muted);margin-top:5px}
+.kpi.hl{border-top:3px solid var(--gold)}
+.kpi.hl .val{color:var(--gold)}
+.up{color:var(--green)} .dn{color:var(--red)}
+.grid{display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow)}
+.panel h3{font-size:14px;font-weight:700;margin-bottom:2px;display:flex;
+  align-items:center;gap:6px}
+.panel .hint{font-size:11px;color:var(--muted);margin-bottom:8px}
+.full{grid-column:1 / -1}
+svg{width:100%;height:auto;display:block}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;
+  margin-bottom:14px}
+.mini{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:12px 14px;box-shadow:var(--shadow)}
+.mini .lbl{font-size:12px;color:var(--muted)}
+.mini .val{font-size:17px;font-weight:700;margin-top:2px}
+.sorthint{cursor:pointer;user-select:none;color:var(--blue);font-size:12px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap;margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+.foot{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--muted);line-height:1.7}
+.mono{font-family:"Cascadia Mono",Consolas,monospace;font-size:11px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>RMB-Macro-Sim <span class="sub">人民币升值宏观情景模拟 · 研究仪表盘</span></h1>
+  <span class="badge">Monte Carlo · 2000 次 × 8 情景</span>
+</div>
+<div class="disc">传导链: 汇率 GBM → 输入性通胀 → 出口(Marshall-Lerner) → 11 行业利润 → 资产定价 + 资本流入(融资红利·资本深化)。</div>
+
+<div class="chips" id="chips"></div>
+<div class="meta" id="meta"></div>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="grid">
+  <div class="panel">
+    <h3>🛫 USD/CNY 路径 (中位数 ± 25-75%)</h3>
+    <div class="hint">5 年走势带; 终值标注于曲线末端</div>
+    <div id="fxchart"></div>
+    <div class="legend">
+      <span><i style="background:var(--blue)"></i>中位数路径</span>
+      <span><i style="background:var(--blue);opacity:.18"></i>25-75% 分位</span>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>⚖️ 资本净效益瀑布 (5 年累计, T$)</h3>
+    <div class="hint">净效益 = 融资红利 + 资本深化 − 出口损失</div>
+    <div id="wfchart"></div>
+  </div>
+</div>
+
+<div class="row2" id="minis"></div>
+
+<div class="panel full">
+  <h3>🏭 11 行业 5 年累计利润冲击
+    <span class="sorthint" id="sorthint" style="margin-left:auto">按影响排序 ↓</span>
+  </h3>
+  <div class="hint">相对基准情景的利润变化 (正值=受益, 负值=受损)</div>
+  <div id="indchart"></div>
+</div>
+
+<div class="foot">
+  <div>⚠️ 免责声明: 研究框架, 不构成投资建议。参数为校准假设, 情景为概率模拟而非预测。</div>
+  <div>📊 数据源: FRED / 腾讯行情 / akshare(北向), 截至 2026-09 ｜ 生成时间: <span id="gen"></span></div>
+  <div class="mono">复现: python run_all.py (图表) · python run_real.py (真实数据校准) · python export_dashboard.py (本页)</div>
+</div>
+
+<script>
+const DASH_DATA = {
+ "generated": "2026-09-06 16:22",
+ "n_simulations": 2000,
+ "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。",
+ "presets": [
+  {
+   "key": "p0",
+   "label": "不升值 0%",
+   "note": "基准参数, 汇率零漂移对照",
+   "fx_median": [
+    7.2,
+    7.2071,
+    7.204,
+    7.1738,
+    7.162,
+    7.1707
+   ],
+   "fx_lo": [
+    7.2,
+    7.0173,
+    6.9284,
+    6.842,
+    6.7762,
+    6.7471
+   ],
+   "fx_hi": [
+    7.2,
+    7.3935,
+    7.4733,
+    7.5383,
+    7.5754,
+    7.5974
+   ],
+   "fx_5y": 7.171,
+   "apprec_5y_pct": 0.4,
+   "industry": {
+    "export_lowend": 0.1,
+    "export_hightech": 0.3,
+    "domestic_consumption": 0.0,
+    "real_estate": 0.1,
+    "infrastructure": 0.1,
+    "new_energy": -0.0,
+    "semiconductor": 0.1,
+    "commodity_metals": 0.3,
+    "power_compute": 0.2,
+    "gold": 0.2,
+    "bank_insurance": 0.1
+   },
+   "waterfall": {
+    "loss": 0.004,
+    "inflow": 1.851,
+    "deepening": 0.728,
+    "net": 2.583
+   },
+   "returns": {
+    "equity": 8.0,
+    "bond": -1.5,
+    "gold": 2.9,
+    "metal": 3.4
+   }
+  },
+  {
+   "key": "p3",
+   "label": "慢速升值 3%",
+   "note": "基准参数, 温和升值",
+   "fx_median": [
+    7.2,
+    6.9941,
+    6.7845,
+    6.5564,
+    6.3522,
+    6.1719
+   ],
+   "fx_lo": [
+    7.2,
+    6.8099,
+    6.5249,
+    6.2531,
+    6.01,
+    5.8073
+   ],
+   "fx_hi": [
+    7.2,
+    7.175,
+    7.0381,
+    6.8895,
+    6.7188,
+    6.5392
+   ],
+   "fx_5y": 6.172,
+   "apprec_5y_pct": 16.7,
+   "industry": {
+    "export_lowend": -12.7,
+    "export_hightech": -5.0,
+    "domestic_consumption": 3.0,
+    "real_estate": 3.2,
+    "infrastructure": 1.5,
+    "new_energy": -1.8,
+    "semiconductor": 4.0,
+    "commodity_metals": 6.7,
+    "power_compute": 4.2,
+    "gold": 5.9,
+    "bank_insurance": 1.5
+   },
+   "waterfall": {
+    "loss": -0.141,
+    "inflow": 2.003,
+    "deepening": 0.771,
+    "net": 2.633
+   },
+   "returns": {
+    "equity": 8.1,
+    "bond": -0.7,
+    "gold": -4.7,
+    "metal": 2.0
+   }
+  },
+  {
+   "key": "p6",
+   "label": "基准情景 6%",
+   "note": "基准参数 (config.yaml), 政策驱动升值",
+   "fx_median": [
+    7.2,
+    6.7874,
+    6.3894,
+    5.9921,
+    5.6339,
+    5.3122
+   ],
+   "fx_lo": [
+    7.2,
+    6.6086,
+    6.145,
+    5.7149,
+    5.3304,
+    4.9984
+   ],
+   "fx_hi": [
+    7.2,
+    6.9629,
+    6.6282,
+    6.2965,
+    5.9591,
+    5.6283
+   ],
+   "fx_5y": 5.312,
+   "apprec_5y_pct": 35.5,
+   "industry": {
+    "export_lowend": -28.1,
+    "export_hightech": -11.0,
+    "domestic_consumption": 5.8,
+    "real_estate": 7.0,
+    "infrastructure": 3.4,
+    "new_energy": -3.7,
+    "semiconductor": 8.7,
+    "commodity_metals": 15.2,
+    "power_compute": 9.9,
+    "gold": 13.5,
+    "bank_insurance": 3.4
+   },
+   "waterfall": {
+    "loss": -0.312,
+    "inflow": 2.173,
+    "deepening": 0.818,
+    "net": 2.678
+   },
+   "returns": {
+    "equity": 8.2,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   }
+  },
+  {
+   "key": "p10",
+   "label": "快速升值 10%",
+   "note": "激进升值, 转型加速情景",
+   "fx_median": [
+    7.2,
+    6.5213,
+    5.8982,
+    5.3145,
+    4.8009,
+    4.3493
+   ],
+   "fx_lo": [
+    7.2,
+    6.3495,
+    5.6725,
+    5.0687,
+    4.5422,
+    4.0923
+   ],
+   "fx_hi": [
+    7.2,
+    6.6899,
+    6.1186,
+    5.5845,
+    5.078,
+    4.6081
+   ],
+   "fx_5y": 4.349,
+   "apprec_5y_pct": 65.5,
+   "industry": {
+    "export_lowend": -30.0,
+    "export_hightech": -20.5,
+    "domestic_consumption": 10.3,
+    "real_estate": 13.0,
+    "infrastructure": 6.4,
+    "new_energy": -6.7,
+    "semiconductor": 16.2,
+    "commodity_metals": 28.7,
+    "power_compute": 18.9,
+    "gold": 25.5,
+    "bank_insurance": 6.4
+   },
+   "waterfall": {
+    "loss": -0.425,
+    "inflow": 2.301,
+    "deepening": 0.87,
+    "net": 2.745
+   },
+   "returns": {
+    "equity": 8.7,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   }
+  },
+  {
+   "key": "p6c",
+   "label": "6% + 保守资本",
+   "note": "资本流入按北向历史常态 (6.5%/年, 弱美元荒)",
+   "fx_median": [
+    7.2,
+    6.7874,
+    6.3894,
+    5.9921,
+    5.6339,
+    5.3122
+   ],
+   "fx_lo": [
+    7.2,
+    6.6086,
+    6.145,
+    5.7149,
+    5.3304,
+    4.9984
+   ],
+   "fx_hi": [
+    7.2,
+    6.9629,
+    6.6282,
+    6.2965,
+    5.9591,
+    5.6283
+   ],
+   "fx_5y": 5.312,
+   "apprec_5y_pct": 35.5,
+   "industry": {
+    "export_lowend": -28.1,
+    "export_hightech": -11.0,
+    "domestic_consumption": 5.8,
+    "real_estate": 7.0,
+    "infrastructure": 3.4,
+    "new_energy": -3.7,
+    "semiconductor": 8.7,
+    "commodity_metals": 15.2,
+    "power_compute": 9.9,
+    "gold": 13.5,
+    "bank_insurance": 3.4
+   },
+   "waterfall": {
+    "loss": -0.312,
+    "inflow": 1.678,
+    "deepening": 0.624,
+    "net": 1.99
+   },
+   "returns": {
+    "equity": 8.2,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   }
+  },
+  {
+   "key": "p6x",
+   "label": "6% + 激进美元荒",
+   "note": "美元流动性稀缺峰值情景 (15%/年, 强美元荒)",
+   "fx_median": [
+    7.2,
+    6.7874,
+    6.3894,
+    5.9921,
+    5.6339,
+    5.3122
+   ],
+   "fx_lo": [
+    7.2,
+    6.6086,
+    6.145,
+    5.7149,
+    5.3304,
+    4.9984
+   ],
+   "fx_hi": [
+    7.2,
+    6.9629,
+    6.6282,
+    6.2965,
+    5.9591,
+    5.6283
+   ],
+   "fx_5y": 5.312,
+   "apprec_5y_pct": 35.5,
+   "industry": {
+    "export_lowend": -28.1,
+    "export_hightech": -11.0,
+    "domestic_consumption": 5.8,
+    "real_estate": 7.0,
+    "infrastructure": 3.4,
+    "new_energy": -3.7,
+    "semiconductor": 8.7,
+    "commodity_metals": 15.2,
+    "power_compute": 9.9,
+    "gold": 13.5,
+    "bank_insurance": 3.4
+   },
+   "waterfall": {
+    "loss": -0.312,
+    "inflow": 3.066,
+    "deepening": 1.152,
+    "net": 3.907
+   },
+   "returns": {
+    "equity": 8.2,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   }
+  },
+  {
+   "key": "p6r",
+   "label": "实测校准 6%",
+   "note": "实测: 即期6.71 + 3y波动2.84%, 6%情景",
+   "fx_median": [
+    6.7108,
+    6.3255,
+    5.9563,
+    5.5936,
+    5.2626,
+    4.9612
+   ],
+   "fx_lo": [
+    6.7108,
+    6.2067,
+    5.7936,
+    5.4086,
+    5.0597,
+    4.7513
+   ],
+   "fx_hi": [
+    6.7108,
+    6.4412,
+    6.1135,
+    5.794,
+    5.4765,
+    5.1691
+   ],
+   "fx_5y": 4.961,
+   "apprec_5y_pct": 35.3,
+   "industry": {
+    "export_lowend": -27.9,
+    "export_hightech": -10.9,
+    "domestic_consumption": 5.8,
+    "real_estate": 6.9,
+    "infrastructure": 3.4,
+    "new_energy": -3.7,
+    "semiconductor": 8.7,
+    "commodity_metals": 15.1,
+    "power_compute": 9.8,
+    "gold": 13.4,
+    "bank_insurance": 3.4
+   },
+   "waterfall": {
+    "loss": -0.31,
+    "inflow": 2.171,
+    "deepening": 0.817,
+    "net": 2.679
+   },
+   "returns": {
+    "equity": 8.2,
+    "bond": -0.7,
+    "gold": -5.0,
+    "metal": 2.0
+   }
+  },
+  {
+   "key": "piv",
+   "label": "现实惯性 2.7%",
+   "note": "实测: 近3年实际升值漂移 2.7%/年",
+   "fx_median": [
+    6.7108,
+    6.5377,
+    6.3627,
+    6.1757,
+    6.0052,
+    5.8512
+   ],
+   "fx_lo": [
+    6.7108,
+    6.415,
+    6.1888,
+    5.9715,
+    5.7737,
+    5.6036
+   ],
+   "fx_hi": [
+    6.7108,
+    6.6573,
+    6.5306,
+    6.3969,
+    6.2493,
+    6.0963
+   ],
+   "fx_5y": 5.851,
+   "apprec_5y_pct": 14.7,
+   "industry": {
+    "export_lowend": -11.1,
+    "export_hightech": -4.4,
+    "domestic_consumption": 2.7,
+    "real_estate": 2.8,
+    "infrastructure": 1.3,
+    "new_energy": -1.6,
+    "semiconductor": 3.5,
+    "commodity_metals": 5.9,
+    "power_compute": 3.7,
+    "gold": 5.1,
+    "bank_insurance": 1.3
+   },
+   "waterfall": {
+    "loss": -0.123,
+    "inflow": 1.985,
+    "deepening": 0.766,
+    "net": 2.627
+   },
+   "returns": {
+    "equity": 8.1,
+    "bond": -0.7,
+    "gold": -4.4,
+    "metal": 2.0
+   }
+  }
+ ]
+};
+const PRESETS = DASH_DATA.presets;
+let active = "p6";
+let sortAsc = true;
+
+const I18N_IND = {
+  export_lowend:"低端制造", export_hightech:"高新出口", domestic_consumption:"消费",
+  real_estate:"地产", infrastructure:"基建", new_energy:"新能源",
+  semiconductor:"半导体", commodity_metals:"工业金属", power_compute:"算力/电力",
+  gold:"黄金", bank_insurance:"银行保险"
+};
+const W = 560, H = 210, PAD = {l:44, r:14, t:12, b:30};
+const W2 = 330, H2 = 250, PAD2 = {l:16, r:16, t:16, b:44};
+
+function p(t){const d=document.createElement("div");d.innerHTML=t;return d.firstChild}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function fmtT(v){return (v>0?"+":"")+v.toFixed(2)+" T$"}
+function svgAttrs(el, attrs){for(const k in attrs)el.setAttribute(k, attrs[k]);return el}
+function newSVG(w,h){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  s.setAttribute("viewBox","0 0 "+w+" "+h);s.setAttribute("preserveAspectRatio","xMidYMid meet");
+  return s}
+function svgEl(tag, attrs){const e=document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for(const k in attrs)e.setAttribute(k,attrs[k]);return e}
+function renderChips(){
+  const box=document.getElementById("chips"); box.innerHTML="";
+  PRESETS.forEach(function(p0){
+    const b=document.createElement("button");
+    b.className="chip"+(p0.key===active?" active":"");
+    b.textContent=p0.label;
+    b.onclick=function(){active=p0.key;renderChips();renderAll()};
+    box.appendChild(b);
+  });
+}
+function renderMeta(){
+  const p0=PRESETS.find(function(x){return x.key===active});
+  document.getElementById("meta").innerHTML=
+    "<b>"+esc(p0.label)+"</b> · "+esc(p0.note)+
+    " ｜ 累计升值 "+(p0.apprec_5y_pct)+"% ｜ USD/CNY 5 年终值 <b>"+p0.fx_5y+"</b>";
+}
+function renderKPIs(){
+  const p0=PRESETS.find(function(x){return x.key===active});
+  const w=p0.waterfall; const box=document.getElementById("kpis"); box.innerHTML="";
+  const cards=[
+    {l:"🧭 净效益 (5年)",v:fmtT(w.net),cls:"hl",
+     tag:"收益 ≈ 损失的 "+(Math.abs(w.net/w.loss).toFixed(1))+" 倍"},
+    {l:"💰 资本净流入",v:fmtT(w.inflow),c:"up",tag:"A股/债市/FDI 融资红利"},
+    {l:"🏗️ 资本深化",v:fmtT(w.deepening),c:"up",tag:"GDP 增量贡献"},
+    {l:"📉 出口利润损失",v:fmtT(w.loss),c:"dn",tag:"低端/高新出口承压"}
+  ];
+  cards.forEach(function(c){
+    const el=document.createElement("div"); el.className="kpi "+c.cls;
+    el.innerHTML='<div class="lbl">'+c.l+'</div><div class="val '+(c.c||"")+'">'+
+      c.v+'</div><div class="tag">'+esc(c.tag)+'</div>';
+    box.appendChild(el);
+  });
+}
+function renderMinis(){
+  const p0=PRESETS.find(function(x){return x.key===active});
+  const r=p0.returns, box=document.getElementById("minis"); box.innerHTML="";
+  const items=[["📈 A股加权年化",r.equity,"%"],["🏦 中国国债年化",r.bond,"%"],
+    ["🥇 黄金(人民币计价)",r.gold,"%"],["🧱 工业金属年化",r.metal,"%"]];
+  items.forEach(function(it){
+    const sgn=it[1]>=0?"up":"dn"; const el=document.createElement("div");
+    el.className="mini";
+    el.innerHTML='<div class="lbl">'+it[0]+'</div><div class="val '+sgn+'">'+
+      (it[1]>=0?"+":"")+it[1]+it[2]+'</div>';
+    box.appendChild(el);
+  });
+}
+function renderFX(){
+  const p0=PRESETS.find(function(x){return x.key===active});
+  const med=p0.fx_median, lo=p0.fx_lo, hi=p0.fx_hi;
+  const all=lo.concat(hi).concat(med);
+  const ymin=Math.min.apply(null,all)*0.995, ymax=Math.max.apply(null,all)*1.005;
+  const x=function(t){return PAD.l+t*(W-PAD.l-PAD.r)/5};
+  const y=function(v){return PAD.t+(ymax-v)*(H-PAD.t-PAD.b)/(ymax-ymin)};
+  const svg=newSVG(W,H);
+  for(let t=0;t<=5;t++){
+    svg.appendChild(svgEl("line",{x1:x(t),y1:PAD.t,x2:x(t),y2:H-PAD.b,
+      stroke:"#e5e9f0","stroke-width":1}));
+    const tx=svgEl("text",{x:x(t),y:H-PAD.b+16,"font-size":11,fill:"#6b7280",
+      "text-anchor":"middle"}); tx.textContent="Y"+t; svg.appendChild(tx);
+  }
+  for(let i=0;i<=4;i++){
+    const g=svgEl("text",{x:PAD.l-8,y:y(ymin+(ymax-ymin)*i/4)+4,"font-size":10,
+      fill:"#6b7280","text-anchor":"end"});
+    g.textContent=(ymin+(ymax-ymin)*i/4).toFixed(2); svg.appendChild(g);
+  }
+  const band=svgEl("polygon",{fill:"#2563eb",opacity:0.15});
+  let pts="";
+  for(let t=0;t<=5;t++){pts+=x(t)+","+y(hi[t])+" ";}
+  for(let t=5;t>=0;t--){pts+=x(t)+","+y(lo[t])+" ";}
+  band.setAttribute("points",pts); svg.appendChild(band);
+  let line="";
+  for(let t=0;t<=5;t++){line+=(t?",":"")+x(t)+","+y(med[t]);}
+  svg.appendChild(svgEl("polyline",{points:line,fill:"none",stroke:"#2563eb",
+    "stroke-width":2.4,"stroke-linejoin":"round"}));
+  svg.appendChild(svgEl("circle",{cx:x(5),cy:y(med[5]),r:3.4,fill:"#d97706"}));
+  const lb=svgEl("text",{x:x(5)+8,y:y(med[5])+4,"font-size":11.5,fill:"#d97706",
+    "font-weight":700}); lb.textContent=med[5].toFixed(3); svg.appendChild(lb);
+  document.getElementById("fxchart").innerHTML="";
+  document.getElementById("fxchart").appendChild(svg);
+}
+function renderWaterfall(){
+  const p0=PRESETS.find(function(x){return x.key===active});
+  const w=p0.waterfall;
+  const vals=[w.loss,w.inflow,w.deepening,w.net];
+  const labels=["出口损失","融资红利","资本深化","净效益"];
+  const colors=["#dc2626","#059669","#059669","#d97706"];
+  const vmax=Math.max.apply(null,vals.map(function(v){return Math.abs(v)}));
+  const y1=vmax*1.35, y0=-Math.max(Math.abs(Math.min.apply(null,vals))*1.25,0.3);
+  const x=function(i){return PAD2.l+(i+0.5)*(W2-PAD2.l-PAD2.r)/4};
+  const y=function(v){return PAD2.t+(y1-v)*(H2-PAD2.t-PAD2.b)/(y1-y0)};
+  const svg=newSVG(W2,H2);
+  svg.appendChild(svgEl("line",{x1:PAD2.l,y1:y(0),x2:W2-PAD2.r,y2:y(0),
+    stroke:"#cbd5e1","stroke-dasharray":"3 3"}));
+  const bw=(W2-PAD2.l-PAD2.r)/4*0.5;
+  let acc=0;
+  vals.forEach(function(v,i){
+    let base=0;
+    if(i<3){base=acc; acc+=v;}
+    const top=v>=0?base+v:base;
+    svg.appendChild(svgEl("rect",{x:x(i)-bw/2,y:y(top),width:bw,
+      height:Math.max(y(base)-y(top),1),fill:colors[i],rx:3,opacity:0.92}));
+    const t=svgEl("text",{x:x(i),y:v>=0?y(top)-5:y(top)+13,"font-size":10.5,
+      fill:"#1f2937","font-weight":700,"text-anchor":"middle"});
+    t.textContent=(v>0?"+":"")+v.toFixed(2); svg.appendChild(t);
+    const lb=svgEl("text",{x:x(i),y:H2-14,"font-size":10,fill:"#6b7280",
+      "text-anchor":"middle"}); lb.textContent=labels[i]; svg.appendChild(lb);
+  });
+  document.getElementById("wfchart").innerHTML="";
+  document.getElementById("wfchart").appendChild(svg);
+}
+function renderIndustry(){
+  const p0=PRESETS.find(function(x){return x.key===active});
+  const ind=p0.industry;
+  const items=Object.keys(ind).map(function(k){return {k:k,v:ind[k]}});
+  items.sort(function(a,b){return sortAsc? a.v-b.v : b.v-a.v});
+  const IH=items.length*24+20, IP={l:130,r:64,t:8,b:12};
+  const vmax=Math.max.apply(null,items.map(function(o){return Math.abs(o.v)}));
+  const sc=(W-IP.l-IP.r)/vmax;
+  const svg=newSVG(W,IH);
+  items.forEach(function(o,i){
+    const yy=IP.t+i*(IH-IP.t-IP.b)/items.length+7;
+    const t1=svgEl("text",{x:IP.l-8,y:yy+4,"font-size":11,fill:"#1f2937",
+      "text-anchor":"end"});
+    t1.textContent=I18N_IND[o.k]||o.k; svg.appendChild(t1);
+    const xw=Math.abs(o.v)*sc;
+    svg.appendChild(svgEl("rect",{x:o.v>=0?IP.l:IP.l-xw,y:yy-7,
+      width:Math.max(xw,1.2),height:14,fill:o.v>=0?"#059669":"#dc2626",rx:3,
+      opacity:0.88}));
+    const t=svgEl("text",{x:o.v>=0?IP.l+xw+5:IP.l-xw-5,y:yy+4,"font-size":10.5,
+      fill:"#1f2937","text-anchor":o.v>=0?"start":"end","font-weight":600});
+    t.textContent=(o.v>0?"+":"")+o.v+"%"; svg.appendChild(t);
+  });
+  svg.appendChild(svgEl("line",{x1:IP.l,y1:6,x2:IP.l,y2:IH-6,
+    stroke:"#cbd5e1","stroke-width":1}));
+  document.getElementById("indchart").innerHTML="";
+  document.getElementById("indchart").appendChild(svg);
+  document.getElementById("sorthint").textContent=
+    sortAsc? "按影响升序 ↓":"按影响降序 ↑";
+}
+function renderAll(){
+  renderMeta();renderKPIs();renderMinis();renderFX();renderWaterfall();renderIndustry();
+}
+document.getElementById("sorthint").onclick=function(){sortAsc=!sortAsc;renderIndustry();};
+document.getElementById("gen").textContent=DASH_DATA.generated;
+renderChips();renderAll();
+</script>
+</body>
+</html>

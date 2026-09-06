@@ -108,40 +108,56 @@ fx_sensitivity:
 ## 四、运行方式
 
 ```bash
-# 1. 安装依赖
-pip install numpy pandas matplotlib pyyaml
+# 0. 安装依赖
+pip install numpy pandas matplotlib pyyaml requests
+pip install fredapi akshare          # 可选: 真实数据源 (data_loader/run_real)
 
-# 2. 运行主模型 (生成图表 + 终端摘要)
-python model.py
-
-# 3. (可选) 独立生成可视化
-python visualize.py
-
-# 4. 一键全套 (多情景 + 图表 + 资本瀑布)  ← 推荐
+# 1. 一键全套 (config.yaml 参数 → 7 图 + 瀑布摘要)  ← 主入口
 python run_all.py
 
+# 2. 真实数据校准 (FRED/腾讯/北向 → 三情景 + 情景巨幕图)
+python run_real.py --charts
+
+# 3. 交互仪表盘 (单文件, 8 预设情景, 双击即用 / GitHub Pages)
+python export_dashboard.py
+
+# 4. 详细中文研报 (HTML + PDF, report/)
+python build_report.py
+
 # 5. 单元测试
-python test_model.py
+python test_model.py      # 17 项 (引擎+资本+config)
+python test_real_calib.py # 3 项 (校准函数, 离线)
 ```
 
 输出目录：
 ```
 macro_sim/
-├── model.py            # 核心模型 (6大模块 + ScenarioEngine)
-├── capital_inflow.py   # 🆕 资本流入模块 (融资红利 + 资本深化)
-├── visualize.py        # 图表生成 (深色金融风, 跨平台中文字体)
-├── config.yaml         # 参数配置 (含 capital: 节)
-├── run_all.py          # 一键运行: 多情景 + 图表 + 瀑布摘要
-├── test_model.py       # 单元测试 (15项: 9基础 + 6资本模块)
-├── README.md           # 本文档
-└── charts/             # 一键生成的图表
+├── model.py            # 核心模型 (6大模块 + ScenarioEngine + config 装载)
+├── capital_inflow.py   # 资本流入模块 (融资红利 + 资本深化)
+├── data_loader.py      # 真实数据层: FRED + 腾讯行情 + akshare 北向 (缓存 data/raw/)
+├── calibrate.py        # 实证校准: FX 波动/漂移 · 北向流入率 · 出口弹性 · 行业 β
+├── visualize.py        # 图表 (浅色研报风, 跨平台中文字体)
+├── config.yaml         # ★ 参数唯一真源 (被 run_all/run_real 读取)
+├── run_all.py          # 一键: 多情景 + 图表 + 瀑布摘要
+├── run_real.py         # 真实数据管线: 校准 → A/B/C 三情景
+├── export_dashboard.py # 8 预设 → dashboard.html (单文件交互)
+├── build_report.py     # 中文研报 → report/*.html + *.pdf
+├── test_model.py       # 17 项单元测试
+├── test_real_calib.py  # 3 项校准离线测试
+├── dashboard.html      # 交互仪表盘 (数据内嵌, 离线可用)  [Pages: index.html]
+├── docs/               # code_review / superpowers spec
+├── report/             # 研究报告 HTML + PDF (中文)
+└── charts/             # 一键生成的图表 (浅色研报风)
     ├── 01_fx_scenarios.png        # 多情景汇率路径
     ├── 02_heatmap.png             # 行业利润热力图
     ├── 03_chain.png               # 传导链条
-    ├── 04_capital_waterfall.png   # 🆕 净效益瀑布
-    ├── 05_capital_inflows.png     # 🆕 三渠道年流入堆叠
+    ├── 04_capital_waterfall.png   # 净效益瀑布
+    ├── 05_capital_inflows.png     # 三渠道年流入堆叠
     ├── 06_radar.png               # 资产收益雷达
     └── 07_sensitivity.png         # 敏感性矩阵
+└── charts_real/        # 真实校准情景图
+    ├── scenario_wall.png          # 🆕 三情景巨幕图 (A/B/C 一图对比)
+    └── waterfall_B/C.png          # 实测参数瀑布
 ```
 
 ---

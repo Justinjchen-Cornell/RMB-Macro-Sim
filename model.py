@@ -17,6 +17,7 @@
 依赖：numpy, pandas, matplotlib
 """
 
+import os
 import numpy as np
 import pandas as pd
 from dataclasses import dataclass, field
@@ -87,6 +88,69 @@ class MacroParams:
     n_years: int = 5
     n_simulations: int = 2000
     seed: int = 42
+
+
+# ═══════════════════════════════════════════════════════════════
+#  YAML 配置装载 — config.yaml 是唯一参数真源
+# ═══════════════════════════════════════════════════════════════
+def _yaml_load(path):
+    import yaml
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def load_project_config(path=None):
+    """
+    读取 config.yaml → (MacroParams, CapitalConfig)。
+    path=None 时默认取本文件同目录 config.yaml;文件缺失则回退内置默认值。
+    所有数值键名与 dataclass 字段一一对应(见 config.yaml 注释)。
+    """
+    from capital_inflow import CapitalConfig as _CC
+
+    if path is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yaml")
+    if not os.path.exists(path):
+        return MacroParams(), _CC()
+
+    d = _yaml_load(path)
+
+    ex = d.get("exchange_rate", {})
+    inf = d.get("inflation", {})
+    exp = d.get("export", {})
+    rt = d.get("rates", {})
+    sim = d.get("simulation", {})
+    cap = d.get("capital", {})
+
+    p = MacroParams(
+        cny_spot=ex.get("cny_spot", MacroParams.cny_spot),
+        cny_annual_apprec=ex.get("cny_annual_apprec", MacroParams.cny_annual_apprec),
+        cny_vol=ex.get("cny_vol", MacroParams.cny_vol),
+        import_share=inf.get("import_share", MacroParams.import_share),
+        ppi_pass_through=inf.get("ppi_pass_through", MacroParams.ppi_pass_through),
+        cpi_from_ppi=inf.get("cpi_from_ppi", MacroParams.cpi_from_ppi),
+        export_price_elasticity=exp.get("export_price_elasticity",
+                                        MacroParams.export_price_elasticity),
+        import_price_elasticity=exp.get("import_price_elasticity",
+                                        MacroParams.import_price_elasticity),
+        us_10y=rt.get("us_10y", MacroParams.us_10y),
+        cn_10y=rt.get("cn_10y", MacroParams.cn_10y),
+        rate_diff_mean=rt.get("rate_diff_mean", MacroParams.rate_diff_mean),
+        rate_diff_vol=rt.get("rate_diff_vol", MacroParams.rate_diff_vol),
+        n_years=sim.get("n_years", MacroParams.n_years),
+        n_simulations=sim.get("n_simulations", MacroParams.n_simulations),
+        seed=sim.get("seed", MacroParams.seed),
+    )
+    # 嵌套字典字段整表覆盖
+    if d.get("industry_weights"):
+        p.industry_weights = dict(d["industry_weights"])
+    if d.get("fx_sensitivity"):
+        p.fx_sensitivity = dict(d["fx_sensitivity"])
+
+    try:
+        cc = _CC(**{k: v for k, v in cap.items() if hasattr(_CC, k)})
+    except TypeError:
+        cc = _CC()
+    return p, cc
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -388,187 +452,19 @@ class ScenarioEngine:
         }
         return self.results
 
-    # ── 可视化 ────────────────────────────────────────────────
-    def plot(self, save_dir: str = "/data/workspace/macro_sim/charts"):
-        import os
-        os.makedirs(save_dir, exist_ok=True)
-        from matplotlib import font_manager
-        for name in ["Microsoft YaHei", "SimHei", "PingFang SC",
-                     "Noto Sans CJK SC", "WenQuanYi Micro Hei"]:
-            if name in {f.name for f in font_manager.fontManager.ttflist}:
-                plt.rcParams["font.family"] = name
-                break
-        plt.rcParams["axes.unicode_minus"] = False
-
-        res = self.results
-        years = list(range(self.params.n_years + 1))
-
-        # ── 图1: 汇率路径 (分位数带) ──
-        fig, ax = plt.subplots(figsize=(10, 5))
-        path = res["fx_path"]
-        median = np.median(path, axis=0)
-        p25 = np.percentile(path, 25, axis=0)
-        p75 = np.percentile(path, 75, axis=0)
-        ax.plot(years, median, "b-", lw=2, label="中位数路径")
-        ax.fill_between(years, p25, p75, alpha=0.3, color="blue", label="25%-75%分位")
-        ax.axhline(self.params.cny_spot, color="gray", ls="--", alpha=0.7, label="基准7.20")
-        ax.set_title("USD/CNY 路径模拟 (GBM + 6%年化升值漂移)", fontsize=13)
-        ax.set_xlabel("年")
-        ax.set_ylabel("USD/CNY")
-        ax.legend()
-        ax.grid(alpha=0.3)
-        fig.tight_layout()
-        fig.savefig(f"{save_dir}/01_fx_path.png", dpi=130)
-        plt.close(fig)
-
-        # ── 图2: CPI 路径 ──
-        fig, ax = plt.subplots(figsize=(10, 5))
-        cpi = res["cpi"]
-        ax.plot(years[1:], np.median(cpi, axis=0)[1:], "r-o", label="CPI (中位数)")
-        ax.axhline(0.02, color="gray", ls="--", alpha=0.7, label="2% 目标")
-        ax.set_title("输入性通胀传导: CPI路径", fontsize=13)
-        ax.set_xlabel("年")
-        ax.set_ylabel("CPI (%)")
-        ax.legend()
-        ax.grid(alpha=0.3)
-        fig.tight_layout()
-        fig.savefig(f"{save_dir}/02_cpi_path.png", dpi=130)
-        plt.close(fig)
-
-        # ── 图3: 行业利润冲击 (最终年 Y4) ──
-        fig, ax = plt.subplots(figsize=(11, 6))
-        final = res["industry_profit"].iloc[-1].sort_values()
-        colors = ["#e74c3c" if v < 0 else "#27ae60" for v in final]
-        bars = ax.barh(range(len(final)), final.values, color=colors, alpha=0.85)
-        ax.set_yticks(range(len(final)))
-        ax.set_yticklabels(final.index, fontsize=9)
-        ax.axvline(0, color="black", lw=0.8)
-        ax.set_title(f"行业利润冲击 (Y{len(final)-1} 相对基准, %)", fontsize=13)
-        ax.set_xlabel("利润变化 (%)")
-        ax.grid(alpha=0.3, axis="x")
-        fig.tight_layout()
-        fig.savefig(f"{save_dir}/03_industry_profit.png", dpi=130)
-        plt.close(fig)
-
-        # ── 图4: 资产收益对比 ──
-        fig, ax = plt.subplots(figsize=(9, 5))
-        assets = {
-            "A股(加权)": float(res["equity_return"].iloc[-1]),
-            "中国国债": float(res["bond_return"]),
-            "黄金": float(np.median(res["gold_return"])),
-            "工业金属": float(np.median(res["commodity_return"])),
-        }
-        names = list(assets.keys())
-        vals = list(assets.values())
-        colors = ["#3498db", "#95a5a6", "#f39c12", "#e67e22"]
-        bars = ax.bar(names, vals, color=colors, alpha=0.85)
-        ax.axhline(0, color="black", lw=0.8)
-        for bar, v in zip(bars, vals):
-            ax.text(bar.get_x() + bar.get_width()/2, v + 0.01,
-                    f"{v:.1%}", ha="center", fontsize=11, fontweight="bold")
-        ax.set_title("5年期年化收益模拟 (中位数情景)", fontsize=13)
-        ax.set_ylabel("年化收益率")
-        ax.grid(alpha=0.3, axis="y")
-        fig.tight_layout()
-        fig.savefig(f"{save_dir}/04_asset_returns.png", dpi=130)
-        plt.close(fig)
-
-        # ── 图5: 出口量变化 ──
-        fig, ax = plt.subplots(figsize=(10, 5))
-        exp_v = res["export_volume"]
-        # 低端 vs 高端
-        low = exp_v[:, -1] if exp_v.ndim > 1 else exp_v[-1]
-        ax.plot(years[1:], np.median(exp_v, axis=0)[1:], "m-s", label="净出口贡献")
-        ax.axhline(0, color="black", lw=0.8)
-        ax.set_title("净出口贡献变化 (Marshall-Lerner)", fontsize=13)
-        ax.set_xlabel("年")
-        ax.set_ylabel("GDP占比变化 (%)")
-        ax.legend()
-        ax.grid(alpha=0.3)
-        fig.tight_layout()
-        fig.savefig(f"{save_dir}/05_export.png", dpi=130)
-        plt.close(fig)
-
-        print(f"[✓] 图表已保存至 {save_dir}/")
-
-
+    # 可视化统一走 run_all.py / visualize.py 管线 (config.yaml 为参数真源)。
+    # 历史上有过 plot() 内嵌 Linux 死路径 + 与 run_all 图表命名冲突的双管线问题,
+    # 已于 2026-09 移除。
 # ═══════════════════════════════════════════════════════════════
 #  命令行入口
 # ═══════════════════════════════════════════════════════════════
 if __name__ == "__main__":
-    import os
-
-    print("=" * 60)
-    print("  宏观场景推演模型 (Macro Scenario Simulation Model)")
-    print("  人民币升值 → 通胀/出口/行业利润 → 资产价格")
-    print("=" * 60)
-
-    # ── 基准情景 ──
-    print("\n▶ 运行基准情景 (人民币年化升值6%)...")
-    engine = ScenarioEngine()
-    results = engine.run()
-    engine.plot()
-
-    # ── 输出摘要 ──
-    print("\n" + "─" * 50)
-    print("  模拟结果摘要 (中位数路径, 第5年)")
-    print("─" * 50)
-
-    apprec_final = np.median(results["appreciation"], axis=0)[-1]
-    print(f"\n  人民币累计升值:     {apprec_final:.1f}%")
-    print(f"  USD/CNY 终值:       {np.median(results['fx_path'], axis=0)[-1]:.2f}")
-
-    cpi_final = np.median(results["cpi"], axis=0)[-1]
-    print(f"  CPI (第5年):        {cpi_final:.1%}")
-
-    print(f"\n  行业利润冲击 (Y4):")
-    for ind, val in results["industry_profit"].iloc[-1].sort_values().items():
-        flag = "↓" if val < 0 else "↑"
-        print(f"    {ind:25s} {flag} {val:+.1%}")
-
-    print(f"\n  资产年化收益 (5年中位):")
-    print(f"    A股(加权):         {float(results['equity_return'].iloc[-1]):.1%}")
-    print(f"    中国国债:           {float(results['bond_return']):.1%}")
-    print(f"    黄金:               {float(np.median(results['gold_return'])):.1%}")
-    print(f"    工业金属:           {float(np.median(results['commodity_return'])):.1%}")
-
-    # ── 资本流入瀑布 ──
-    if "capital_inflow" in results:
-        cap = results["capital_inflow"]
-        print(f"\n  资本流入净效益瀑布 (5年累计, T$):")
-        print(f"    出口部门利润损失:   {cap['export_loss']:>+8.2f}")
-        print(f"    资本净流入(融资):   {cap['cumulative_inflow']:>+8.2f}")
-        print(f"    资本深化(GDP增量): {cap['deepening_gain']:>+8.2f}")
-        print(f"    ───────────────────────────")
-        print(f"    净效益:             {cap['net_benefit']:>+8.2f}")
-
-    # ── 敏感性分析：不同升值速度 ──
-    print("\n" + "─" * 50)
-    print("  敏感性分析: 升值速度 vs 行业利润 & 资产收益")
-    print("─" * 50)
-
-    scenarios = [
-        ("快速升值 (10%/年)", 0.10),
-        ("基准 (6%/年)", 0.06),
-        ("慢速升值 (3%/年)", 0.03),
-        ("不升值 (0%)", 0.00),
-    ]
-
-    print(f"\n  {'情景':<20s} {'低端制造':>10s} {'半导体':>10s} {'金属/黄金':>10s} {'A股加权':>10s}")
-    print("  " + "─" * 62)
-
-    for name, apprec_rate in scenarios:
-        p2 = MacroParams(cny_annual_apprec=apprec_rate, seed=123)
-        eng2 = ScenarioEngine(p2)
-        r2 = eng2.run()
-
-        low = r2["industry_profit"]["export_lowend"].iloc[-1]
-        semi = r2["industry_profit"]["semiconductor"].iloc[-1]
-        metal = r2["industry_profit"]["commodity_metals"].iloc[-1]
-        eq = float(r2["equity_return"].iloc[-1])
-
-        print(f"  {name:<20s} {low:>+10.1%} {semi:>+10.1%} {metal:>+10.1%} {eq:>+10.1%}")
-
-    print("\n" + "=" * 60)
-    print("  ✓ 完成。详见 charts/ 目录下的图表。")
-    print("=" * 60)
+    # 统一入口: python run_all.py (全部图表 + 摘要 + 瀑布)
+    # 避免双管线/死路径(2026-09 重构)。
+    print("model.py: 完整管线请运行 python run_all.py")
+    print("          (config.yaml 为参数真源; 真实数据校准: python run_real.py)")
+    try:
+        import run_all
+        run_all.main()
+    except ImportError as e:
+        print("run_all 导入失败:", e)

@@ -14,8 +14,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from model import (
     MacroParams, ExchangeRateModule, InflationModule,
-    ExportModule, IndustryProfitModule, AssetPriceModule, ScenarioEngine
+    ExportModule, IndustryProfitModule, AssetPriceModule, ScenarioEngine,
+    load_project_config,
 )
+from dataclasses import replace
 from visualize import (
     plot_fx_scenarios, plot_industry_heatmap,
     plot_asset_radar, plot_transmission_chain,
@@ -33,20 +35,21 @@ def main():
     print("=" * 64)
 
     # ────────────────────────────────────────────────────────
-    #  Part 1: 多情景汇率路径
+    #  Part 1: 多情景汇率路径  (基准参数来自 config.yaml)
     # ────────────────────────────────────────────────────────
-    print("\n[1/5] 生成多情景汇率路径...")
+    print("\n[1/5] 生成多情景汇率路径...  (基准参数: config.yaml)")
 
+    base_params, base_capital = load_project_config()
     scenarios = {
-        "快速升值(10%)": MacroParams(cny_annual_apprec=0.10, seed=42),
-        "基准(6%)":       MacroParams(cny_annual_apprec=0.06, seed=42),
-        "慢速升值(3%)":   MacroParams(cny_annual_apprec=0.03, seed=42),
-        "不升值(0%)":     MacroParams(cny_annual_apprec=0.00, seed=42),
+        "快速升值(10%)": replace(base_params, cny_annual_apprec=0.10),
+        "基准(6%)":       replace(base_params, cny_annual_apprec=0.06),
+        "慢速升值(3%)":   replace(base_params, cny_annual_apprec=0.03),
+        "不升值(0%)":     replace(base_params, cny_annual_apprec=0.00),
     }
 
     all_paths = {}
     for name, params in scenarios.items():
-        eng = ScenarioEngine(params)
+        eng = ScenarioEngine(params, capital_cfg=base_capital)
         r = eng.run()
         all_paths[name] = r["fx_path"]
 
@@ -58,8 +61,7 @@ def main():
     # ────────────────────────────────────────────────────────
     print("\n[2/5] 运行基准情景 (6%升值)...")
 
-    base_params = MacroParams()
-    engine = ScenarioEngine(base_params)
+    engine = ScenarioEngine(base_params, capital_cfg=base_capital)
     results = engine.run()
 
     # 行业热力图
@@ -102,7 +104,7 @@ def main():
 
     sens_data = {}
     for name, params in scenarios.items():
-        eng = ScenarioEngine(params)
+        eng = ScenarioEngine(params, capital_cfg=base_capital)
         r = eng.run()
         ip = r["industry_profit"].iloc[-1]
         sens_data[name] = {

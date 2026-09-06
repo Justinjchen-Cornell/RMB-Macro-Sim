@@ -164,13 +164,19 @@ def main():
     print("\n[4] calib_results.json saved")
 
     if MAKE_CHARTS:
-        from visualize import plot_capital_waterfall
+        from visualize import plot_capital_waterfall, plot_scenario_wall
         os.makedirs(os.path.join(BASE, "charts_real"), exist_ok=True)
         for name in ["B_realvol", "C_inertia"]:
             cap = out[name]["capital_inflow"]
             plot_capital_waterfall(cap, os.path.join(BASE, "charts_real",
                                                      "waterfall_%s.png" % name))
-        print("    charts_real/waterfall_B/C saved")
+        wall = {"A 原假设(7.20/6%)": out["A_assumption"],
+                "B 实测参数(6.71/6%)": out["B_realvol"],
+                "C 现实惯性(6.71/2.7%)": out["C_inertia"]}
+        plot_scenario_wall(wall, os.path.join(BASE, "charts_real",
+                                              "scenario_wall.png"),
+                           title="RMB-Macro-Sim · 三情景对比 (2000 次 Monte Carlo)")
+        print("    charts_real/ scenario_wall + waterfall_B/C saved")
 
     print("\n" + "=" * 66)
     print("  done. Details -> calib_results.json ; report md authored separately")

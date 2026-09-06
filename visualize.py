@@ -32,27 +32,33 @@ _setup_cjk_font()
 # ── 全局样式 ──────────────────────────────────────────────────
 rcParams["axes.unicode_minus"] = False
 rcParams["figure.dpi"] = 150
+rcParams["axes.titleweight"] = "bold"
+rcParams["font.size"] = 10
 
-# 深色主题配色
-BG = "#1a1a2e"
-PANEL = "#16213e"
-GRID = "#2a2a4a"
-TEXT = "#e8e8f0"
-ACCENT_GOLD = "#f0c040"
-ACCENT_RED = "#e74c3c"
-ACCENT_GREEN = "#27ae60"
-ACCENT_BLUE = "#4a90d9"
+# 浅色研报风配色 (券商研报: 纸白底 + 墨色文字 + 高识别度色)
+BG = "#ffffff"           # 画布纸白
+PANEL = "#f8fafc"        # 面板微灰
+GRID = "#e5e9f0"         # 细分隔线
+TEXT = "#1f2937"         # 墨色正文
+MUTED = "#6b7280"        # 次级文字
+ACCENT_GOLD = "#d97706"  # 金/净效益
+ACCENT_RED = "#dc2626"   # 损失/下行
+ACCENT_GREEN = "#059669" # 收益/上行
+ACCENT_BLUE = "#2563eb"  # 主色(汇率/A股)
+ACCENT_VIOLET = "#7c3aed"
+ACCENT_CYAN = "#0891b2"
 
 
 def setup_ax(ax):
-    """统一深色轴样式"""
-    ax.set_facecolor(PANEL)
-    ax.tick_params(colors=TEXT, labelsize=10)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_color(GRID)
-    ax.spines["bottom"].set_color(GRID)
-    ax.grid(color=GRID, alpha=0.4, lw=0.8)
+    """统一浅色研报轴样式"""
+    ax.set_facecolor(BG)
+    ax.tick_params(colors=MUTED, labelsize=10)
+    for s in ("top", "right"):
+        ax.spines[s].set_visible(False)
+    for s in ("left", "bottom"):
+        ax.spines[s].set_color("#cbd5e1")
+        ax.spines[s].set_linewidth(0.8)
+    ax.grid(color=GRID, alpha=0.6, lw=0.7)
 
 
 def plot_fx_scenarios(all_paths: dict, save_path: str):
@@ -351,3 +357,103 @@ if __name__ == "__main__":
     print("[✓] sensitivity.png")
 
     print(f"\n图表已保存至 {out_dir}/")
+
+
+# ──────────────────────────────────────────────────────────────
+#  情景巨幕图 (Scenario Wall) — 一张图讲完 A/B/C 三情景对比
+# ──────────────────────────────────────────────────────────────
+def plot_scenario_wall(scenarios: dict, save_path: str,
+                       row_labels: list = None,
+                       title: str = None):
+    """
+    scenarios: {"A_原假设": results, "B_实测参数": results, "C_现实惯性": results}
+    3 x 3 布局:
+      行 = 情景 | 列 = [USD/CNY 路径带 | 行业利润冲击(Y5) | 资本净效益瀑布(T$)]
+    """
+    names = list(scenarios.keys())
+    n = len(names)
+    fig, axes = plt.subplots(n, 3, figsize=(15.5, 3.1 * n), facecolor=BG)
+    if n == 1:
+        axes = axes.reshape(1, -1)
+
+    col_heads = ["USD/CNY 路径 (中位+25-75%)",
+                 "行业利润冲击 Y5 (相对基准)",
+                 "资本净效益瀑布 (5年累计, T$)"]
+    for c, ch in enumerate(col_heads):
+        axes[0][c].set_title(ch, fontsize=11.5, pad=10, color=TEXT)
+
+    order_inds = ["export_lowend", "export_hightech", "new_energy",
+                  "domestic_consumption", "real_estate", "infrastructure",
+                  "semiconductor", "commodity_metals", "power_compute",
+                  "bank_insurance", "gold"]
+
+    for i, (name, r) in enumerate(scenarios.items()):
+        # col 0: fx fan
+        ax = axes[i][0]
+        fx = r["fx_path"]
+        yrs = list(range(fx.shape[1]))
+        med = np.median(fx, axis=0)
+        lo = np.percentile(fx, 25, axis=0)
+        hi = np.percentile(fx, 75, axis=0)
+        ax.plot(yrs, med, color=ACCENT_BLUE, lw=2.2)
+        ax.fill_between(yrs, lo, hi, color=ACCENT_BLUE, alpha=0.14)
+        ax.set_ylim(float(med.min()) * 0.97, float(med.max()) * 1.03)
+        ax.annotate("终值 %.2f" % med[-1], xy=(yrs[-1], med[-1]),
+                    xytext=(4, 4), textcoords="offset points",
+                    fontsize=9, color=ACCENT_BLUE, fontweight="bold")
+        setup_ax(ax)
+
+        # col 1: industry bars
+        ax = axes[i][1]
+        fin = r["industry_profit"].iloc[-1]
+        fin = fin.reindex([k for k in order_inds if k in fin.index]).dropna()
+        vals = fin.values
+        cols = [ACCENT_RED if v < 0 else ACCENT_GREEN for v in vals]
+        bars = ax.barh(range(len(vals)), vals * 100, color=cols, alpha=0.88, height=0.62)
+        ax.set_yticks(range(len(vals)))
+        ax.set_yticklabels([k.replace("_", " ") for k in fin.index], fontsize=8.5, color=TEXT)
+        for bi, v in enumerate(vals):
+            ax.text(v * 100 + (0.4 if v >= 0 else -0.4), bi, ("%+.0f%%" % (v * 100)),
+                    va="center", ha="left" if v >= 0 else "right",
+                    fontsize=8, color=MUTED)
+        ax.axvline(0, color="#94a3b8", lw=0.8)
+        ax.set_xlim(-40, 22)
+        setup_ax(ax)
+
+        # col 2: waterfall
+        ax = axes[i][2]
+        cap = r["capital_inflow"]
+        labels = ["出口损失", "融资红利", "资本深化", "净效益"]
+        vals_w = [cap["export_loss"], cap["cumulative_inflow"],
+                  cap["deepening_gain"], cap["net_benefit"]]
+        xs = np.arange(4)
+        bottoms = [0.0]
+        acc = vals_w[0]
+        bottoms.append(acc)
+        acc += vals_w[1]
+        bottoms.append(acc)
+        acc += vals_w[2]
+        bottoms.append(0.0 if vals_w[3] >= 0 else vals_w[3])
+        colors_w = [ACCENT_RED, ACCENT_GREEN, ACCENT_GREEN, ACCENT_GOLD]
+        ax.bar(xs, vals_w, bottom=bottoms, width=0.55, color=colors_w, alpha=0.9)
+        for xi, v in enumerate(vals_w):
+            yp = bottoms[xi] + (v if v >= 0 else 0) + 0.05
+            va = "bottom" if v >= 0 else "top"
+            ax.text(xi, yp, "%+.2f" % v, ha="center", va=va, fontsize=9,
+                    fontweight="bold", color=TEXT)
+        ax.set_xticks(xs)
+        ax.set_xticklabels(labels, fontsize=9, color=TEXT)
+        ax.axhline(0, color="#94a3b8", lw=0.8)
+        ax.set_ylim(min(min(vals_w), -0.8), 3.4)
+        setup_ax(ax)
+
+        # row label
+        fig.text(0.006, (n - i - 0.5) / n, name, rotation=90, va="center", ha="center",
+                 fontsize=10.5, fontweight="bold", color=MUTED)
+
+    if title:
+        fig.suptitle(title, fontsize=14.5, fontweight="bold", color=TEXT, y=0.995)
+    fig.tight_layout(rect=[0.025, 0.01, 1, 0.975 if title else 0.99])
+    fig.savefig(save_path, dpi=150, facecolor=BG, bbox_inches="tight")
+    plt.close(fig)
+    print("  [scenario_wall] %s" % save_path)

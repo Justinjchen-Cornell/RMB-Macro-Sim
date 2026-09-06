@@ -35,24 +35,28 @@ os.makedirs(RAW, exist_ok=True)
 
 
 def _fred_key():
-    p = ENV_PATH
-    if not os.path.exists(p):
-        # fallback: search parent dirs up to 4 levels
-        cur = BASE
-        for _ in range(4):
-            cur = os.path.dirname(cur)
-            cand = os.path.join(cur, ".env")
-            if os.path.exists(cand):
-                p = cand
-                break
-    if os.path.exists(p):
-        for line in open(p, encoding="utf-8", errors="ignore"):
-            s = line.strip()
-            if s.upper().startswith("FRED"):
-                v = s.split("=", 1)[1].strip()
-                if v:
-                    return v
-    raise RuntimeError("FRED_API_KEY not found in .env")
+    # 1) 环境变量优先 (GitHub Actions / 独立克隆场景)
+    env = os.environ.get("FRED_API_KEY")
+    if env:
+        return env.strip()
+    # 2) 向上搜索 .env (仓库根 / 上级目录), 最多 6 层
+    cur = os.path.dirname(os.path.abspath(BASE))
+    for _ in range(6):
+        cand = os.path.join(cur, ".env")
+        if os.path.exists(cand):
+            for line in open(cand, encoding="utf-8", errors="ignore"):
+                s = line.strip()
+                if s.upper().startswith("FRED"):
+                    v = s.split("=", 1)[1].strip()
+                    if v:
+                        return v
+        parent = os.path.dirname(cur)
+        if parent == cur:
+            break
+        cur = parent
+    raise RuntimeError(
+        "FRED_API_KEY missing. Set environment variable FRED_API_KEY or place "
+        "FRED_API_KEY=... in a .env file under the repo root.")
 
 
 # ── FRED ─────────────────────────────────────────────────

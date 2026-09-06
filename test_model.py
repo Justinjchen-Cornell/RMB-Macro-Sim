@@ -13,6 +13,7 @@ from model import (
     MacroParams, ExchangeRateModule, InflationModule,
     ExportModule, IndustryProfitModule, AssetPriceModule, ScenarioEngine
 )
+from model import load_project_config
 from capital_inflow import CapitalInflowModule, CapitalConfig
 
 
@@ -192,6 +193,26 @@ def test_capital_engine_reproducible():
     print("✓ test_capital_engine_reproducible")
 
 
+
+def test_config_yaml_is_source_of_truth():
+    """config.yaml 装载应能往返, 且关键默认值一致 (真源校验)"""
+    import os
+    p, cc = load_project_config()
+    assert abs(p.cny_spot - 7.20) < 1e-9, p.cny_spot
+    assert abs(p.cny_annual_apprec - 0.06) < 1e-9
+    assert len(p.fx_sensitivity) == 11 and len(p.industry_weights) == 11
+    assert abs(cc.equity_inflow_rate - 0.1112) < 1e-6
+    assert abs(cc.deepen_return - 0.156) < 1e-6
+    print("✓ test_config_yaml_is_source_of_truth")
+
+
+def test_config_missing_file_falls_back():
+    """config.yaml 缺失时应回退内置默认值而非崩溃"""
+    p, cc = load_project_config(path="__no_such_file__.yaml")
+    assert p.cny_spot == 7.20
+    print("✓ test_config_missing_file_falls_back")
+
+
 if __name__ == "__main__":
     print("=" * 50)
     print("  运行单元测试...")
@@ -212,6 +233,9 @@ if __name__ == "__main__":
     test_capital_export_loss_sign()
     test_capital_sector_allocation_sums()
     test_capital_engine_reproducible()
+    test_config_yaml_is_source_of_truth()
+    test_config_missing_file_falls_back()
     print("\n" + "=" * 50)
     print("  全部测试通过 ✓")
     print("=" * 50)
+

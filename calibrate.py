@@ -132,7 +132,7 @@ def industry_fx_beta(etf_closes: dict, mkt_closes: pd.DataFrame = None,
         try:
             d = dfx.copy()
             d["date"] = pd.to_datetime(d["date"])
-            px = d.set_index("date")["close"].astype(float).resample("M").last()
+            px = d.set_index("date")["close"].astype(float).resample("ME").last()
             ri = np.log(px).diff()
             tab = pd.concat([ri], axis=1)
             tab.columns = ["ri"]
@@ -140,14 +140,14 @@ def industry_fx_beta(etf_closes: dict, mkt_closes: pd.DataFrame = None,
                 m = mkt_closes.copy()
                 m["date"] = pd.to_datetime(m["date"])
                 rm = np.log(m.set_index("date")["close"].astype(float)
-                            .resample("M").last()).diff()
+                            .resample("ME").last()).diff()
                 rm.name = "rm"
                 tab = pd.concat([tab, rm], axis=1).dropna()
             if fx is not None:
                 f = fx.copy()
                 f["date"] = pd.to_datetime(f["date"])
                 fx_m = np.log(f.set_index("date")["usdcny"].astype(float)
-                              .resample("M").last()).diff()
+                              .resample("ME").last()).diff()
                 fx_m.name = "dfx"
                 tab = pd.concat([tab, fx_m], axis=1).dropna()
             else:

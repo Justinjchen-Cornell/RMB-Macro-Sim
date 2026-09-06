@@ -24,6 +24,22 @@ export:
 rates:
   us_10y: 0.0481              # 美国10年国债收益率
   cn_10y: 0.0169              # 中国10年国债收益率
+  rate_diff_mean: 0.0312      # 利差均值 (us - cn)
+  rate_diff_vol: 0.008        # 利差波动率
+
+# ── 行业权重 (A股映射, 与 fx_sensitivity 一一对应) ──
+industry_weights:
+  export_lowend: 0.08
+  export_hightech: 0.12
+  domestic_consumption: 0.20
+  real_estate: 0.10
+  infrastructure: 0.10
+  new_energy: 0.10
+  semiconductor: 0.08
+  commodity_metals: 0.06
+  power_compute: 0.06
+  gold: 0.04
+  bank_insurance: 0.06
 
 # ── 行业敏感度 (利润弹性: % 变化 per 10% 累计升值) ──
 #  经济含义: 人民币累计升值10%, 该行业5年累计利润相对基准变化多少%
