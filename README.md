@@ -11,6 +11,14 @@
 
 <p align="center"><img src="assets/dashboard_preview.png" alt="dashboard preview" width="85%"></p>
 
+> ✨ **功能总览 (v2.1)**：
+> - 🎚️ **升贬幅度滑块 -5% ~ +15%**(41 档预跑 MC,拖动实时联动行业/FX/瀑布/宏观风险)
+> - 🏛️ **GDP 当量 + 就业风险暴露 + 风险等级**逐档量化
+> - 🗺️ **行业 × 年份热力图** · 🧭 **信号→动作对照表**(5 条阈值规则,联动 GOR)
+> - 🔮 **年度展望三包络**(模型 × news_watch 新闻事件表,逐年 USD/CNY + 每万美元金额变动)
+> - 📰 **日卡/结论卡自动生成**(social_cards.py,每日管道附带,4:5/1:1 可直接发圈)
+> - 🔬 **回测校验层**(backtest.py):北向-汇率回归、9 段汇率窗口行业验证、平缓性诊断
+>
 > 🧭 This repository simulates the macro impact of a controlled RMB (CNY) appreciation path:
 > FX (GBM, real-calibrated) → import inflation → export competitiveness (Marshall-Lerner) →
 > 11-sector profit shocks → asset prices (A-shares / bonds / gold / commodities) +
@@ -134,7 +142,13 @@ python export_dashboard.py
 python build_report.py
 python build_report_en.py     # English edition (RMB_Appreciation_Impact_Report_*.pdf)
 
-# 5. 单元测试
+# 5. 回测诊断 (北向-汇率回归 + 汇率窗口行业验证 + 平缓性分解)
+python backtest.py
+
+# 6. 社交媒体卡 (日卡 4:5 + 受益/受损/顺序 1:1 + 标题库)
+python social_cards.py
+
+# 7. 单元测试
 python test_model.py      # 17 项 (引擎+资本+config)
 python test_real_calib.py # 3 项 (校准函数, 离线)
 ```
@@ -274,4 +288,22 @@ dashboard.html → 自动提交 → Pages 自动重建。**需在仓库 Settings
 
 ---
 
+
+
+---
+
+## 十、版本记录 · v2.1 (2026-09-06)
+
+| 版本 | 内容 |
+|---|---|
+| v1.0 | 元宝共建初版: 6 模块引擎 + config.yaml + 9 单测 |
+| v2.0 | 资本流入模块(capital_inflow)+ 净效益瀑布; 真实数据层(data_loader/calibrate/run_real) |
+| v2.1 打磨 | 浅色研报风; 情景巨幕图; config 真源化; dashboard v1; 中/英 PDF 报告; 每日管道(GitHub Actions); README_EN |
+| v2.1 传播+实用 | 三包络展望 + 信号→动作表 + 日卡/结论卡 + 标题库; 滑块扩至 **-5%~15%**; 代码审查 8×P1 修复 |
+| v2.1 回测修订 | backtest.py 诊断 → 修复 ±30% 截断/吸引力封顶/缺失 carry 通道; 流入率重锚(0.1088/0.0890/0.0475); 6% 头版不变; 档位区分度 ×3 |
+
+**参数修订依据**: docs/backtest_2026-09.md ｜ **代码审查**: docs/code_review_2026-09-06.md ｜
+**校准说明**: real_data_report_2026-09-06.md ｜ **spec**: docs/superpowers/specs/
+
+---
 > ⚠️ **免责声明**：本模型为教学/研究用途，参数基于公开信息估算，不构成投资建议。实际决策需结合专业判断。

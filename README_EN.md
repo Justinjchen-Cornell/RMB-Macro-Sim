@@ -22,19 +22,23 @@ python export_dashboard.py     # writes dashboard.html (self-contained)
 ![Dashboard preview](assets/dashboard_preview.png)
 
 **Dashboard includes:**
-- 🎚️ **Appreciation slider (0–10%, step 0.5%)** — 21 pre-run Monte Carlo grids
-  (600 runs each); drag to watch industry shocks, FX paths and the net-benefit
-  waterfall move in real time;
+- 🎚️ **CNY move slider −5% … +15% (step 0.5%, 41 grids)** — pre-run Monte Carlo
+  grids (400 runs each); drag to watch industry shocks, FX paths, the waterfall
+  and macro risk move in real time — depreciation scenarios included;
+  differentiated by a backtest-driven parameter revision (see § Backtesting);
+- 🏛️ **Macro risk cards** — GDP-equivalent impact (profit-margin-adjusted),
+  employment exposure (10k jobs), weighted profit-shock index and a risk tier
+  (low/mid/high), recomputed for every slider tick;
 - 🏛️ **Macro risk cards** — GDP-equivalent impact (profit-margin-adjusted),
   employment exposure (10k jobs), weighted profit-shock index and a risk tier
   (low/mid/high), computed per scenario;
 - 🗺️ **Industry × year heatmap** — 11 sectors × Y1–Y5 cumulative profit shocks;
 - 🧭 **Signal-to-action rules** - 5 threshold triggers (R1 fast-appreciation activation < 6.30, R2 thesis falsification > 7.00, R3 PBOC fixing spread, R4 fiscal-regime tell, R5 inflow validation), status auto-checked against the live spot;
 - 📰 **Daily reading card** (`social_cards.py`) - 4:5 shareable PNG regenerated every morning with the pipeline (spot, outlook, macro risk);
-- 🔮 **Annual outlook panel** — most-likely USD/CNY path per year, blending the
-  calibrated inertia drift with a maintainable news/event watch table
-  (`news_watch.yaml`); shows yearly level, % move, 25-75% band and the CNY
-  amount change per USD 10,000;
+- 🔮 **Annual outlook panel (3 envelopes)** — for every year: low / base /
+  high USD/CNY paths blending calibrated inertia drift with a maintainable
+  news/event watch table (`news_watch.yaml`); shows yearly level, % move,
+  envelope band and the CNY amount change per USD 10,000;
 - 🧭 Scenario chips: 0%/3%/6%/10%, conservative vs aggressive capital inflow,
   real-calibrated, realized-inertia — plus full waterfall, FX fan charts,
   A-share/bond/gold/metal returns.
@@ -90,6 +94,9 @@ pip install fredapi akshare                             # optional real data
 python run_all.py                  # config.yaml → 7 charts + waterfall summary
 python run_real.py --charts        # real-data calibration + 3-scenario wall
 python export_dashboard.py         # interactive dashboard (single file)
+python backtest.py                 # diagnostics: northbound-FX regression,
+                                   # FX-episode sector check, flatness analysis
+python social_cards.py             # daily reading card + 1:1 opinion cards
 python build_report.py             # 9-page Chinese report (HTML+PDF)
 python build_report_en.py          # 8-page English report (HTML+PDF)
 
@@ -109,22 +116,24 @@ Add `FRED_API_KEY` in Settings → Secrets (falls back to offline cache otherwis
 - `report/人民币升值宏观影响研究报告_2026-09-06.pdf` (Chinese, 9 pages)
 - `report/RMB_Appreciation_Impact_Report_2026-09-06.pdf` (English, 8 pages)
 - `real_data_report_2026-09-06.md` — calibration notes and limitations
+- `docs/backtest_2026-09.md` — backtest findings & parameter revision log
 
 ---
 
 ## 📂 Repository layout
 
 ```
-model.py / capital_inflow.py    6-module engine + capital waterfall
+model.py / capital_inflow.py    6-module engine + capital waterfall (carry channel)
 data_loader.py / calibrate.py   real data (FRED/Tencent/northbound) + estimators
-run_all.py / run_real.py        scenario pipelines (assumption & real-data)
+backtest.py                     empirical diagnostics (northbound-FX, episodes)
 outlook.py + news_watch.yaml    yearly outlook: inertia + news-event scoring
-export_dashboard.py             dashboard generator (8 presets + 21-grid slider)
+run_all.py / run_real.py        scenario pipelines (assumption & real-data)
+export_dashboard.py             dashboard generator (8 presets + 41-grid slider)
+social_cards.py                 daily reading + opinion cards (assets/, social/)
 build_report.py / _en.py        Chinese & English report builders (HTML→PDF)
 viz_en.py                       English chart twins (light research style)
 dashboard.html / index.html     self-contained interactive dashboard
-docs/                           superpowers spec + code-review report
-report/ assets/ charts*/ data/  deliverables
+docs/ report/ assets/ data/     specs, reviews, reports, cards, caches
 ```
 
 ---
@@ -138,3 +147,4 @@ ends at the 2024-08 disclosure reform (dark period). Data as of 2026-09.
 Sources: FRED, Tencent Finance, akshare.
 
 Apache-2.0 · © 2026 Justinjchen · Built with collaborative AI-assisted research.
+v2.1 (2026-09-06): propagation & utility pack, −5%…+15% slider, backtest-driven parameter revision — see docs/backtest_2026-09.md.
