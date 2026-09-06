@@ -24,7 +24,7 @@ def test_fx_simulation_shape():
     path = fx.simulate(5, 100, 42)
     assert path.shape == (100, 6), f"Expected (100, 6), got {path.shape}"
     # 起始值应为基准汇率
-    assert np.allclose(path[:, 0], 7.20)
+    assert np.allclose(path[:, 0], 6.7108)
     print("✓ test_fx_simulation_shape")
 
 
@@ -45,7 +45,7 @@ def test_no_appreciation_zero_effect():
     fx = ExchangeRateModule(p)
     path = fx.simulate(5, 500, 42)
     final = np.median(path[:, -1])
-    assert abs(final - 7.20) < 0.15, f"Expected ~7.20, got {final}"
+    assert abs(final - 6.7108) < 0.15, f"Expected ~6.7108, got {final}"
     print("✓ test_no_appreciation_zero_effect")
 
 
@@ -198,7 +198,7 @@ def test_config_yaml_is_source_of_truth():
     """config.yaml 装载应能往返, 且关键默认值一致 (真源校验)"""
     import os
     p, cc = load_project_config()
-    assert abs(p.cny_spot - 7.20) < 1e-9, p.cny_spot
+    assert abs(p.cny_spot - 6.7108) < 1e-9, p.cny_spot
     assert abs(p.cny_annual_apprec - 0.06) < 1e-9
     assert len(p.fx_sensitivity) == 11 and len(p.industry_weights) == 11
     assert abs(cc.equity_inflow_rate - 0.10879) < 1e-6
@@ -209,7 +209,7 @@ def test_config_yaml_is_source_of_truth():
 def test_config_missing_file_falls_back():
     """config.yaml 缺失时应回退内置默认值而非崩溃"""
     p, cc = load_project_config(path="__no_such_file__.yaml")
-    assert p.cny_spot == 7.20
+    assert p.cny_spot == 6.7108
     print("✓ test_config_missing_file_falls_back")
 
 

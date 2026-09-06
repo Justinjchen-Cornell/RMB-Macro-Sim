@@ -115,7 +115,7 @@ def main():
 
     N, SEED = 2000, 42
     scen = {
-        "A_assumption": dict(cny_spot=7.20, cny_annual_apprec=0.06, cny_vol=0.04),
+        "A_assumption": dict(cny_spot=7.20, cny_annual_apprec=0.06, cny_vol=0.04),  # v1发布假设(对照用,勿当现价)
         "B_realvol":    dict(cny_spot=spot, cny_annual_apprec=0.06,
                              cny_vol=vol3y if vol3y < 0.15 else 0.04),
         "C_inertia":    dict(cny_spot=spot, cny_annual_apprec=drift_inertia,

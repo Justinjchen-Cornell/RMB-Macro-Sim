@@ -34,7 +34,7 @@ from capital_inflow import CapitalInflowModule, CapitalConfig
 class MacroParams:
     """宏观结构参数（可从外部 YAML/JSON 覆盖）"""
     # ── 汇率 ──
-    cny_spot: float = 7.20          # 基准 USD/CNY
+    cny_spot: float = 6.7108        # 基准 USD/CNY (2026-09-05)
     cny_annual_apprec: float = 0.06  # 年化升值幅度 (6%)
     cny_vol: float = 0.04           # 汇率波动率
 

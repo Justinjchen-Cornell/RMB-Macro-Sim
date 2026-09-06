@@ -157,9 +157,13 @@ def piv(p6, live):
     return replace(p6, cny_annual_apprec=inertia)
 
 
-def build_grid(step: float = 0.005, n_sim: int = GRID_N, seed: int = GRID_SEED) -> list:
+def build_grid(step: float = 0.005, n_sim: int = GRID_N, seed: int = GRID_SEED,
+               live: dict = None) -> list:
     """Appreciation-rate grid powering the dashboard slider (0..10%)."""
     base_p, base_cap = load_project_config()
+    if live:
+        base_p = replace(base_p, cny_spot=live.get("spot", REAL_SPOT),
+                         cny_vol=live.get("vol3y", REAL_VOL))
     out = []
     rates = np.arange(-0.05, 0.15001, step)   # 2026-09: 覆盖贬值(-5%)至超速升值(15%)
     for rate in rates:
@@ -222,7 +226,7 @@ def _outlook(live):
 
 def export(html_out: str = None, live: dict = None) -> dict:
     presets = build_presets(live=live)
-    grid = build_grid()
+    grid = build_grid(live=live)
     payload = {
         "generated": dt.datetime.now().strftime("%Y-%m-%d %H:%M"),
         "n_simulations": N,
@@ -259,7 +263,8 @@ def export(html_out: str = None, live: dict = None) -> dict:
 
 
 if __name__ == "__main__":
-    live = get_live() if ("--live" in sys.argv) else None
+    # 默认总是使用实时校准(含最新 spot)；--live 仅为兼容参数(强制刷新数据源)
+    live = get_live()
     if live and live.get("live"):
         print("live calibration: spot=%.4f vol3y=%.4f inertia=%.4f as_of=%s"
               % (live["spot"], live["vol3y"], live["inertia_apprec"],

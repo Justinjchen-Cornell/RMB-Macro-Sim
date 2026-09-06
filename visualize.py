@@ -77,8 +77,8 @@ def plot_fx_scenarios(all_paths: dict, save_path: str):
         p75 = np.percentile(path, 75, axis=0)
         ax.fill_between(years, p25, p75, color=colors[name], alpha=0.12)
 
-    ax.axhline(7.20, color=TEXT, ls="--", alpha=0.5, lw=1)
-    ax.text(0.1, 7.25, "基准 7.20", color=TEXT, fontsize=9)
+    ax.axhline(6.7108, color=TEXT, ls="--", alpha=0.5, lw=1)
+    ax.text(0.1, 7.25, "基准 6.71", color=TEXT, fontsize=9)
 
     ax.set_title("USD/CNY 路径模拟：四种升值情景对比", color=TEXT, fontsize=15, fontweight="bold", pad=15)
     ax.set_xlabel("年", color=TEXT)
