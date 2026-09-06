@@ -29,6 +29,8 @@ python export_dashboard.py     # writes dashboard.html (self-contained)
   employment exposure (10k jobs), weighted profit-shock index and a risk tier
   (low/mid/high), computed per scenario;
 - 🗺️ **Industry × year heatmap** — 11 sectors × Y1–Y5 cumulative profit shocks;
+- 🧭 **Signal-to-action rules** - 5 threshold triggers (R1 fast-appreciation activation < 6.30, R2 thesis falsification > 7.00, R3 PBOC fixing spread, R4 fiscal-regime tell, R5 inflow validation), status auto-checked against the live spot;
+- 📰 **Daily reading card** (`social_cards.py`) - 4:5 shareable PNG regenerated every morning with the pipeline (spot, outlook, macro risk);
 - 🔮 **Annual outlook panel** — most-likely USD/CNY path per year, blending the
   calibrated inertia drift with a maintainable news/event watch table
   (`news_watch.yaml`); shows yearly level, % move, 25-75% band and the CNY

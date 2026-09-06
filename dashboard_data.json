@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-06 16:50",
+ "generated": "2026-09-06 17:02",
  "n_simulations": 2000,
  "grid_n": 600,
  "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。GDP/就业为利润冲击的当量近似(利润率8%、就业弹性0.5), 非预测。",
@@ -6159,6 +6159,10 @@
     "year": 2026,
     "drift": 4.9,
     "level": 6.3899,
+    "level_low": 6.5977,
+    "level_high": 6.3263,
+    "env_lo": 6.3263,
+    "env_hi": 6.5977,
     "chg_pct": 4.78,
     "usd10k_cny": 3209.0,
     "band_lo": 6.2671,
@@ -6169,6 +6173,10 @@
     "year": 2027,
     "drift": 5.9,
     "level": 6.0238,
+    "level_low": 6.4219,
+    "level_high": 5.9639,
+    "env_lo": 5.9639,
+    "env_hi": 6.4219,
     "chg_pct": 5.73,
     "usd10k_cny": 3661.0,
     "band_lo": 5.8595,
@@ -6179,6 +6187,10 @@
     "year": 2028,
     "drift": 4.3,
     "level": 5.7703,
+    "level_low": 6.2509,
+    "level_high": 5.7129,
+    "env_lo": 5.7129,
+    "env_hi": 6.2509,
     "chg_pct": 4.21,
     "usd10k_cny": 2535.0,
     "band_lo": 5.5769,
@@ -6189,6 +6201,10 @@
     "year": 2029,
     "drift": 2.9,
     "level": 5.6053,
+    "level_low": 6.0843,
+    "level_high": 5.5496,
+    "env_lo": 5.5496,
+    "env_hi": 6.0843,
     "chg_pct": 2.86,
     "usd10k_cny": 1649.0,
     "band_lo": 5.3879,
@@ -6199,6 +6215,10 @@
     "year": 2030,
     "drift": 2.9,
     "level": 5.4451,
+    "level_low": 5.9223,
+    "level_high": 5.3909,
+    "env_lo": 5.3909,
+    "env_hi": 5.9223,
     "chg_pct": 2.86,
     "usd10k_cny": 1602.0,
     "band_lo": 5.2084,
@@ -6271,7 +6291,16 @@
     "source": "日元干预分析报告 (2026-07) / Jackson Hole 沃什表态"
    }
   ],
-  "note": "最可能幅度 = 现实惯性 + 新闻事件评分(线性衰减); 区间为近似 25-75%。新闻表见 news_watch.yaml, 可自行增删。"
+  "envelopes": {
+   "low": "inertia + 贬值类事件(最弱升值)",
+   "base": "inertia + 全部事件(最可能)",
+   "high": "inertia + 升值类事件(最强升值)"
+  },
+  "event_impact_total": {
+   "pos_pp": 3.2,
+   "neg_pp": -1.0
+  },
+  "note": "包络上/下沿用于展示新闻事件的主观不确定性; 区间列为近似 25-75%。事件表: news_watch.yaml 可自行增删。"
  },
  "live": {
   "spot": 6.7108,

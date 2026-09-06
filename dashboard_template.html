@@ -141,8 +141,8 @@ svg{width:100%;height:auto;display:block}
 
 <div class="panel full" style="margin-top:14px">
   <h3>🔮 年度展望: 最可能的人民币升贬路径 <span class="badge" style="margin-left:auto">模型结果 × 国内外新闻事件</span></h3>
-  <div class="hint">最可能幅度 = 现实惯性(FRED 实测) + 新闻/事件评分(见 news_watch.yaml, 可增删);
-  区间为近似 25-75%; "金额"按每 1 万美元等值人民币变动展示</div>
+  <div class="hint">三包络: 下沿=仅贬值类事件(最弱升值) / 最可能=全部事件 / 上沿=仅升值类事件(最强升值)。
+事件表 news_watch.yaml 可增删(影响合计 +3.2pp / -1.0pp); "金额"按每 1 万美元等值人民币变动。</div>
   <div id="outlooktab"></div>
   <div id="outlooknews"></div>
 </div>
@@ -159,7 +159,12 @@ svg{width:100%;height:auto;display:block}
 
 
 <div class="panel full" style="margin-top:14px">
-  <h3>🗺️ 行业 × 年份 冲击热力图 <span class="sorthint" id="hmnote" style="margin-left:auto;cursor:default">Y1–Y5 累计利润冲击(%)</span></h3>
+  <div class="panel full" style="margin-top:14px">
+  <h3>🧭 信号 → 动作对照 <span class="badge" style="margin-left:auto">联动 GOR / Deep-Risk-OPP</span></h3>
+  <div class="hint">阈值触发制; spot 类规则按实时校准自动判定, 其余为人工观察项(建议每日对 GOR 日卡核对 10Y/VIX/中间价)</div>
+  <div id="signaltab"></div>
+</div>
+<h3>🗺️ 行业 × 年份 冲击热力图 <span class="sorthint" id="hmnote" style="margin-left:auto;cursor:default">Y1–Y5 累计利润冲击(%)</span></h3>
   <div class="hint">行=行业 · 列=年份(累计升值加深) · 颜色深浅=冲击强度</div>
   <div id="hmchart"></div>
   <div class="legbar"><span>受损 -40%</span><div class="grad"></div><span>中性 0</span><div class="grad" style="background:linear-gradient(90deg,#f3f4f6,#059669);max-width:110px"></div><span>受益 +40%</span></div>
@@ -386,12 +391,12 @@ function renderHeat(){
 }
 function renderOutlook(){
   const o=DASH_DATA.outlook||{rows:[],events:[]},box=document.getElementById("outlooktab");
-  let html='<table class="otbl"><tr><th>年份</th><th>最可能年末 USD/CNY</th><th>年变动 (升值+)</th><th>大概率区间</th><th>每 1 万美元人民币值变动</th><th>节奏</th></tr>';
+  let html='<table class="otbl"><tr><th>年份</th><th>最可能年末<br>USD/CNY</th><th>年变动(升值+)</th><th>事件包络区间<br>(弱~强升值)</th><th>每 1 万美元<br>人民币值变动</th><th>节奏</th></tr>';
   o.rows.forEach(function(r){
     const cls=r.pace.indexOf("加速")>=0?"tier-high":(r.pace.indexOf("趋缓")>=0||r.pace.indexOf("贬值")>=0?"tier-mid":"tier-low");
-    html+="<tr><td>"+r.year+"</td><td><b>"+r.level.toFixed(3)+"</b></td><td class='"+
+    html+="<tr><td><b>"+r.year+"</b></td><td><b>"+r.level.toFixed(3)+"</b></td><td class='"+
       (r.chg_pct>=0?"up":"dn")+"'>"+r.chg_pct.toFixed(2)+"%</td><td>"+
-      r.band_lo.toFixed(3)+" ~ "+r.band_hi.toFixed(3)+"</td><td>"+
+      r.level_low.toFixed(3)+" ~ "+r.level_high.toFixed(3)+"</td><td>"+
       (r.usd10k_cny>0?"+":"")+r.usd10k_cny.toFixed(0)+" 元</td><td><span class='"+cls+"'>"+
       r.pace+"</span></td></tr>";
   });
@@ -405,9 +410,28 @@ function renderOutlook(){
     }).join(" ");
   }
 }
+
+function renderSignals(){
+  const spot=(DASH_DATA.live||{}).spot||0;
+  const box=document.getElementById("signaltab");
+  const RULES=[
+    {n:"R1 快速升值激活", c:"USD/CNY 收盘 < 6.30", act:"快速升值路径概率上调 → A股/人民币资产档位+50%(如 9.5%→14%), 资本流入假设切激进档", s:spot>0&&spot<6.30?"已触发":"观察中 (现价 "+spot.toFixed(3)+")", t:"auto"},
+    {n:"R2 升值叙事证伪", c:"USD/CNY 收盘 > 7.00", act:"回到惯性/双向情景 → 人民币资产降回底仓, 等 R1 重新触发", s:spot>7.00?"已触发":"观察中 (现价 "+spot.toFixed(3)+")", t:"auto"},
+    {n:"R3 政策意图读数", c:"中间价 vs 即期 偏强 > 0.3%", act:"确认主动升值管理 → 最可能档上调半档(需中间价数据, akshare 可接)", s:"人工观察", t:"watch"},
+    {n:"R4 财政制度切换(GOR tell)", c:"10Y>4.8% 且油价同步上行", act:"弱美元强货币剧本权重上调 → 与 R1 叠加, 黄金美元计价多头", s:"人工观察 (10Y 4.77 近临界)", t:"watch"},
+    {n:"R5 资本流入验证", c:"北向季度持仓新增 > 0.05T$ / VIX>35", act:"持仓验证→资本假设升一档; VIX>35=速冻 → 全部风险仓位减半, 现金待命", s:"人工观察 (北向 2024-08 后黑暗期)", t:"watch"}
+  ];
+  let html='<table class="otbl"><tr><th>规则</th><th>触发条件</th><th>动作 (与框架联动)</th><th>当前状态</th></tr>';
+  RULES.forEach(function(r){
+    const cls=r.t==="auto"?(r.s.indexOf("已触发")>=0?"tier-high":"tier-low"):"tier-mid";
+    html+="<tr><td><b>"+r.n+"</b></td><td>"+r.c+"</td><td>"+r.act+"</td><td><span class='"+cls+"'>"+r.s+"</span></td></tr>";
+  });
+  html+="</table>";
+  box.innerHTML=html;
+}
 function renderAll(){
   renderMeta();renderKPIs();renderMacro();renderMinis();renderFX();
-  renderWaterfall();renderIndustry();renderHeat();renderOutlook();
+  renderWaterfall();renderIndustry();renderHeat();renderOutlook();renderSignals();
 }
 function onSlider(){
   const v=parseFloat(document.getElementById("rateSlider").value);

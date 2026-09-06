@@ -28,10 +28,13 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python export_dashboard.py --live
 
+      - name: Generate daily reading + social cards
+        run: python social_cards.py
+
       - name: Commit if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dashboard.html index.html dashboard_data.json dashboard_template.html
+          git add dashboard.html index.html dashboard_data.json dashboard_template.html assets social
           git diff --cached --quiet || git commit -m "Auto: daily dashboard refresh [$(date -u +%Y-%m-%d)]"
           git push origin main || echo "nothing to push"
