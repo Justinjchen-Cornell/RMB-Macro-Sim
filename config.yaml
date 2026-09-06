@@ -1,0 +1,66 @@
+# 宏观场景推演模型 — 参数配置
+# =====================================
+# 修改本文件后重新运行: python model.py
+# 所有参数均可在此调整，无需改代码
+
+# ── 汇率假设 ─────────────────────────────────────────
+exchange_rate:
+  cny_spot: 7.20              # 基准 USD/CNY
+  cny_annual_apprec: 0.06     # 年化升值幅度 (6%)
+  cny_vol: 0.04               # 汇率波动率
+
+# ── 通胀传导 ─────────────────────────────────────────
+inflation:
+  import_share: 0.18          # 进口占中间投入比例
+  ppi_pass_through: 0.55      # 汇率→PPI 传递系数
+  cpi_from_ppi: 0.30          # PPI→CPI 传递系数
+
+# ── 出口弹性 (Marshall-Lerner) ──────────────────────
+export:
+  export_price_elasticity: -0.45   # 本币升值1% → 出口量变化
+  import_price_elasticity: 0.35
+
+# ── 利率环境 ─────────────────────────────────────────
+rates:
+  us_10y: 0.0481              # 美国10年国债收益率
+  cn_10y: 0.0169              # 中国10年国债收益率
+
+# ── 行业敏感度 (利润弹性: % 变化 per 10% 累计升值) ──
+#  经济含义: 人民币累计升值10%, 该行业5年累计利润相对基准变化多少%
+fx_sensitivity:
+  export_lowend: -8.0          # 低端制造业/小家电 (最敏感, 缺乏议价)
+  export_hightech: -3.0         # 高新技术出口 (有部分议价能力)
+  domestic_consumption: 1.0
+  real_estate: 1.5
+  infrastructure: 0.5
+  new_energy: -1.5
+  semiconductor: 2.0            # 进口设备成本下降受益
+  commodity_metals: 4.0         # 人民币购买力 + 全球定价
+  power_compute: 2.5
+  gold: 3.5
+  bank_insurance: 0.5
+
+# ── 资本流入模块 (capital_inflow.py, 2026-09校准) ─────
+#  对标: 5年累计 流入+2.17T$ / 资本深化+0.81T$ / 净效益+2.69T$ (6%升值基准)
+#  ⚠ 流入率/美元荒强度/边际产出 均为待实测校准项 (见 README "下一步")
+capital:
+  foreign_equity_base: 0.55      # 外资持有A股存量 (T$)
+  foreign_bond_base: 0.50        # 外资持有中国债券存量 (T$)
+  fdi_stock: 3.40                # 中国FDI存量 (T$)
+  equity_inflow_rate: 0.1112     # A股年流入率 (占存量)
+  bond_inflow_rate: 0.0910       # 债市年流入率
+  fdi_inflow_rate: 0.0485        # FDI年流入率
+  apprec_elasticity: 0.8         # 升值吸引力弹性
+  re_rate_growth: 0.05           # A股估值重估年增值
+  dollar_drain_boost: 0.50       # 美元荒峰值超额 (2026Q4-2027Q1)
+  drain_peak_year: 2.0
+  drain_width: 1.3
+  export_value_annual: 3.5       # 年出口额 (T$)
+  exporter_margin: 0.10          # 出口商利润率
+  deepen_return: 0.156           # 流入资本边际年化产出
+
+# ── 模拟设置 ─────────────────────────────────────────
+simulation:
+  n_years: 5
+  n_simulations: 2000
+  seed: 42

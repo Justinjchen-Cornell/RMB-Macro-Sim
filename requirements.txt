@@ -1,0 +1,9 @@
+numpy>=1.24
+pandas>=2.0
+matplotlib>=3.7
+pyyaml>=6.0
+requests>=2.28          # data_loader (Tencent行情)
+# 可选: 真实数据源 (缺失时 data_loader 报错提示, 核心模拟不受影响)
+fredapi>=0.5.2          # FRED 序列
+akshare>=1.14           # 北向资金
+pillow>=10.0            # 图表校验

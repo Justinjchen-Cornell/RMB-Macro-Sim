@@ -1,0 +1,210 @@
+{
+ "fx_stats": {
+  "as_of": "2026-08-28",
+  "spot": 6.726,
+  "1y": {
+   "annual_vol": 0.0204,
+   "annual_drift": -0.0619,
+   "n": 251
+  },
+  "3y": {
+   "annual_vol": 0.0284,
+   "annual_drift": -0.027,
+   "n": 751
+  },
+  "5y": {
+   "annual_vol": 0.04,
+   "annual_drift": 0.0078,
+   "n": 1250
+  },
+  "10y": {
+   "annual_vol": 0.0403,
+   "annual_drift": 0.0007,
+   "n": 2496
+  },
+  "all": {
+   "annual_vol": 0.0801,
+   "annual_drift": 0.015,
+   "n": 9972
+  }
+ },
+ "equity": {
+  "northbound_annual_net_T_rmb_mean": 0.189,
+  "northbound_holdings_T_rmb_mean": 1.71,
+  "full_scope_holdings_T_rmb_est": 2.907,
+  "full_scope_holdings_T_usd_est": 0.433,
+  "historical_rate": 0.065,
+  "rate_used_by_model": 0.1112,
+  "yearly_net_T_rmb": {
+   "2015": 0.019,
+   "2016": 0.061,
+   "2017": 0.2,
+   "2018": 0.294,
+   "2019": 0.352,
+   "2020": 0.209,
+   "2021": 0.432,
+   "2022": 0.09,
+   "2023": 0.044
+  },
+  "note": "northbound daily net valid only through 2024-08 (disclosure reform); 2024-09+ is a dark period - use with scenario judgement"
+ },
+ "export": {
+  "n": 402,
+  "period": [
+   "1993-01-31",
+   "2026-06-30"
+  ],
+  "beta_d12": -0.059,
+  "se": 0.0987,
+  "t": -0.6,
+  "r2": 0.0009,
+  "model_elasticity": -0.45,
+  "note": "value elasticity includes price; not auto-applied"
+ },
+ "industry": {
+  "export_hightech": {
+   "n": 82,
+   "beta_fx_per_1pct": 0.9539,
+   "t": 1.15,
+   "r2": 0.3944,
+   "interpret": "CNY depreciation HELPS"
+  },
+  "domestic_consumption": {
+   "n": 91,
+   "beta_fx_per_1pct": 0.2908,
+   "t": 0.66,
+   "r2": 0.5534,
+   "interpret": "CNY depreciation HELPS"
+  },
+  "real_estate": {
+   "n": 91,
+   "beta_fx_per_1pct": -0.1272,
+   "t": -0.25,
+   "r2": 0.467,
+   "interpret": "CNY depreciation HURTS"
+  },
+  "new_energy": {
+   "n": 66,
+   "beta_fx_per_1pct": 0.0323,
+   "t": 0.05,
+   "r2": 0.4023,
+   "interpret": "CNY depreciation HELPS"
+  },
+  "semiconductor": {
+   "n": 86,
+   "beta_fx_per_1pct": 0.8498,
+   "t": 0.91,
+   "r2": 0.2587,
+   "interpret": "CNY depreciation HELPS"
+  },
+  "commodity_metals": {
+   "n": 91,
+   "beta_fx_per_1pct": -0.6371,
+   "t": -1.0,
+   "r2": 0.4171,
+   "interpret": "CNY depreciation HURTS"
+  },
+  "power_compute": {
+   "n": 78,
+   "beta_fx_per_1pct": 0.9387,
+   "t": 0.99,
+   "r2": 0.3337,
+   "interpret": "CNY depreciation HELPS"
+  },
+  "gold": {
+   "n": 91,
+   "beta_fx_per_1pct": 0.1054,
+   "t": 0.28,
+   "r2": 0.0126,
+   "interpret": "CNY depreciation HELPS"
+  },
+  "bank_insurance": {
+   "n": 91,
+   "beta_fx_per_1pct": -0.7816,
+   "t": -2.29,
+   "r2": 0.2843,
+   "interpret": "CNY depreciation HURTS"
+  }
+ },
+ "spot": 6.7108,
+ "scenarios": {
+  "A_assumption": {
+   "fx_5y_median": 5.312,
+   "apprec_5y_median_pct": 35.5,
+   "industry_final_pct": {
+    "export_lowend": -28.1,
+    "export_hightech": -11.0,
+    "domestic_consumption": 5.8,
+    "real_estate": 7.0,
+    "infrastructure": 3.4,
+    "new_energy": -3.7,
+    "semiconductor": 8.7,
+    "commodity_metals": 15.2,
+    "power_compute": 9.9,
+    "gold": 13.5,
+    "bank_insurance": 3.4
+   },
+   "equity_ret_pct": 8.2,
+   "bond_ret_pct": -0.7,
+   "gold_ret_pct": -5.0,
+   "capital": {
+    "export_loss": -0.312,
+    "inflow": 2.173,
+    "deepening": 0.818,
+    "net": 2.678
+   }
+  },
+  "B_realvol": {
+   "fx_5y_median": 4.961,
+   "apprec_5y_median_pct": 35.3,
+   "industry_final_pct": {
+    "export_lowend": -27.9,
+    "export_hightech": -10.9,
+    "domestic_consumption": 5.8,
+    "real_estate": 6.9,
+    "infrastructure": 3.4,
+    "new_energy": -3.7,
+    "semiconductor": 8.7,
+    "commodity_metals": 15.1,
+    "power_compute": 9.8,
+    "gold": 13.4,
+    "bank_insurance": 3.4
+   },
+   "equity_ret_pct": 8.2,
+   "bond_ret_pct": -0.7,
+   "gold_ret_pct": -5.0,
+   "capital": {
+    "export_loss": -0.31,
+    "inflow": 2.171,
+    "deepening": 0.817,
+    "net": 2.679
+   }
+  },
+  "C_inertia": {
+   "fx_5y_median": 5.851,
+   "apprec_5y_median_pct": 14.7,
+   "industry_final_pct": {
+    "export_lowend": -11.1,
+    "export_hightech": -4.4,
+    "domestic_consumption": 2.7,
+    "real_estate": 2.8,
+    "infrastructure": 1.3,
+    "new_energy": -1.6,
+    "semiconductor": 3.5,
+    "commodity_metals": 5.9,
+    "power_compute": 3.7,
+    "gold": 5.1,
+    "bank_insurance": 1.3
+   },
+   "equity_ret_pct": 8.1,
+   "bond_ret_pct": -0.7,
+   "gold_ret_pct": -4.4,
+   "capital": {
+    "export_loss": -0.123,
+    "inflow": 1.985,
+    "deepening": 0.766,
+    "net": 2.627
+   }
+  }
+ }
+}
