@@ -1,0 +1,63 @@
+name: FX Baseline Watchdog
+
+on:
+  schedule:
+    - cron: '23 3 * * *'   # 03:23 UTC — 1h after the daily dashboard refresh (02:23 UTC)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check FX baseline
+        id: check
+        continue-on-error: true
+        run: |
+          pip install --quiet requests
+          python fx_watchdog.py | tee /tmp/fxw.txt
+
+      - name: Open alert issue (baseline stale/drifted)
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTS=$(gh issue list --state open --search '"FX BASELINE" in:title' --json number --jq 'length')
+          if [ "$EXISTS" != "0" ]; then
+            echo "Alert issue already open — skipping duplicate."
+            exit 0
+          fi
+          {
+            echo "The FX watchdog detected a problem with the dashboard baseline."
+            echo ""
+            echo '```'
+            cat /tmp/fxw.txt
+            echo '```'
+            echo ""
+            echo "**Impact**: justinjchen-cornell.github.io/RMB-Macro-Sim may show scenarios starting from an outdated USD/CNY level."
+            echo "**Fix**: check the Daily dashboard refresh workflow:"
+            echo "https://github.com/Justinjchen-Cornell/RMB-Macro-Sim/actions/workflows/daily-dashboard.yml"
+            echo ""
+            echo "(Auto-opened by FX Baseline Watchdog; auto-closes when the baseline recovers.)"
+          } > /tmp/fxw_body.md
+          gh issue create             --title "🔴 FX BASELINE: dashboard may be using a stale rate"             --body-file /tmp/fxw_body.md
+
+      - name: Close alert issue (baseline recovered)
+        if: steps.check.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for N in $(gh issue list --state open --search '"FX BASELINE" in:title' --json number --jq '.[].number'); do
+            gh issue close "$N" --comment "✅ FX baseline recovered — watchdog OK."
+            echo "Closed alert issue #$N"
+          done
+          echo "No open alert issues — all clean."
