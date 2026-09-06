@@ -105,6 +105,7 @@ svg{width:100%;height:auto;display:block}
 <div class="foot">
   <div>⚠️ 免责声明: 研究框架, 不构成投资建议。参数为校准假设, 情景为概率模拟而非预测。</div>
   <div>📊 数据源: FRED / 腾讯行情 / akshare(北向), 截至 2026-09 ｜ 生成时间: <span id="gen"></span></div>
+  <div class="small">🔁 实时校准: <span id="liveinfo">—</span></div>
   <div class="mono">复现: python run_all.py (图表) · python run_real.py (真实数据校准) · python export_dashboard.py (本页)</div>
 </div>
 
@@ -276,6 +277,10 @@ function renderAll(){
 }
 document.getElementById("sorthint").onclick=function(){sortAsc=!sortAsc;renderIndustry();};
 document.getElementById("gen").textContent=DASH_DATA.generated;
+var LV=DASH_DATA.live||{}; document.getElementById("liveinfo").textContent=
+  (LV.live? "当日抓取":"离线缓存")+" · USD/CNY "+LV.spot+" · 波动率(3y) "+
+  (LV.vol3y*100).toFixed(2)+"%"+" · 惯性升值 "+(LV.inertia_apprec*100).toFixed(2)+
+  "%"+(LV.as_of? " · FX数据截至 "+LV.as_of:"")+(LV.live?"":" · "+LV.note);
 renderChips();renderAll();
 </script>
 </body>

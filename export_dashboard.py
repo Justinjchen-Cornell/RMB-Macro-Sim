@@ -30,9 +30,12 @@ INERTIA_APPREC = 0.027     # 3y realized drift (appreciation)
 # 升值漂移 0.06 基准下确定性路径中位终值约对应情景数值,由引擎计算
 
 
-def build_presets(n_sim: int = N, seed: int = SEED) -> list:
+def build_presets(n_sim: int = N, seed: int = SEED, live: dict = None) -> list:
     base_p, base_cap = load_project_config()
     presets = []
+    if live:
+        base_p = replace(base_p, cny_spot=live.get("spot", REAL_SPOT),
+                         cny_vol=live.get("vol3y", REAL_VOL))
 
     def add(key, label, params, cap_cfg=None, note=""):
         eng = ScenarioEngine(params, capital_cfg=cap_cfg or base_cap)
@@ -72,10 +75,11 @@ def build_presets(n_sim: int = N, seed: int = SEED) -> list:
     cap_agg = replace(base_cap, equity_inflow_rate=0.15,
                       dollar_drain_boost=0.90, bond_inflow_rate=0.12)
 
-    p6r = replace(base_p, cny_spot=REAL_SPOT, cny_vol=REAL_VOL,
+    live_apprec = live.get("inertia_apprec", INERTIA_APPREC) if live else INERTIA_APPREC
+    p6r = replace(base_p, cny_spot=base_p.cny_spot, cny_vol=base_p.cny_vol,
                   cny_annual_apprec=0.06, n_simulations=n_sim, seed=seed)
-    piv = replace(base_p, cny_spot=REAL_SPOT, cny_vol=REAL_VOL,
-                  cny_annual_apprec=INERTIA_APPREC,
+    piv = replace(base_p, cny_spot=base_p.cny_spot, cny_vol=base_p.cny_vol,
+                  cny_annual_apprec=live_apprec,
                   n_simulations=n_sim, seed=seed)
 
     add("p0", "不升值 0%", p0, note="基准参数, 汇率零漂移对照")
@@ -91,13 +95,47 @@ def build_presets(n_sim: int = N, seed: int = SEED) -> list:
     return presets
 
 
-def export(html_out: str = None) -> dict:
-    presets = build_presets()
+def get_live():
+    """Best-effort live calibration. Falls back gracefully on any failure."""
+    live = {"spot": REAL_SPOT, "vol3y": REAL_VOL,
+            "inertia_apprec": INERTIA_APPREC, "as_of": None,
+            "live": False, "note": "offline defaults"}
+    try:
+        from data_loader import ensure_data
+        from calibrate import fx_realized_stats
+        data = ensure_data(refresh=True)
+        fx = data.get("fx_fred")
+        if fx is not None and len(fx) > 60:
+            st = fx_realized_stats(fx)
+            live["as_of"] = st.get("as_of")
+            vol = st.get("3y", {}).get("annual_vol")
+            drift1 = st.get("1y", {}).get("annual_drift")
+            drift3 = st.get("3y", {}).get("annual_drift")
+            if vol and vol < 0.15:
+                live["vol3y"] = round(float(vol), 4)
+            if drift3 is not None:
+                live["inertia_apprec"] = round(max(-0.10, min(0.10, -float(drift3))), 4)
+            live["drift1y"] = round(float(drift1), 4) if drift1 is not None else None
+        sp = data.get("spot", {})
+        if sp.get("whUSDCNY") and sp["whUSDCNY"].get("price"):
+            live["spot"] = float(sp["whUSDCNY"]["price"])
+        live["live"] = True
+        live["note"] = "live FRED/Tencent"
+    except Exception as e:
+        live["note"] = "live failed (%s) - offline defaults" % type(e).__name__
+    return live
+
+
+def export(html_out: str = None, live: dict = None) -> dict:
+    presets = build_presets(live=live)
     payload = {
         "generated": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"),
         "n_simulations": N,
         "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。",
         "presets": presets,
+        "live": live or {"spot": REAL_SPOT, "vol3y": REAL_VOL,
+                         "inertia_apprec": INERTIA_APPREC, "live": False,
+                         "note": "offline defaults"},
     }
     if html_out is None:
         html_out = os.path.join(BASE, "dashboard.html")
@@ -128,4 +166,8 @@ def export(html_out: str = None) -> dict:
 
 
 if __name__ == "__main__":
-    export()
+    live = get_live() if ("--live" in sys.argv) else None
+    if live and live.get("live"):
+        print("live calibration: spot=%.4f vol3y=%.4f inertia=%.4f as_of=%s"
+              % (live["spot"], live["vol3y"], live["inertia_apprec"], live.get("as_of")))
+    export(live=live)
