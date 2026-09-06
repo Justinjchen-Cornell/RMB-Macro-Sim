@@ -123,6 +123,7 @@ python export_dashboard.py
 
 # 4. 详细中文研报 (HTML + PDF, report/)
 python build_report.py
+python build_report_en.py     # English edition (RMB_Appreciation_Impact_Report_*.pdf)
 
 # 5. 单元测试
 python test_model.py      # 17 项 (引擎+资本+config)
@@ -235,6 +236,12 @@ python data_loader.py --refresh    # FRED + 腾讯(行情) + akshare(北向), �
 python run_real.py --charts        # 校准 → A/B/C 三情景 → charts_real/ 瀑布图
 python test_real_calib.py          # 校准函数离线单测 (3/3)
 ```
+
+**每日自动刷新管道**（`.github/workflows/daily-dashboard.yml`,每天 10:23 北京时间）:
+`export_dashboard.py --live` 抓当日 FRED/腾讯数据 → 重校准即期/波动率/惯性 → 更新
+dashboard.html → 自动提交 → Pages 自动重建。**需在仓库 Settings→Secrets 添加
+`FRED_API_KEY`**（或 `gh secret set FRED_API_KEY --repo Justinjchen-Cornell/RMB-Macro-Sim`）;
+无 key 时自动降级为离线缓存 + 腾讯现价刷新。
 
 **实证结论速览**（详见报告）：
 - 即期 USD/CNY = **6.71**（模型基准 7.20 已偏离 7%）；近 1 年实际升值 **~6.2%/年** ≈ 模型情景 6%
