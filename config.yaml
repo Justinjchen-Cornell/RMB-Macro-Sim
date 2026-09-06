@@ -63,9 +63,9 @@ capital:
   foreign_equity_base: 0.55      # 外资持有A股存量 (T$)
   foreign_bond_base: 0.50        # 外资持有中国债券存量 (T$)
   fdi_stock: 3.40                # 中国FDI存量 (T$)
-  equity_inflow_rate: 0.1112     # A股年流入率 (占存量)
-  bond_inflow_rate: 0.0910       # 债市年流入率
-  fdi_inflow_rate: 0.0485        # FDI年流入率
+  equity_inflow_rate: 0.10879    # A股年流入率 (占存量, 2026-09重锚)
+  bond_inflow_rate: 0.08903      # 债市年流入率 (2026-09重锚)
+  fdi_inflow_rate: 0.04745       # FDI年流入率 (2026-09重锚)
   apprec_elasticity: 0.8         # 升值吸引力弹性
   re_rate_growth: 0.05           # A股估值重估年增值
   dollar_drain_boost: 0.50       # 美元荒峰值超额 (2026Q4-2027Q1)

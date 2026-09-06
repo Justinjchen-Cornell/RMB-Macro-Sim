@@ -1,0 +1,192 @@
+{
+ "northbound_fx": {
+  "n": 10,
+  "same_year": {
+   "corr": -0.433,
+   "beta_Trmb_per_pct_fx": -0.0127,
+   "t": -1.36,
+   "n": 10
+  },
+  "lag1_year": {
+   "corr": -0.472,
+   "beta_Trmb_per_pct_fx": -0.0139,
+   "t": -1.52,
+   "n": 10
+  }
+ },
+ "episodes": [
+  {
+   "start": "2018-01-30",
+   "end": "2018-06-30",
+   "fx_chg6_pct": NaN,
+   "type": "depreciation",
+   "semiconductor": null,
+   "metals": null,
+   "gold": null,
+   "banks": null,
+   "hightech": null
+  },
+  {
+   "start": "2018-06-30",
+   "end": "2018-11-30",
+   "fx_chg6_pct": NaN,
+   "type": "depreciation",
+   "semiconductor": null,
+   "metals": null,
+   "gold": null,
+   "banks": null,
+   "hightech": null
+  },
+  {
+   "start": "2019-03-31",
+   "end": "2019-08-31",
+   "fx_chg6_pct": 6.92,
+   "type": "depreciation",
+   "semiconductor": 15.02,
+   "metals": -5.14,
+   "gold": 28.99,
+   "banks": 0.33,
+   "hightech": null
+  },
+  {
+   "start": "2020-04-30",
+   "end": "2020-09-30",
+   "fx_chg6_pct": -4.11,
+   "type": "appreciation",
+   "semiconductor": -13.03,
+   "metals": -2.43,
+   "gold": -15.51,
+   "banks": -18.22,
+   "hightech": -13.84
+  },
+  {
+   "start": "2021-12-31",
+   "end": "2022-05-31",
+   "fx_chg6_pct": 4.83,
+   "type": "depreciation",
+   "semiconductor": -8.84,
+   "metals": 5.55,
+   "gold": 24.82,
+   "banks": 14.68,
+   "hightech": -10.69
+  },
+  {
+   "start": "2022-05-31",
+   "end": "2022-10-31",
+   "fx_chg6_pct": 10.54,
+   "type": "depreciation",
+   "semiconductor": 4.48,
+   "metals": 1.95,
+   "gold": 12.19,
+   "banks": 0.6,
+   "hightech": -1.34
+  },
+  {
+   "start": "2022-11-30",
+   "end": "2023-04-30",
+   "fx_chg6_pct": -5.39,
+   "type": "appreciation",
+   "semiconductor": 6.35,
+   "metals": -6.35,
+   "gold": 3.99,
+   "banks": -2.37,
+   "hightech": 11.86
+  },
+  {
+   "start": "2023-04-30",
+   "end": "2023-09-30",
+   "fx_chg6_pct": 6.24,
+   "type": "depreciation",
+   "semiconductor": -6.12,
+   "metals": -4.34,
+   "gold": 7.9,
+   "banks": 6.61,
+   "hightech": 8.61
+  },
+  {
+   "start": "2025-11-30",
+   "end": "2026-04-30",
+   "fx_chg6_pct": -4.07,
+   "type": "appreciation",
+   "semiconductor": 22.69,
+   "metals": 14.98,
+   "gold": -0.05,
+   "banks": -11.28,
+   "hightech": 36.81
+  }
+ ],
+ "flatness_current": [
+  {
+   "rate_pct": -5.0,
+   "loss": 0.196,
+   "inflow": 1.602,
+   "deepening": 0.652,
+   "net": 2.45,
+   "lowend": 16.7
+  },
+  {
+   "rate_pct": -2.5,
+   "loss": 0.104,
+   "inflow": 1.702,
+   "deepening": 0.682,
+   "net": 2.487,
+   "lowend": 8.7
+  },
+  {
+   "rate_pct": 0.0,
+   "loss": -0.001,
+   "inflow": 1.813,
+   "deepening": 0.714,
+   "net": 2.526,
+   "lowend": -0.4
+  },
+  {
+   "rate_pct": 2.5,
+   "loss": -0.121,
+   "inflow": 1.951,
+   "deepening": 0.751,
+   "net": 2.581,
+   "lowend": -10.9
+  },
+  {
+   "rate_pct": 5.0,
+   "loss": -0.259,
+   "inflow": 2.11,
+   "deepening": 0.792,
+   "net": 2.643,
+   "lowend": -23.3
+  },
+  {
+   "rate_pct": 7.5,
+   "loss": -0.416,
+   "inflow": 2.293,
+   "deepening": 0.838,
+   "net": 2.715,
+   "lowend": -37.5
+  },
+  {
+   "rate_pct": 10.0,
+   "loss": -0.593,
+   "inflow": 2.505,
+   "deepening": 0.888,
+   "net": 2.8,
+   "lowend": -53.5
+  },
+  {
+   "rate_pct": 12.5,
+   "loss": -0.713,
+   "inflow": 2.752,
+   "deepening": 0.944,
+   "net": 2.984,
+   "lowend": -60.0
+  },
+  {
+   "rate_pct": 15.0,
+   "loss": -0.796,
+   "inflow": 2.956,
+   "deepening": 1.001,
+   "net": 3.16,
+   "lowend": -60.0
+  }
+ ]
+}

@@ -306,9 +306,9 @@ class IndustryProfitModule:
             # ④ 利率效应 (利差收窄 → 估值修复, 小量)
             rate_effect = 0.05 * (apprec / 100.0)
 
-            # 合计并裁剪到经济合理区间
+            # 合计并裁剪到经济合理区间 (2026-09 回测调宽: 旧 ±30% 在 5y 累计>40% 时截断档位差异)
             total = fx_effect + inflation_effect + export_effect + rate_effect
-            total = np.clip(total, -0.30, 0.30)
+            total = np.clip(total, -0.60, 0.60)
             results[industry] = total
 
         df = pd.DataFrame(results)

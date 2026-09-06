@@ -35,13 +35,13 @@ class CapitalConfig:
     fdi_stock: float = 3.40                # 中国吸收FDI存量
 
     # ── 年度流入率 (占存量的比例, 已按2026-09校准) ──
-    equity_inflow_rate: float = 0.1112     # A股: 每年新增 ~11% 存量
-    bond_inflow_rate: float = 0.0910       # 债市: 每年新增 ~9% 存量
-    fdi_inflow_rate: float = 0.0485        # FDI: 每年新增 ~4.85% 存量
+    equity_inflow_rate: float = 0.10879    # A股: 每年新增 ~11% 存量 (2026-09 重锚)
+    bond_inflow_rate: float = 0.08903      # 债市: 每年新增 ~9% 存量 (2026-09 重锚)
+    fdi_inflow_rate: float = 0.04745       # FDI: 每年新增 ~4.75% 存量 (2026-09 重锚)
 
     # ── 吸引力弹性 ──
     apprec_elasticity: float = 0.8         # 累计升值每+10个百分点 → 吸引力 +8%
-    apprec_cap: float = 0.35               # 吸引力上限 (防外推失真)
+    apprec_cap: float = 0.90               # 吸引力上限 (防外推失真; 2026-09 回测调宽: 旧0.35在>7.5%/年档位提前饱和)
     re_rate_growth: float = 0.05           # A股存量因估值重估的年自然增值
 
     # ── 美元荒时序 (2026Q4-2027Q1 向心坍缩峰值) ──
@@ -147,7 +147,10 @@ class CapitalInflowModule:
             flows["bond"][t] = f_bd
             flows["fdi"][t] = f_fd
 
-            equity_h = equity_h * (1 + cfg.re_rate_growth) + f_eq
+            # carry 通道: 外资以美元计的收益 = 本地回报 + 本币升值 → 存量自然增值率随当年升值速度抬升
+            year_apprec = 0.0 if t == 0 else max(0.0, (float(apprec[t]) - float(apprec[t - 1])) / 100.0)
+            g_eq = cfg.re_rate_growth + year_apprec
+            equity_h = equity_h * (1 + g_eq) + f_eq
             bond_h = bond_h + f_bd
             stocks["equity"].append(equity_h)
             stocks["bond"].append(bond_h)

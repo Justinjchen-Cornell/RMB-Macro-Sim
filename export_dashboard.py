@@ -25,7 +25,7 @@ from capital_inflow import CapitalConfig
 from dataclasses import replace
 
 N, SEED = 2000, 42
-GRID_N, GRID_SEED = 600, 7
+GRID_N, GRID_SEED = 400, 7
 REAL_SPOT = 6.7108
 REAL_VOL = 0.0284          # 3y realized vol
 INERTIA_APPREC = 0.027     # 3y realized drift (appreciation)
@@ -161,7 +161,7 @@ def build_grid(step: float = 0.005, n_sim: int = GRID_N, seed: int = GRID_SEED) 
     """Appreciation-rate grid powering the dashboard slider (0..10%)."""
     base_p, base_cap = load_project_config()
     out = []
-    rates = np.arange(0.0, 0.1001, step)
+    rates = np.arange(-0.05, 0.15001, step)   # 2026-09: 覆盖贬值(-5%)至超速升值(15%)
     for rate in rates:
         p = replace(base_p, cny_annual_apprec=float(rate),
                     n_simulations=n_sim, seed=seed)

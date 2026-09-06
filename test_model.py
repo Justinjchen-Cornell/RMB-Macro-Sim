@@ -201,7 +201,7 @@ def test_config_yaml_is_source_of_truth():
     assert abs(p.cny_spot - 7.20) < 1e-9, p.cny_spot
     assert abs(p.cny_annual_apprec - 0.06) < 1e-9
     assert len(p.fx_sensitivity) == 11 and len(p.industry_weights) == 11
-    assert abs(cc.equity_inflow_rate - 0.1112) < 1e-6
+    assert abs(cc.equity_inflow_rate - 0.10879) < 1e-6
     assert abs(cc.deepen_return - 0.156) < 1e-6
     print("✓ test_config_yaml_is_source_of_truth")
 
