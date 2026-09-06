@@ -169,6 +169,12 @@ svg{width:100%;height:auto;display:block}
   <div id="hmchart"></div>
   <div class="legbar"><span>受损 -40%</span><div class="grad"></div><span>中性 0</span><div class="grad" style="background:linear-gradient(90deg,#f3f4f6,#059669);max-width:110px"></div><span>受益 +40%</span></div>
 </div>
+
+<div class="panel full" style="margin-top:14px">
+  <h3>🔗 Deep-Risk-OPP 联动 · GOR × easing <span class="badge" style="margin-left:auto">每日 00:00 UTC 刷新</span></h3>
+  <div class="hint">跨站读取金油比相对定价(GOR)与黄金宏观宽松偏向(easing), 与本站人民币情景交叉参考</div>
+  <div id="drlink"></div>
+</div>
 <div class="foot">
 
   <div>⚠️ 免责声明: 研究框架, 不构成投资建议。参数为校准假设, 情景为概率模拟而非预测。</div>
@@ -179,7 +185,7 @@ svg{width:100%;height:auto;display:block}
 
 <script>
 const DASH_DATA = {
- "generated": "2026-09-06 17:06",
+ "generated": "2026-09-06 22:07",
  "n_simulations": 2000,
  "grid_n": 400,
  "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。GDP/就业为利润冲击的当量近似(利润率8%、就业弹性0.5), 非预测。",
@@ -11000,7 +11006,58 @@ document.getElementById("liveinfo").textContent=
   (LV.live?"当日抓取":"离线缓存")+" · USD/CNY "+LV.spot+" · 波动率(3y) "+
   (LV.vol3y*100).toFixed(2)+"%"+" · 惯性升值 "+(LV.inertia_apprec*100).toFixed(2)+
   "%"+(LV.as_of?" · FX数据截至 "+LV.as_of:"")+(LV.live?"":" · "+LV.note);
-renderChips();renderAll();
+function renderLink(){
+  const box=document.getElementById("drlink");
+  if(!box){return;}
+  box.innerHTML='<div class="hint">读取 Deep-Risk-OPP 线上读数 (gor/goldmac)…</div>';
+  const ctl=new AbortController();
+  const to=setTimeout(function(){ctl.abort();},8000);
+  Promise.all([
+    fetch("https://justinjchen-cornell.github.io/Deep-Risk-OPP/gor_latest.json",{signal:ctl.signal}).then(function(r){return r.json();}).catch(function(){return null;}),
+    fetch("https://justinjchen-cornell.github.io/Deep-Risk-OPP/goldmac_latest.json",{signal:ctl.signal}).then(function(r){return r.json();}).catch(function(){return null;})
+  ]).then(function(res){
+    clearTimeout(to);
+    const g=res[0], e=res[1];
+    if(!g && !e){
+      box.innerHTML='<div class="hint">离线或网络不可用 — 联动读数跳过。线上版: justinjchen-cornell.github.io/Deep-Risk-OPP/dashboard.html</div>';
+      return;
+    }
+    let gz="—", gc="#6b7280", gv="—";
+    if(g && g.gor_wti!=null){
+      gv=g.gor_wti.toFixed(1);
+      gz=g.gor_wti>=45?"EXTREME":(g.gor_wti>=30?"RECOVERY":(g.gor_wti>=20?"FAIR":"BUBBLE"));
+      gc=g.gor_wti>=45?"#dc2626":(g.gor_wti>=30?"#d97706":(g.gor_wti>=20?"#059669":"#2563eb"));
+    }
+    let esc="—", ec="#6b7280", et="—", t3="—";
+    if(e && typeof e.score==="number"){
+      esc=(e.score>=0?"+":"")+e.score.toFixed(2);
+      const zm={strong_ease:"强宽松",mild_ease:"温和宽松",mild_tight:"温和收紧",strong_tight:"强收紧"};
+      et=zm[e.zone]||e.zone||"—";
+      const cm={strong_ease:"#059669",mild_ease:"#16a34a",mild_tight:"#d97706",strong_tight:"#dc2626"};
+      ec=cm[e.zone]||"#6b7280";
+      t3=(e.trend_3m>=0?"+":"")+e.trend_3m.toFixed(2);
+    }
+    let act="联动数据未齐 — 参考各自读数";
+    if(g && g.gor_wti!=null && e && typeof e.score==="number"){
+      const high=(e.zone==="strong_ease"||e.zone==="mild_ease");
+      const v=g.gor_wti;
+      if(v>=45){ act=high?"油主攻,金当盾 — 黄金底仓保留(双确认)":"油靠自身供给故事; 黄金不加档"; }
+      else if(v>=30){ act=high?"黄金重估窗口 — 金可加档":"双逆风 — 守现金"; }
+      else { act="GOR 中性区: easing 仅辅助观察"; }
+    }
+    const upd=(g&&g.updated)||(e&&e.as_of)||"";
+    box.innerHTML=
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'+
+      '<span class="ev" style="border:1px solid '+gc+'">GOR(WTI) <b style="color:'+gc+'">'+gv+'</b> · '+gz+'</span>'+
+      '<span class="ev" style="border:1px solid '+ec+'">easing <b style="color:'+ec+'">'+esc+'</b> · '+et+' · 3m '+t3+'</span>'+
+      (upd?'<span class="ev" style="border-color:#e5e9f0;color:#6b7280">读数截至 '+upd+'</span>':'')+
+      '</div>'+
+      '<div style="padding:10px 12px;border-left:3px solid #2563eb;background:#f8fafc;border-radius:0 8px 8px 0;font-size:13px">🧭 联动动作: <b>'+act+'</b></div>'+
+      '<div style="margin-top:6px;font-size:11px;color:#6b7280">GOR=金油相对定价; easing=黄金宏观宽松偏向(2016-26 季频命中 67.5%) · 慢信号定仓位档, 非择时</div>';
+  }).catch(function(){ clearTimeout(to); box.innerHTML='<div class="hint">联动读数获取失败 — 已跳过</div>'; });
+}
+
+renderChips();renderAll();renderLink();
 </script>
 </body>
 </html>
