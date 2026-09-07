@@ -13,6 +13,20 @@ from modules.optimizer import (balanced_year, optimize_unified,
 from modules.optimizer import TOOL_SETS
 PREMISE = "前提: 以升值为主动力, 进口政策只补足差额"
 
+def _engine_profit_cb(n_sim=300, seed=7):
+    """repo 引擎利润口径回调(低端制造 5y 冲击)。"""
+    from model import MacroParams, ScenarioEngine, load_project_config
+    from dataclasses import replace
+    mp, cc = load_project_config()
+
+    def cb(rate):
+        p = replace(mp, cny_annual_apprec=float(rate),
+                    n_simulations=n_sim, seed=seed)
+        r = ScenarioEngine(p, capital_cfg=cc).run()
+        return float(r["industry_profit"]["export_lowend"].iloc[-1]) * 100
+    return cb
+
+
 def main():
     cb = None
     try:

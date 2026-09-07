@@ -24,3 +24,14 @@ fiscal_budget_gdp: 3.0
 oil_base: 90.0
 oil_shock: 1.30
 # 注: 政策层唯一真源; 缺失时引擎用内置默认(数值一致)
+res_alloc_ust: 0.35
+res_alloc_gold: 0.15
+res_alloc_fx: 0.25
+res_alloc_cash: 0.25
+res_duration: 6.0
+val_dy: 0.0015
+val_gold: 0.08
+val_usd: 0.01
+val_dy_shock: 0.01
+val_gold_shock: 0.12
+val_usd_shock: 0.06

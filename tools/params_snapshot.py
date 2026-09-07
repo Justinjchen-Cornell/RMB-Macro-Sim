@@ -20,7 +20,8 @@ import sys
 import datetime as dt
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-P_DIR = os.path.join(BASE, "params")
+ROOT = os.path.dirname(BASE)
+P_DIR = os.path.join(ROOT, "params")
 os.makedirs(P_DIR, exist_ok=True)
 sys.path.insert(0, BASE)
 
@@ -35,8 +36,8 @@ def _yaml(path):
 
 def main():
     p = UnifiedParams()
-    pol = _yaml(os.path.join(BASE, "policy_params.yaml"))
-    cfg = _yaml(os.path.join(BASE, "config.yaml"))
+    pol = _yaml(os.path.join(ROOT, "policy_params.yaml"))
+    cfg = _yaml(os.path.join(ROOT, "config.yaml"))
     now = dt.datetime.now().strftime("%Y-%m-%d %H:%M")
 
     # ---- trade_elasticity.csv ----
@@ -73,7 +74,10 @@ def main():
                             "apprec_elasticity", "deepen_return"]},
         "flight_curve": {"k_norm": 13.3, "linear": 0.30,
                          "nonlinear_pow": 1.5, "threshold_speed": 0.06},
-        "reserves": {"base_t": p.reserves_t, "floor_t": p.reserves_floor_t},
+        "reserves": {"base_t": p.reserves_t, "floor_t": p.reserves_floor_t,
+                       "alloc": {"ust": p.res_alloc_ust, "gold": p.res_alloc_gold,
+                                "fx": p.res_alloc_fx, "cash": p.res_alloc_cash},
+                       "valuation": {"note": "H1: 久期x利率 + 金价 + 美元折算; 常规/冲击两档情景见 policy_params.yaml"}},
         "redlines": {"flight_gdp_pct": p.flight_redline,
                      "deind_gdp_pct": p.deind_gdp_redline,
                      "deind_profit_pct": p.deind_profit_redline},

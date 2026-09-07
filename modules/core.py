@@ -36,6 +36,18 @@ class UnifiedParams:
     svc_import_t: float = 0.6
     reserves_t: float = 3.2
     reserves_floor_t: float = 2.5
+    # H1: 外储资产配置与估值情景 (占比合计=1; 估值年度变化率/收益率为小数)
+    res_alloc_ust: float = 0.35
+    res_alloc_gold: float = 0.15
+    res_alloc_fx: float = 0.25
+    res_alloc_cash: float = 0.25
+    res_duration: float = 6.0
+    val_dy: float = 0.0015      # 常规年 10Y 上行 bp
+    val_gold: float = 0.08      # 常规年金价涨幅
+    val_usd: float = 0.01       # 常规年美元升值(非美资产折算损失)
+    val_dy_shock: float = 0.01  # 冲击年: 收益率急升
+    val_gold_shock: float = 0.12
+    val_usd_shock: float = 0.06
     fiscal_budget_gdp: float = 3.0     # 财政赤字容忍 (% GDP)
     # 油价
     oil_base: float = 90.0

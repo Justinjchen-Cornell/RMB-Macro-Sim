@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-07 20:31",
+ "generated": "2026-09-07 20:59",
  "note": "生成物快照; 唯一真源 = config.yaml + policy_params.yaml + 代码默认",
  "oil_to_cpi": {
   "lags_cum": 0.14,
@@ -35,7 +35,16 @@
  },
  "reserves": {
   "base_t": 3.2,
-  "floor_t": 2.5
+  "floor_t": 2.5,
+  "alloc": {
+   "ust": 0.35,
+   "gold": 0.15,
+   "fx": 0.25,
+   "cash": 0.25
+  },
+  "valuation": {
+   "note": "H1: 久期x利率 + 金价 + 美元折算; 常规/冲击两档情景见 policy_params.yaml"
+  }
  },
  "redlines": {
   "flight_gdp_pct": 35.0,

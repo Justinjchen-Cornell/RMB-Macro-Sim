@@ -13,6 +13,7 @@ def capital_path(appr_rate, p: UnifiedParams, horizon=5,
     """S型净资本流入(GDP%): 升值预期吸引流入但边际递减;
     走资随管制(1-open)衰减; 报复冲击减流入。"""
     flows = []
+    vals = []
     reserves = float(p.reserves_t)
     path = []
     for t in range(1, horizon + 1):
@@ -21,10 +22,13 @@ def capital_path(appr_rate, p: UnifiedParams, horizon=5,
         net_gdp = (attract - flight_share) * (1 - us_tariff_shock
                                         * p.us_retaliation_sensitivity)
         net_t = float(net_gdp * p.gdp_usd_t)
+        val = float(valuation_pnl(reserves, p, shock=(t == 1 and us_tariff_shock > 0)))
         flows.append(net_t)
-        reserves += net_t
+        vals.append(val)
+        reserves += net_t + val
         path.append(reserves)
     return {"flows_t": [round(x, 3) for x in flows],
+            "valuation_t": [round(x, 3) for x in vals],
             "reserves_path_t": [round(x, 3) for x in path],
             "reserves_end_t": round(reserves, 3),
             "floor_hit": bool(reserves < p.reserves_floor_t)}
@@ -38,6 +42,18 @@ def flight_pct_gdp(s, p: UnifiedParams):
     return p.openness * 13.3 * raw * 100.0
 
 
+
+
+def valuation_pnl(r_t, p: UnifiedParams, shock=False):
+    """外储估值性损益(T$): 美债(久期x利率) + 黄金 + 非美货币折算。
+    r_t 为期初存量; 冲击年用更陡情景(速冻: 利率急升、美元急升、金价大涨)。"""
+    dy = p.val_dy_shock if shock else p.val_dy
+    dg = p.val_gold_shock if shock else p.val_gold
+    du = p.val_usd_shock if shock else p.val_usd
+    ust = -p.res_duration * dy * p.res_alloc_ust * r_t
+    gold = dg * p.res_alloc_gold * r_t
+    fx = -du * p.res_alloc_fx * r_t
+    return ust + gold + fx
 
 
 def capital_components(appr_rate, p: UnifiedParams, us_tariff_shock=0.0):

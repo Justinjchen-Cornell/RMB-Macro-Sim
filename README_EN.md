@@ -161,4 +161,4 @@ Sources: FRED, Tencent Finance, akshare.
 
 Apache-2.0 · © 2026 Justinjchen · Built with collaborative AI-assisted research.
 v2.1 (2026-09-06): propagation & utility pack, −5%…+15% slider, backtest-driven parameter revision — see docs/backtest_2026-09.md.
-v3.0 (2026-09): unified policy layer (policy_engine.py) - Lu-three-principles quantified (dual-metric redlines, layered oil-CPI, S-curve capital, reserves floor, 4 import tools, min-policy-k). Policy band 5-7%/yr; @6% k=0.05 (policy 16% / speed 84%). Legacy v2/v3 archived.
+v3.0 (2026-09): unified policy layer (policy_engine.py) - Lu-three-principles quantified (dual-metric redlines, layered oil-CPI, S-curve capital, reserves floor, 4 import tools, min-policy-k). Policy band 5-6.5%/yr; @6% k=0.05 (policy 16% / speed 84%). Legacy v2/v3 archived.

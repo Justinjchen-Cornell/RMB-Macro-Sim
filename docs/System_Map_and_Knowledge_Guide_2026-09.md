@@ -27,7 +27,7 @@ Three layers, do not mix:
 |---|---|---|
 | ① Data | FRED / Tencent / akshare + news_watch | free, cacheable, reproducible |
 | ② Market engine | 41-grid slider, sector shocks, waterfall | FX → inflation → exports → sectors → assets + capital inflow |
-| ③ Policy engine | dual-metric redlines, min-policy-k, band 5-7% | translate the 3 principles into constraints |
+| ③ Policy engine | dual-metric redlines, min-policy-k, band 5-6.5% | translate the 3 principles into constraints |
 | ④ Cross-validation | GOR × easing, oil drill-down, 3 boards | independent checks from another framework |
 | ⑤ Products | dashboard / PDFs / daily card / weekly | one conclusion, many skins |
 
@@ -40,7 +40,7 @@ Three layers, do not mix:
 | easing +0.30 | goldmac | 5 FRED series, rolling-10y z-score | medium-high (sample 2016-09+ = 10y, shorter than paper 30y; release-lag +1/+2m checks keep quarterly hit 65-67.5%; revised-final data, mild upward bias possible but small) |
 | Flight 9.6% (6%, openness 0.4) | policy_engine | normalized v2 calibration curve | ⚠️ no external data anchor — do not treat as measurement |
 | Surplus 0.30T (6% + k=0.05) | policy_engine | elasticities 0.35/0.45, tools scaled by k | medium (elasticity assumptions) |
-| Policy band 5-7% | policy_engine | all redlines hold inside; 8%+ breaches profit redline (40.5) | medium (premise: appreciation as primary engine) |
+| Policy band 5-6.5% | policy_engine | all redlines hold inside; 8%+ breaches profit redline (40.5) | medium (premise: appreciation as primary engine) |
 | 2026 outlook 6.39 (−4.8%) | outlook | inertia 2.7% + news-event scores | low-medium (subjective events; read 3-envelope 6.33-6.60) |
 
 **Three rules when reading numbers**: ① read the interval, not the point; ② never mix
@@ -53,7 +53,7 @@ metrics (profit-% vs GDP-%); ③ assumptions are documented above.
    buy USD gold — do not add the two currencies' returns.
 2. **Do easing and GOR disagree?** GOR prices gold vs oil (relative); easing prices the
    macro wind for gold (absolute). One steers oil (the spear), one guards gold (the shield).
-3. **Is "policy band 5-7%" a forecast?** No — it is the speed range at which all redlines
+3. **Is "policy band 5-6.5%" a forecast?** No — it is the speed range at which all redlines
    hold *given the three principles*. That the realized 1y drift (~6.2%) falls inside is
    corroboration of policy intent, not a guarantee.
 4. **Why two deindustrialization numbers (28.8 vs 2.9)?** One measures sector *profit*
