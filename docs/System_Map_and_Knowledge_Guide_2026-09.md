@@ -37,7 +37,7 @@ Three layers, do not mix:
 |---|---|---|---|
 | Net benefit +2.68T$ (≈9× loss) | capital-inflow module | inflow 11%, dollar-drain ×1.5, marginal return 0.156 | ⚠️ point estimate — read the band (1.99 conservative ↔ 3.91 aggressive) |
 | Low-end mfg −28.8% (6%) | industry module | −8% profit per +10% cumulative appreciation | medium (elasticity assumption; clip ±60%) |
-| easing +0.30 | goldmac | 5 FRED series, rolling-10y z-score | medium-high (67.5% quarterly, 10y sample) |
+| easing +0.30 | goldmac | 5 FRED series, rolling-10y z-score | medium-high (sample 2016-09+ = 10y, shorter than paper 30y; release-lag +1/+2m checks keep quarterly hit 65-67.5%; revised-final data, mild upward bias possible but small) |
 | Flight 9.6% (6%, openness 0.4) | policy_engine | normalized v2 calibration curve | ⚠️ no external data anchor — do not treat as measurement |
 | Surplus 0.30T (6% + k=0.05) | policy_engine | elasticities 0.35/0.45, tools scaled by k | medium (elasticity assumptions) |
 | Policy band 5-7% | policy_engine | all redlines hold inside; 8%+ breaches profit redline (40.5) | medium (premise: appreciation as primary engine) |
