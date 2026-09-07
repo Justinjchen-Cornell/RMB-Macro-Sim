@@ -25,13 +25,13 @@
 | `modules/` | 政策引擎拆分(core/inflation/trade/capital/industry/evaluate/optimizer) |
 | `params/` | 参数库(生成物:弹性CSV/传导JSON/校准历史 log;真源=两个 yaml) |
 | `tools/` | 维护工具:draw_maps / params_snapshot / sensitivity_9x |
-| `docs/` | 愿景(VISION) · 文件地图(本文件) · 项目地图(PROJECT_MAP) · 版本(VERSION) · 体系图与知识指南(中英) · 研究/校准/统一/回测文档 |
+| `docs/` | 愿景(VISION) · 文件地图(本文件) · 项目地图(PROJECT_MAP) · 版本(VERSION) · 体系图与知识指南(中英) · 校准报告(real_data_report 已移入) · 统一/回测/计划文档 |
 | `assets/` | 图(system_map ×2、dashboard 预览、日卡/结论卡) |
 | `charts/` / `charts_real/` | 引擎图表输出 |
 | `report/` | 中/英 PDF 研究报告 |
 | `data/raw/` | 真实数据缓存(FRED/腾讯/akshare) |
 | `social/` | 传播(标题库) |
-| `demo.ipynb` / 其余 md | 演示与旧说明(README_QUICKSTART 待并入 README) |
+| — | 旧演示/快速上手(README_QUICKSTART、demo.ipynb)已清理, 内容并入 README 与 git 历史 |
 
 ## 归属红线
 

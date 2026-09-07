@@ -19,8 +19,8 @@ GREEN = "#059669"; PUR = "#7c3aed"; LINE = "#e5e9f0"
 
 T = {
 "zh": {
- "title": "RMB-Macro-Sim v3.0 · 体系图(简化版)",
- "sub": "免费数据 → 两个引擎 + 一个交叉验证 → 一个仪表盘",
+ "title": "大国博弈·财政货币产业一体化政策模拟器 · 体系图",
+ "sub": "宏观政策沙盒: 数据 → 市场×政策×博弈 → 可落地结论",
  "data": "① 数据: FRED · 腾讯行情 · akshare · news_watch(新闻事件表)",
  "m_t": "② 市场引擎 会怎样?",
  "m_b": ["汇率 → 通胀/出口/行业", "资产 + 资本流入", "41 档滑块情景"],
@@ -32,8 +32,8 @@ T = {
  "flow": "一条流: easing +0.30 → 金是盾不加 ∥ USD/CNY 6.71 → 6.39(2026) ∥ GOR 49.1 → 油主攻 → 50% 仓, 48% 现金等速冻 → 错杀三档 → 2027 重估",
 },
 "en": {
- "title": "RMB-Macro-Sim v3.0 · System Map (simplified)",
- "sub": "Free data → two engines + one cross-check → one dashboard",
+ "title": "Great-Power Fiscal x Monetary x Industrial Policy Sandbox",
+ "sub": "Macro-policy sandbox: data → market x policy x game/stress → actionable reads",
  "data": "① Data: FRED · Tencent · akshare · news_watch",
  "m_t": "② Market engine — what happens?",
  "m_b": ["FX → inflation/exports/sectors", "assets + capital inflows", "41-grid scenarios"],
