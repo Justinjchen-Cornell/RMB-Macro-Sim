@@ -21,6 +21,8 @@ python export_dashboard.py     # writes dashboard.html (self-contained)
 
 ![Dashboard preview](assets/dashboard_preview.png)
 
+**System map & plain-language knowledge guide (CN):** [docs/体系图解与知识地图_2026-09.md](docs/体系图解与知识地图_2026-09.md) · `assets/system_map.png` — data → market engine × policy engine × cross-validation → products.
+
 **Dashboard includes:**
 - 🎚️ **CNY move slider −5% … +15% (step 0.5%, 41 grids)** — pre-run Monte Carlo
   grids (400 runs each); drag to watch industry shocks, FX paths, the waterfall

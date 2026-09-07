@@ -13,6 +13,10 @@
 
 <p align="center"><img src="assets/dashboard_preview.png" alt="dashboard preview" width="85%"></p>
 
+<p align="center"><a href="assets/system_map.png"><img src="assets/system_map.png" alt="system map" width="92%"></a></p>
+
+> 🗺️ **先看图**:[体系架构图 + 易读版知识说明 → docs/体系图解与知识地图_2026-09.md](docs/体系图解与知识地图_2026-09.md)(五层架构: 数据 → 市场引擎 × 政策引擎 × 交叉验证 → 表达层;含"关键数字出处表"与常见误解澄清)
+
 > ✨ **功能总览 (v3.0 · 政策模拟系统)**：
 > - 🎚️ **升贬幅度滑块 -5% ~ +15%**(41 档预跑 MC,拖动实时联动行业/FX/瀑布/宏观风险)
 > - 🏛️ **政策算法层(policy_engine.py, v3.0 一等公民)**:卢氏三原则统一系统(双口径去工业/分层通胀/S型资本/外储底线/四进口工具/最小政策度 k),与市场情景层并列
