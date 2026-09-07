@@ -1,0 +1,10 @@
+channel,parameter,value,source
+goods_export,lam_e,0.35,policy_params.yaml
+goods_import,lam_m,0.45,policy_params.yaml
+services,lam_svc,0.25,policy_params.yaml
+export_volume,export_price_elasticity,-0.45,config.yaml
+import_volume,import_price_elasticity,0.35,config.yaml
+tariff_tool,tariff_elasticity,0.6,policy_engine
+procurement_tool,procurement_max_increment_t,0.08,policy_engine
+access_tool,svc_import_elasticity,0.45,policy_engine
+demand_tool,demand_income_elasticity,0.5,policy_engine

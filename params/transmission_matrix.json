@@ -1,0 +1,58 @@
+{
+ "generated": "2026-09-07 20:31",
+ "note": "生成物快照; 唯一真源 = config.yaml + policy_params.yaml + 代码默认",
+ "oil_to_cpi": {
+  "lags_cum": 0.14,
+  "ept": 0.35,
+  "appr_offset_factor": "ept"
+ },
+ "fx_to_sector": {
+  "export_lowend": -8.0,
+  "export_hightech": -3.0,
+  "domestic_consumption": 1.0,
+  "real_estate": 1.5,
+  "infrastructure": 0.5,
+  "new_energy": -1.5,
+  "semiconductor": 2.0,
+  "commodity_metals": 4.0,
+  "power_compute": 2.5,
+  "gold": 3.5,
+  "bank_insurance": 0.5
+ },
+ "capital_inflow": {
+  "equity_inflow_rate": 0.10879,
+  "bond_inflow_rate": 0.08903,
+  "fdi_inflow_rate": 0.04745,
+  "dollar_drain_boost": 0.5,
+  "apprec_elasticity": 0.8,
+  "deepen_return": 0.156
+ },
+ "flight_curve": {
+  "k_norm": 13.3,
+  "linear": 0.3,
+  "nonlinear_pow": 1.5,
+  "threshold_speed": 0.06
+ },
+ "reserves": {
+  "base_t": 3.2,
+  "floor_t": 2.5
+ },
+ "redlines": {
+  "flight_gdp_pct": 35.0,
+  "deind_gdp_pct": 35.0,
+  "deind_profit_pct": 35.0
+ },
+ "industry_weights": {
+  "export_lowend": 0.08,
+  "export_hightech": 0.12,
+  "domestic_consumption": 0.2,
+  "real_estate": 0.1,
+  "infrastructure": 0.1,
+  "new_energy": 0.1,
+  "semiconductor": 0.08,
+  "commodity_metals": 0.06,
+  "power_compute": 0.06,
+  "gold": 0.04,
+  "bank_insurance": 0.06
+ }
+}

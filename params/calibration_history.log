@@ -1,0 +1,2 @@
+# 校准历史 (calibration_history) - 每次校准/回测追加一行
+2026-09-07 20:31 | v3.0 | init snapshot | lam_e=0.35 lam_m=0.45 ept=0.35 openness=0.4 | 9x median=9.7 (7.0-13.0) | 真源: config.yaml+policy_params.yaml
