@@ -209,27 +209,38 @@ def get_live():
 
 
 def _policy_rows(grid):
-    """卢氏三原则 dials per grid rate (openness 0.40 vs 0.25 封堵对照)。"""
-    from policy_algo import evaluate
+    """卢氏三原则 dials per grid rate (统一 policy_engine, 双口径, open .40/.25)。"""
+    import policy_engine as pe
     rows = []
     for g in grid:
-        ev = evaluate(g["rate_pct"],
-                      g["industry"].get("export_lowend", 0.0), openness=0.40)
-        ev25 = evaluate(g["rate_pct"],
-                        g["industry"].get("export_lowend", 0.0), openness=0.25)
-        d = ev["dials"]; d25 = ev25["dials"]
+        low = g["industry"].get("export_lowend", 0.0)
+        rate = g["rate_pct"] / 100.0
+        def ev_at(op):
+            p = pe.UnifiedParams(openness=op)
+            # 拨盘行 = 纯速度口径(政策工具为零; 政策分摊见 insight/k 解)
+            return pe.evaluate(rate, p, pe.ImportTools(0, 0, 0, 0),
+                               profit_shock_pct=low)
+        e40 = ev_at(0.40); e25 = ev_at(0.25)
+        by = None
+        for t in range(1, 13):
+            if pe.trade_surplus_t(rate, pe.UnifiedParams(), t) <= 0.3:
+                by = t
+                break
         rows.append({"r": g["rate_pct"],
-                     "ia": d["inflation_absorbed_pct"],
-                     "se": d["surplus_end_t"], "rp": d["rebalancing_pct"],
-                     "by": d["balanced_year"] if d["balanced_year"] else -1,
-                     "di": d["deind_pressure_pct"],
-                     "f40": d["flight_risk"], "v40": ev["verdict"],
-                     "f25": d25["flight_risk"], "v25": ev25["verdict"]})
+                     "ia": e40["inflation"]["absorbed_pct"],
+                     "se": e40["surplus_t"], "rp": max(
+                         0, round((1 - e40["surplus_t"] / 1.2) * 100, 1)),
+                     "by": by if by else -1,
+                     "di": e40["deind"]["profit_shock_pct"],
+                     "dg": e40["deind"]["gdp_erode_pt"],
+                     "f40": e40["flight_gdp_pct"], "v40": e40["verdict"],
+                     "f25": e25["flight_gdp_pct"], "v25": e25["verdict"]})
     return {"rows": rows,
-            "oil_scen": "+30% Brent, 5y 情景",
-            "insight": "6%/年 -> 5y 顺差 0.67T(收敛44%), 5y 完全平衡需 ~8.7%/年但去工业化超限; "
-                       "建议: 速度带 6-7% + 进口需求端政策分摊平衡责任 + 严封堵走资 "
-                       "(open 0.25 -> 10%/年档风险 56 降到 35)"}
+            "oil_scen": "油价+30%, 5y; EPT 0.35 分层",
+            "insight": ("统一引擎(V2a利润 x V2b GDP x V3工具 x V4外储): 双口径红线均35 - "
+                        "利润口径 6%=28.8 带内 / 8%=40.5 破线; GDP侵蚀口径 6%=2.9。"
+                        "固定速度带最小政策度: 6% 只需 k=0.05(政策承担16%, 速度84%, "
+                        "财政0.04%GDP); 5% 需 k=0.10(政策30%)。8%+ 去工业化(利润)超限。")}
 
 
 def _outlook(live):

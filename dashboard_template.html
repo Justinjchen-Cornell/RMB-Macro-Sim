@@ -542,7 +542,7 @@ function renderPolicy(){
     '<div class="mini"><div class="lbl">① 通胀对冲 (油价+30%)</div><div class="val '+(p.ia>=50?"up":"dn")+'">'+p.ia.toFixed(0)+'%</div></div>'+
     '<div class="mini"><div class="lbl">② 顺差 5y 末</div><div class="val">'+p.se.toFixed(2)+' T$ <span style="font-size:11px;color:#6b7280">收敛 '+p.rp.toFixed(0)+'%'+(p.by>0?" · 第"+p.by+"年达标":" · 未达")+'</span></div></div>'+
     '<div class="mini"><div class="lbl">③ 走资风险 (open '+polOpen.toFixed(2)+')</div><div class="val" style="color:'+fc+'">'+f.toFixed(0)+'/100</div></div>'+
-    '<div class="mini"><div class="lbl">去工业化压力 (低端制造)</div><div class="val" style="color:'+dc+'">'+p.di.toFixed(1)+'%</div></div>'+
+    '<div class="mini"><div class="lbl">去工业化 (利润/GDP侵蚀)</div><div class="val" style="color:'+dc+'">'+p.di.toFixed(1)+'% <span style="font-size:10px;color:#6b7280">GDP '+p.dg.toFixed(1)+'%</span></div></div>'+
     '</div>'+
     '<div style="padding:8px 10px;border-left:3px solid '+vc+';background:#f8fafc;border-radius:0 8px 8px 0;font-size:13px;color:#1f2937">判定 @ '+CUR.rate_pct.toFixed(1)+'%/年: <b style="color:'+vc+'">'+v+'</b></div>';
   const note=document.getElementById("polnote");
