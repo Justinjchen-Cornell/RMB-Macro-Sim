@@ -37,6 +37,33 @@ PATHS = {
                   "shock_years": [2026]},
 }
 BASE_BRENT = 90.0
+W0 = {"inf": 25.0, "trade": 25.0, "bill": 20.0, "fx": 20.0, "pol": 10.0}
+
+
+def _score_variants(parts, w0=None, step=10.0):
+    """各权重 +/-step(其余按比例归一到100) -> 分数 min/max。"""
+    w0 = w0 or dict(W0)
+    scores = []
+    for k in w0:
+        for d in (step, -step):
+            w = dict(w0)
+            delta = d if w0[k] + d > 0 else 0.0
+            w[k] = w0[k] + delta
+            others = sum(v for kk, v in w.items() if kk != k)
+            scale = (100.0 - w[k]) / others if others else 1.0
+            for kk in w:
+                if kk != k:
+                    w[kk] *= scale
+            val = (parts["inf"] * (w["inf"] / w0["inf"])
+                   + parts["trade"] * (w["trade"] / w0["trade"])
+                   + parts["bill"] * (w["bill"] / w0["bill"])
+                   + parts["fx"] * (w["fx"] / w0["fx"])
+                   + parts["pol"] * (w["pol"] / w0["pol"]))
+            scores.append(val)
+    return min(scores), max(scores)
+
+
+
 
 
 def rebal_surplus_t(rate, t):
@@ -74,13 +101,17 @@ def run():
             s_fx = 20.0 if (rate >= 0 and yr not in p["shock_years"]) else (
                 14.0 if rate >= 0 else 8.0)
             s_pol = 10.0 if px <= 78 else (6.0 if px >= 115 else 8.0)
+            parts = {"inf": s_inf, "trade": s_trade, "bill": s_bill,
+                     "fx": s_fx, "pol": s_pol}
+            lo, hi = _score_variants(parts)
             score = round(s_inf + s_trade + s_bill + s_fx + s_pol, 1)
             rows.append({"year": yr, "brent": px, "rmb_rate": rate,
                          "bill_T": round(bill, 3),
                          "infl_raw_pt": round(infl_raw, 2),
                          "infl_net_pt": round(infl_net, 2),
                          "surplus_T": round(surp, 3),
-                         "score": score})
+                         "score": score,
+                         "score_lo": round(lo, 1), "score_hi": round(hi, 1)})
             prev_p = px
         avg = round(float(np.mean([r["score"] for r in rows])), 1)
         win2 = round(float(np.mean([r["score"] for r in rows[:2]])), 1)
@@ -90,11 +121,12 @@ def run():
                       "best_score": best["score"]}
         print("\n[%s]  avg=%.1f | 前2年均分=%.1f | 最优年=%d (%.1f)"
               % (pname, avg, win2, best["year"], best["score"]))
-        print("  年 | Brent | 人民币立场% | 能源账单T$ | 输入通胀净pp | 顺差T$ | 有利度")
+        print("  年 | Brent | 人民币立场% | 能源账单T$ | 输入通胀净pp | 顺差T$ | 有利度(±10pp带)")
         for r in rows:
-            print("  %d | %5d | %4.1f%% | %5.2f | %5.2f | %5.2f | %5.1f"
+            print("  %d | %5d | %4.1f%% | %5.2f | %5.2f | %5.2f | %5.1f(%4.1f-%4.1f)"
                   % (r["year"], r["brent"], r["rmb_rate"], r["bill_T"],
-                     r["infl_net_pt"], r["surplus_T"], r["score"]))
+                     r["infl_net_pt"], r["surplus_T"], r["score"],
+                     r["score_lo"], r["score_hi"]))
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            "oil_year_scenario.json"), "w",
               encoding="utf-8") as f:
