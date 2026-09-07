@@ -310,7 +310,7 @@ dashboard.html → 自动提交 → Pages 自动重建。**需在仓库 Settings
 
 | 版本 | 内容 |
 |---|---|
-| v1.0 | 元宝共建初版: 6 模块引擎 + config.yaml + 9 单测 |
+| v1.0 | 初版基线: 6 模块引擎 + config.yaml + 9 单测 |
 | v2.0 | 资本流入模块(capital_inflow)+ 净效益瀑布; 真实数据层(data_loader/calibrate/run_real) |
 | v2.1 打磨 | 浅色研报风; 情景巨幕图; config 真源化; dashboard v1; 中/英 PDF 报告; 每日管道(GitHub Actions); README_EN |
 | v2.1 传播+实用 | 三包络展望 + 信号→动作表 + 日卡/结论卡 + 标题库; 滑块扩至 **-5%~15%**; 代码审查 8×P1 修复 |
