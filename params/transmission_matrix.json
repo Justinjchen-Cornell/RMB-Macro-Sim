@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-07 20:59",
+ "generated": "2026-09-07 21:12",
  "note": "生成物快照; 唯一真源 = config.yaml + policy_params.yaml + 代码默认",
  "oil_to_cpi": {
   "lags_cum": 0.14,
@@ -47,7 +47,7 @@
   }
  },
  "redlines": {
-  "flight_gdp_pct": 35.0,
+  "flight_gdp_pct": 8.0,
   "deind_gdp_pct": 35.0,
   "deind_profit_pct": 35.0
  },

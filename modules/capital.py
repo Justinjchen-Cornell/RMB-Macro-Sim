@@ -37,9 +37,11 @@ def capital_path(appr_rate, p: UnifiedParams, horizon=5,
 
 
 def flight_pct_gdp(s, p: UnifiedParams):
-    """走资占 GDP% (v2 归一化标定): open=.40 -> 6%=9.6%, 10%=33%; 红线 35。"""
+    """资本外流强度(% GDP, M4 锚定): 以官方月度残差(2015-16 危机年均 ~5.25%GDP)为极端档。
+    open=.40 -> 6%=1.5%, 10%=5.3%(危机档); 红线 8%。"""
     raw = 0.30 * s + 4.0 * max(0.0, s - 0.06) ** 1.5
-    return p.openness * 13.3 * raw * 100.0
+    k = getattr(p, "flight_k", 2.12)
+    return p.openness * k * raw * 100.0
 
 
 

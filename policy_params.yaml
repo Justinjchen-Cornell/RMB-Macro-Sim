@@ -9,7 +9,8 @@ nee_share: 0.20
 hot_share: 0.15
 rmb_intl: 0.15
 us_retaliation_sensitivity: 0.5
-flight_redline: 35.0
+flight_k: 2.12
+flight_redline: 8.0
 deind_gdp_redline: 35.0
 deind_profit_redline: 35.0
 cca_redline: 55.0

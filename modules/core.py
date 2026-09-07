@@ -24,7 +24,8 @@ class UnifiedParams:
     rmb_intl: float = 0.15
     us_retaliation_sensitivity: float = 0.5
     # 红线 (双口径并立)
-    flight_redline: float = 35.0       # 走资红线 (% GDP, V2b口径)
+    flight_k: float = 2.12        # 走资曲线系数 (M4 锚定 2015-16 残差 ~5.25%GDP 危机带)
+    flight_redline: float = 8.0   # 走资红线 (% GDP, 危机上限 5.25% x 1.5 安全边际)
     deind_gdp_redline: float = 35.0    # 去工业化红线 GDP 侵蚀 (% GDP)
     deind_profit_redline: float = 35.0 # 去工业化红线 利润冲击 (%, V2a口径)
     cca_redline: float = 55.0

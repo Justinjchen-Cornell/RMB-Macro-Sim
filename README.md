@@ -315,7 +315,7 @@ dashboard.html → 自动提交 → Pages 自动重建。**需在仓库 Settings
 | v2.1 打磨 | 浅色研报风; 情景巨幕图; config 真源化; dashboard v1; 中/英 PDF 报告; 每日管道(GitHub Actions); README_EN |
 | v2.1 传播+实用 | 三包络展望 + 信号→动作表 + 日卡/结论卡 + 标题库; 滑块扩至 **-5%~15%**; 代码审查 8×P1 修复 |
 | v2.1 回测修订 | backtest.py 诊断 → 修复 ±30% 截断/吸引力封顶/缺失 carry 通道; 流入率重锚(0.1088/0.0890/0.0475); 6% 头版不变; 档位区分度 ×3 |
-| **v3.0 全面升级** | 政策系统去碎片化: policy_engine.py 统一 V2a/V2b/V3/V4(双口径并立、走资 v2 标定、报复博弈、外储底线);旧 policy_algo/v2/v3 归档;dashboard 政策卡切统一引擎;政策带 5-6.5%(6%: k=0.05, 政策16%/速度84%) |
+| **v3.0 全面升级** | 政策系统去碎片化: policy_engine.py 统一 V2a/V2b/V3/V4(双口径并立、走资 v2 标定、报复博弈、外储底线);旧 policy_algo/v2/v3 归档;dashboard 政策卡切统一引擎;政策带 5-7%(6%: k=0.05, 政策16%/速度84%) |
 
 **参数修订依据**: docs/backtest_2026-09.md ｜ **代码审查**: docs/code_review_2026-09-06.md ｜
 **校准说明**: real_data_report_2026-09-06.md ｜ **spec**: docs/superpowers/specs/

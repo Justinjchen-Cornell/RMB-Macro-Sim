@@ -1,0 +1,12 @@
+{
+ "crisis_annual_t": 0.997,
+ "crisis_pct_gdp": 5.25,
+ "anchor_note": "残差 = -d外储+货物顺差+FDI+估值; 数据覆盖至各源最新",
+ "sources": [
+  "akshare 外储/黄金储备(月)",
+  "akshare 贸易顺差(月)",
+  "akshare FDI(月, 2023-07 后缺失)",
+  "FRED DGS10/DEXCHUS",
+  "akshare GC(2016+)"
+ ]
+}
