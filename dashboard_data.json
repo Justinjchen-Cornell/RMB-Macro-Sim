@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-07 09:00",
+ "generated": "2026-09-07 07:24",
  "n_simulations": 2000,
  "grid_n": 400,
  "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。GDP/就业为利润冲击的当量近似(利润率8%、就业弹性0.5), 非预测。",
@@ -11044,9 +11044,8 @@
   "spot": 6.7108,
   "vol3y": 0.0284,
   "inertia_apprec": 0.027,
-  "as_of": "2026-08-28",
-  "live": true,
-  "note": "live FRED/Tencent",
-  "drift1y": -0.0619
+  "as_of": null,
+  "live": false,
+  "note": "live failed (RuntimeError) - offline defaults"
  }
 }
