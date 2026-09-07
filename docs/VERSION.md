@@ -11,3 +11,11 @@
 | 参数真源 | config.yaml (市场) + policy_params.yaml (政策, v3.1 起) |
 | 文档索引 | docs/PROJECT_MAP.md |
 | 版本徽章 | README 顶部"tests-20/20 / v3.0" 均以此表为准 |
+
+## 完成态(2026-09 收尾)
+
+- Grill G1-G19 改进: Batch E(7 项)+ M(1/2/3/4/5/6)+ H1-H5 全部落地
+- 走资/9x/带宽数字均已锚定与区间化(见 docs/H2-H5_scope_2026-09.md)
+- 定位: 宏观政策沙盒(VISION.md)· 文件地图(STRUCTURE.md)· 项目地图(PROJECT_MAP.md)
+- 结构: 入口(根)+ 引擎(modules/)+ 工具(tools/)+ 参数库(params/)+ 文档(docs/)+ 表达(assets/report/social)
+- 下一步候选: ①季度持仓槽位首条入库 ②港交所月度页解析 ③图表/文档英文补齐 ④发布材料(v3.0 项目发布帖)
