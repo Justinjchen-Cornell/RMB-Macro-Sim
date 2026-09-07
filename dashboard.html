@@ -197,7 +197,7 @@ svg{width:100%;height:auto;display:block}
 
 <script>
 const DASH_DATA = {
- "generated": "2026-09-07 20:34",
+ "generated": "2026-09-07 20:46",
  "n_simulations": 2000,
  "grid_n": 400,
  "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。GDP/就业为利润冲击的当量近似(利润率8%、就业弹性0.5), 非预测。",
@@ -11130,6 +11130,12 @@ const DASH_DATA = {
   "oil_scen": "油价+30%, 5y; EPT 0.35 分层",
   "insight": "[政策带前提: 以升值为主动力, 进口政策只补足差额] 统一引擎(V2a利润 x V2b GDP x V3工具 x V4外储): 双口径红线均35 - 利润口径 6%=28.8 带内 / 8%=40.5 破线; GDP侵蚀口径 6%=2.9。固定速度带最小政策度: 6% 只需 k=0.05(政策承担16%, 速度84%, 财政0.04%GDP); 5% 需 k=0.10(政策30%)。8%+ 去工业化(利润)超限。"
  },
+ "net_band": {
+  "lo": 6.97,
+  "med": 9.7,
+  "hi": 13.03,
+  "note": "固定6%路径的确定性代理(800采样); 用于话术区间, 非新点估计"
+ },
  "outlook": {
   "rows": [
    {
@@ -11330,7 +11336,7 @@ function renderKPIs(){
   const p=CUR,w=p.waterfall,box=document.getElementById("kpis");box.innerHTML="";
   const cards=[
     {l:"🧭 净效益 (5年)",v:fmtT(w.net),cls:"hl",
-     tag:"收益 ≈ 损失的 "+(Math.abs(w.net/w.loss).toFixed(1))+" 倍"},
+     tag:"收益 ≈ 损失的 "+(DASH_DATA.net_band?(DASH_DATA.net_band.lo+"-"+DASH_DATA.net_band.hi+" 倍(参数区间)"):(Math.abs(w.net/w.loss).toFixed(1)+" 倍"))},
     {l:"💰 资本净流入",v:fmtT(w.inflow),c:"up",tag:"A股/债市/FDI 融资红利"},
     {l:"🏗️ 资本深化",v:fmtT(w.deepening),c:"up",tag:"GDP 增量贡献"},
     {l:"📉 出口利润损失",v:fmtT(w.loss),c:"dn",tag:"低端/高新出口承压"}];

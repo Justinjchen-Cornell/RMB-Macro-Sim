@@ -40,7 +40,7 @@
 > export elasticity and industry FX betas. See `real_data_report_2026-09-06.md`.
 >
 > 📚 Headline result (6% annual appreciation, 5y): export loss **-0.31 T\$** vs financing
-> **+2.17 T\$** + deepening **+0.82 T\$** → net **+2.68 T\$** (≈ 9× the cost).
+> **+2.17 T\$** + deepening **+0.82 T\$** → net **+2.68 T\$** (≈ 7-13× the cost (parameter interval, median ~9.7)).
 >
 > ⚠️ Research framework only — not investment advice. Sources: FRED, Tencent Finance,
 > akshare (Eastmoney). Developed via collaborative AI-assisted research; data as of 2026-09.
@@ -85,7 +85,7 @@
 > → 人民币资产成为最优容器 → A股/债市/FDI 三渠道资本涌入 → 融资红利 + 资本深化。
 > 成本-收益瀑布：**净效益 = 资本净流入 + 资本深化 + 出口利润损失(负)**。
 > 2026-09 校准锚点 (6%年化升值, 5年累计)：出口损失 **-0.31 T$** ｜ 融资红利 **+2.17 T$** ｜
-> 资本深化 **+0.82 T$** ｜ **净效益 +2.68 T$ ≈ 出口损失的 9 倍**。
+> 资本深化 **+0.82 T$** ｜ **净效益 +2.68 T$ ≈ 出口损失的 7-13 倍(参数区间)**。
 > ⚠️ 参数为现实量级近似 + 校准假设（见 §5 待办）。
 
 ### 2.2 核心公式
@@ -226,7 +226,7 @@ macro_sim/
 | 出口部门利润损失 | **-0.31** | 旧模型的"全部成本" |
 | 资本净流入 (融资) | **+2.17** | 外资涌入 A股/债市/FDI |
 | 资本深化 (GDP增量) | **+0.82** | 新增资本的长期生产率转化 |
-| **▶ 净效益** | **+2.68** | **净收益 ≈ 损失的 9 倍** |
+| **▶ 净效益** | **+2.68** | **净收益 ≈ 损失的 7-13 倍(参数区间)** |
 
 ### 5.4 资产年化收益 (5年中位)
 

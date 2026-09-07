@@ -240,7 +240,7 @@ function renderKPIs(){
   const p=CUR,w=p.waterfall,box=document.getElementById("kpis");box.innerHTML="";
   const cards=[
     {l:"🧭 净效益 (5年)",v:fmtT(w.net),cls:"hl",
-     tag:"收益 ≈ 损失的 "+(Math.abs(w.net/w.loss).toFixed(1))+" 倍"},
+     tag:"收益 ≈ 损失的 "+(DASH_DATA.net_band?(DASH_DATA.net_band.lo+"-"+DASH_DATA.net_band.hi+" 倍(参数区间)"):(Math.abs(w.net/w.loss).toFixed(1)+" 倍"))},
     {l:"💰 资本净流入",v:fmtT(w.inflow),c:"up",tag:"A股/债市/FDI 融资红利"},
     {l:"🏗️ 资本深化",v:fmtT(w.deepening),c:"up",tag:"GDP 增量贡献"},
     {l:"📉 出口利润损失",v:fmtT(w.loss),c:"dn",tag:"低端/高新出口承压"}];

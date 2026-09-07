@@ -75,7 +75,7 @@ Net benefit = **capital inflow + capital deepening − export profit loss**.
 | Export-sector profit loss | −0.31 |
 | Financing inflow | +2.17 |
 | Capital deepening | +0.82 |
-| **Net benefit** | **+2.68 (≈ 9× the cost)** |
+| **Net benefit** | **+2.68 (≈ 7-13× the cost (parameter interval, median ~9.7))** |
 
 The conclusion is robust to the appreciation pace: even at the realized
 2.7%-per-year inertia path the net benefit stays ≈ +2.6 T$.

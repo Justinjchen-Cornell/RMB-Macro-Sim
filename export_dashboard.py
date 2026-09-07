@@ -208,6 +208,19 @@ def get_live():
     return live
 
 
+def _net_band():
+    """9x 参数区间(来自 tools/sensitivity_9x.json; 失败回落静态值)。"""
+    try:
+        p = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                         "tools", "sensitivity_9x.json")
+        d = json.load(open(p, encoding="utf-8"))
+        r = d["ratio_9x_pct"]
+        return {"lo": r[0], "med": r[2], "hi": r[4],
+                "note": d.get("note", "")}
+    except Exception:
+        return {"lo": 7.0, "med": 9.7, "hi": 13.0, "note": "fallback static"}
+
+
 def _policy_rows(grid):
     """卢氏三原则 dials per grid rate (统一 policy_engine, 双口径, open .40/.25)。"""
     import policy_engine as pe
@@ -274,6 +287,7 @@ def export(html_out: str = None, live: dict = None) -> dict:
         "presets": presets,
         "grid": grid,
         "policy": _policy_rows(grid),
+        "net_band": _net_band(),
         "outlook": _outlook(live),
         "live": live or {"spot": REAL_SPOT, "vol3y": REAL_VOL,
                          "inertia_apprec": INERTIA_APPREC, "live": False,
