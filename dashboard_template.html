@@ -170,6 +170,18 @@ svg{width:100%;height:auto;display:block}
   <div class="legbar"><span>受损 -40%</span><div class="grad"></div><span>中性 0</span><div class="grad" style="background:linear-gradient(90deg,#f3f4f6,#059669);max-width:110px"></div><span>受益 +40%</span></div>
 </div>
 
+
+<div class="panel full" style="margin-top:14px">
+  <h3>🎯 政策算法评估 · 卢氏三原则
+    <span style="margin-left:auto;display:inline-flex;gap:6px">
+      <button class="chip" id="open40" style="margin:0">开放度 0.40</button>
+      <button class="chip" id="open25" style="margin:0">加严封堵 0.25</button>
+    </span>
+  </h3>
+  <div class="hint">三原则仪表: ①消化输入性通胀(油价+30%情景) ②顺差 1.2T→基本平衡 ③封堵走资、避免去工业化</div>
+  <div id="polcard"></div>
+  <div id="polnote" style="margin-top:8px;font-size:11.5px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 12px"></div>
+</div>
 <div class="panel full" style="margin-top:14px">
   <h3>🔗 Deep-Risk-OPP 联动 · GOR × easing <span class="badge" style="margin-left:auto">每日 00:00 UTC 刷新</span></h3>
   <div class="hint">跨站读取金油比相对定价(GOR)与黄金宏观宽松偏向(easing), 与本站人民币情景交叉参考</div>
@@ -506,7 +518,42 @@ function renderLink(){
   }).catch(function(){ clearTimeout(to); box.innerHTML='<div class="hint">联动读数获取失败 — 已跳过</div>'; });
 }
 
-renderChips();renderAll();renderLink();
+let polOpen = 0.40;
+function polRow(rate){
+  const P=DASH_DATA.policy||{rows:[]};
+  for(let k=0;k<P.rows.length;k++){ if(Math.abs(P.rows[k].r-rate)<0.01){return P.rows[k];} }
+  return null;
+}
+const KM_RATE={p0:0,p3:3,p6:6,p10:10,p6c:6,p6x:6,p6r:6,piv:2.7};
+function renderPolicy(){
+  const rate=CUR.rate_pct!=null?CUR.rate_pct:(KM_RATE[CUR.key]!=null?KM_RATE[CUR.key]:0);
+  const p=polRow(rate);
+  const P=DASH_DATA.policy||{};
+  const box=document.getElementById("polcard");
+  if(!p){ if(box){box.innerHTML='<div class="hint">—</div>';} return; }
+  const is25 = polOpen<0.4;
+  const f = is25? p.f25 : p.f40;
+  const v = is25? p.v25 : p.v40;
+  const fc = f>55?"#dc2626":(f>40?"#d97706":"#059669");
+  const dc = p.di>35?"#dc2626":(p.di>28?"#d97706":"#059669");
+  const vc = v.indexOf("政策带")>=0?"#059669":(v.indexOf("边缘")>=0?"#d97706":"#dc2626");
+  box.innerHTML=
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:8px">'+
+    '<div class="mini"><div class="lbl">① 通胀对冲 (油价+30%)</div><div class="val '+(p.ia>=50?"up":"dn")+'">'+p.ia.toFixed(0)+'%</div></div>'+
+    '<div class="mini"><div class="lbl">② 顺差 5y 末</div><div class="val">'+p.se.toFixed(2)+' T$ <span style="font-size:11px;color:#6b7280">收敛 '+p.rp.toFixed(0)+'%'+(p.by>0?" · 第"+p.by+"年达标":" · 未达")+'</span></div></div>'+
+    '<div class="mini"><div class="lbl">③ 走资风险 (open '+polOpen.toFixed(2)+')</div><div class="val" style="color:'+fc+'">'+f.toFixed(0)+'/100</div></div>'+
+    '<div class="mini"><div class="lbl">去工业化压力 (低端制造)</div><div class="val" style="color:'+dc+'">'+p.di.toFixed(1)+'%</div></div>'+
+    '</div>'+
+    '<div style="padding:8px 10px;border-left:3px solid '+vc+';background:#f8fafc;border-radius:0 8px 8px 0;font-size:13px;color:#1f2937">判定 @ '+CUR.rate_pct.toFixed(1)+'%/年: <b style="color:'+vc+'">'+v+'</b></div>';
+  const note=document.getElementById("polnote");
+  if(note){ note.textContent=P.insight||""; }
+}
+
+renderChips();renderAll();renderLink();renderPolicy();
+document.getElementById("open40").classList.add("active");
+document.getElementById("open40").onclick=function(){polOpen=0.40;document.getElementById("open40").classList.add("active");document.getElementById("open25").classList.remove("active");renderPolicy();};
+document.getElementById("open25").onclick=function(){polOpen=0.25;document.getElementById("open25").classList.add("active");document.getElementById("open40").classList.remove("active");renderPolicy();};
+
 </script>
 </body>
 </html>

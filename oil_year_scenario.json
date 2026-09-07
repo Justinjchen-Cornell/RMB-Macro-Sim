@@ -1,0 +1,176 @@
+{
+ "A 温和去风险": {
+  "rows": [
+   {
+    "year": 2026,
+    "brent": 96,
+    "rmb_rate": 3.0,
+    "bill_T": 0.394,
+    "infl_raw_pt": 0.67,
+    "infl_net_pt": 0.0,
+    "surplus_T": 1.158,
+    "score": 95.9
+   },
+   {
+    "year": 2027,
+    "brent": 90,
+    "rmb_rate": 4.0,
+    "bill_T": 0.369,
+    "infl_raw_pt": -0.62,
+    "infl_net_pt": 0.0,
+    "surplus_T": 1.111,
+    "score": 96.9
+   },
+   {
+    "year": 2028,
+    "brent": 88,
+    "rmb_rate": 5.0,
+    "bill_T": 0.361,
+    "infl_raw_pt": -0.22,
+    "infl_net_pt": 0.0,
+    "surplus_T": 0.99,
+    "score": 98.2
+   },
+   {
+    "year": 2029,
+    "brent": 86,
+    "rmb_rate": 5.0,
+    "bill_T": 0.353,
+    "infl_raw_pt": -0.23,
+    "infl_net_pt": 0.0,
+    "surplus_T": 0.916,
+    "score": 98.4
+   },
+   {
+    "year": 2030,
+    "brent": 85,
+    "rmb_rate": 5.0,
+    "bill_T": 0.348,
+    "infl_raw_pt": -0.12,
+    "infl_net_pt": 0.0,
+    "surplus_T": 0.834,
+    "score": 98.5
+   }
+  ],
+  "avg_score": 97.6,
+  "first2y_score": 96.4,
+  "best_year": 2030,
+  "best_score": 98.5
+ },
+ "B 供给冲击": {
+  "rows": [
+   {
+    "year": 2026,
+    "brent": 120,
+    "rmb_rate": 0.0,
+    "bill_T": 0.492,
+    "infl_raw_pt": 3.33,
+    "infl_net_pt": 3.33,
+    "surplus_T": 1.036,
+    "score": 61.9
+   },
+   {
+    "year": 2027,
+    "brent": 110,
+    "rmb_rate": 3.0,
+    "bill_T": 0.451,
+    "infl_raw_pt": -0.83,
+    "infl_net_pt": 0.0,
+    "surplus_T": 0.981,
+    "score": 90.2
+   },
+   {
+    "year": 2028,
+    "brent": 96,
+    "rmb_rate": 4.0,
+    "bill_T": 0.394,
+    "infl_raw_pt": -1.27,
+    "infl_net_pt": 0.0,
+    "surplus_T": 1.037,
+    "score": 97.1
+   },
+   {
+    "year": 2029,
+    "brent": 91,
+    "rmb_rate": 5.0,
+    "bill_T": 0.373,
+    "infl_raw_pt": -0.52,
+    "infl_net_pt": 0.0,
+    "surplus_T": 0.896,
+    "score": 97.9
+   },
+   {
+    "year": 2030,
+    "brent": 89,
+    "rmb_rate": 5.0,
+    "bill_T": 0.365,
+    "infl_raw_pt": -0.22,
+    "infl_net_pt": 0.0,
+    "surplus_T": 0.818,
+    "score": 98.1
+   }
+  ],
+  "avg_score": 89.0,
+  "first2y_score": 76.0,
+  "best_year": 2030,
+  "best_score": 98.1
+ },
+ "C 速冻-修复": {
+  "rows": [
+   {
+    "year": 2026,
+    "brent": 70,
+    "rmb_rate": 2.0,
+    "bill_T": 0.287,
+    "infl_raw_pt": -2.22,
+    "infl_net_pt": 0.0,
+    "surplus_T": 1.19,
+    "score": 93.9
+   },
+   {
+    "year": 2027,
+    "brent": 76,
+    "rmb_rate": 2.0,
+    "bill_T": 0.312,
+    "infl_raw_pt": 0.86,
+    "infl_net_pt": 0.0,
+    "surplus_T": 1.273,
+    "score": 98.5
+   },
+   {
+    "year": 2028,
+    "brent": 83,
+    "rmb_rate": 4.0,
+    "bill_T": 0.34,
+    "infl_raw_pt": 0.92,
+    "infl_net_pt": 0.0,
+    "surplus_T": 1.091,
+    "score": 97.7
+   },
+   {
+    "year": 2029,
+    "brent": 86,
+    "rmb_rate": 5.0,
+    "bill_T": 0.353,
+    "infl_raw_pt": 0.36,
+    "infl_net_pt": 0.0,
+    "surplus_T": 0.916,
+    "score": 98.4
+   },
+   {
+    "year": 2030,
+    "brent": 88,
+    "rmb_rate": 5.0,
+    "bill_T": 0.361,
+    "infl_raw_pt": 0.23,
+    "infl_net_pt": 0.0,
+    "surplus_T": 0.822,
+    "score": 98.2
+   }
+  ],
+  "avg_score": 97.3,
+  "first2y_score": 96.2,
+  "best_year": 2027,
+  "best_score": 98.5
+ }
+}

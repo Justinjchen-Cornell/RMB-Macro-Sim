@@ -208,6 +208,30 @@ def get_live():
     return live
 
 
+def _policy_rows(grid):
+    """卢氏三原则 dials per grid rate (openness 0.40 vs 0.25 封堵对照)。"""
+    from policy_algo import evaluate
+    rows = []
+    for g in grid:
+        ev = evaluate(g["rate_pct"],
+                      g["industry"].get("export_lowend", 0.0), openness=0.40)
+        ev25 = evaluate(g["rate_pct"],
+                        g["industry"].get("export_lowend", 0.0), openness=0.25)
+        d = ev["dials"]; d25 = ev25["dials"]
+        rows.append({"r": g["rate_pct"],
+                     "ia": d["inflation_absorbed_pct"],
+                     "se": d["surplus_end_t"], "rp": d["rebalancing_pct"],
+                     "by": d["balanced_year"] if d["balanced_year"] else -1,
+                     "di": d["deind_pressure_pct"],
+                     "f40": d["flight_risk"], "v40": ev["verdict"],
+                     "f25": d25["flight_risk"], "v25": ev25["verdict"]})
+    return {"rows": rows,
+            "oil_scen": "+30% Brent, 5y 情景",
+            "insight": "6%/年 -> 5y 顺差 0.67T(收敛44%), 5y 完全平衡需 ~8.7%/年但去工业化超限; "
+                       "建议: 速度带 6-7% + 进口需求端政策分摊平衡责任 + 严封堵走资 "
+                       "(open 0.25 -> 10%/年档风险 56 降到 35)"}
+
+
 def _outlook(live):
     from outlook import compute as oc
     spot = (live or {}).get("spot", REAL_SPOT)
@@ -238,6 +262,7 @@ def export(html_out: str = None, live: dict = None) -> dict:
                        "note": "GDP当量 = 增加值权重×利润冲击×利润率; 就业当量 = 就业权重×冲击×弹性"},
         "presets": presets,
         "grid": grid,
+        "policy": _policy_rows(grid),
         "outlook": _outlook(live),
         "live": live or {"spot": REAL_SPOT, "vol3y": REAL_VOL,
                          "inertia_apprec": INERTIA_APPREC, "live": False,
