@@ -17,6 +17,7 @@ policy_engine.py - Unified Lu-three-principles policy system (V2 x V3 x V4)
   6) 输出契约统一为 dict, 供 CLI / dashboard / 文档共用。
 Run: python policy_engine.py
 """
+import dataclasses
 from dataclasses import dataclass, field
 from typing import List, Optional
 import numpy as np
@@ -166,6 +167,8 @@ def intl_control_conflict(p: UnifiedParams):
 # 3. 双口径去工业化
 # ============================================================
 def deind_dual(appr_rate, p: UnifiedParams, profit_shock_pct=None):
+    """桥注: 利润冲击%约等于GDP侵蚀%x10(低端制造利润占增加值约8-12%,
+    传导近线性); 两口径各对各自35红线, 勿跨比。"""
     """GDP侵蚀口径(V2b)恒内置; 利润口径(V2a)支持注入 repo 引擎实测。"""
     gdp_erode = p.lam_e * appr_rate * 0.28 * 5 * 100.0       # % GDP 5y
     if profit_shock_pct is None:
@@ -215,7 +218,7 @@ def import_policy_delta(tools: ImportTools, p: UnifiedParams) -> dict:
 def evaluate(appr_rate, p: UnifiedParams = None,
              tools: ImportTools = None, profit_shock_pct=None,
              oil_pct=0.30, us_tariff_shock=0.0, horizon=5):
-    p = p or UnifiedParams()
+    p = p or load_policy_params()
     tools = tools or ImportTools()
     inf = inflation_net(appr_rate, p, horizon, oil_pct)
     surp = trade_surplus_t(appr_rate, p, horizon)
@@ -311,6 +314,9 @@ def sweep_table(p=None, profit_cb=None, tools_name="积极",
     return rows
 
 
+PREMISE = "前提: 以升值为主动力, 进口政策只补足差额"
+
+
 def _engine_profit_cb(n_sim=300, seed=7):
     """repo 引擎利润口径回调(低端制造 5y 冲击)。"""
     from model import MacroParams, ScenarioEngine, load_project_config
@@ -354,6 +360,27 @@ def policy_needed_at(speed, p=None, profit_cb=None, target=0.3,
             "share_policy_pct": round(max(0.0, (sur_no_pol - target)
                                           / max(1e-9, base_no - target) * 100), 1),
             "ok": ev["ok"], "verdict": ev["verdict"]}
+
+
+
+
+def load_policy_params(path=None):
+    """政策层参数真源: policy_params.yaml (缺失时用内置默认, 与历史数值一致)。"""
+    import yaml as _yaml
+    import os as _os
+    if path is None:
+        path = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)),
+                             "policy_params.yaml")
+    p = UnifiedParams()
+    if not _os.path.exists(path):
+        return p
+    with open(path, encoding="utf-8") as f:
+        d = _yaml.safe_load(f) or {}
+    keys = {f.name for f in dataclasses.fields(p)}
+    for k, v in d.items():
+        if k in keys:
+            setattr(p, k, v)
+    return p
 
 
 def main():

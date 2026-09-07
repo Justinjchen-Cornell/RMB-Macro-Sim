@@ -1,0 +1,26 @@
+lam_e: 0.35
+lam_m: 0.45
+lam_svc: 0.25
+ept: 0.35
+openness: 0.40
+fdi_share: 0.30
+portfolio_share: 0.35
+nee_share: 0.20
+hot_share: 0.15
+rmb_intl: 0.15
+us_retaliation_sensitivity: 0.5
+flight_redline: 35.0
+deind_gdp_redline: 35.0
+deind_profit_redline: 35.0
+cca_redline: 55.0
+gdp_usd_t: 19.0
+exports_t: 3.5
+imports_t: 2.3
+svc_export_t: 0.4
+svc_import_t: 0.6
+reserves_t: 3.2
+reserves_floor_t: 2.5
+fiscal_budget_gdp: 3.0
+oil_base: 90.0
+oil_shock: 1.30
+# 注: 政策层唯一真源; 缺失时引擎用内置默认(数值一致)

@@ -197,7 +197,7 @@ svg{width:100%;height:auto;display:block}
 
 <script>
 const DASH_DATA = {
- "generated": "2026-09-07 20:06",
+ "generated": "2026-09-07 20:26",
  "n_simulations": 2000,
  "grid_n": 400,
  "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。GDP/就业为利润冲击的当量近似(利润率8%、就业弹性0.5), 非预测。",
@@ -11128,7 +11128,7 @@ const DASH_DATA = {
    }
   ],
   "oil_scen": "油价+30%, 5y; EPT 0.35 分层",
-  "insight": "统一引擎(V2a利润 x V2b GDP x V3工具 x V4外储): 双口径红线均35 - 利润口径 6%=28.8 带内 / 8%=40.5 破线; GDP侵蚀口径 6%=2.9。固定速度带最小政策度: 6% 只需 k=0.05(政策承担16%, 速度84%, 财政0.04%GDP); 5% 需 k=0.10(政策30%)。8%+ 去工业化(利润)超限。"
+  "insight": "[政策带前提: 以升值为主动力, 进口政策只补足差额] 统一引擎(V2a利润 x V2b GDP x V3工具 x V4外储): 双口径红线均35 - 利润口径 6%=28.8 带内 / 8%=40.5 破线; GDP侵蚀口径 6%=2.9。固定速度带最小政策度: 6% 只需 k=0.05(政策承担16%, 速度84%, 财政0.04%GDP); 5% 需 k=0.10(政策30%)。8%+ 去工业化(利润)超限。"
  },
  "outlook": {
   "rows": [
@@ -11639,7 +11639,19 @@ function renderPolicy(){
   if(note){ note.textContent=P.insight||""; }
 }
 
-renderChips();renderAll();renderLink();renderPolicy();
+renderChips();renderAll();renderLink();renderPolicy();renderBanner();
+function renderBanner(){
+  const LV=DASH_DATA.live||{};
+  if(LV.live){return;}
+  if(document.getElementById("offlineBanner")){return;}
+  const b=document.createElement("div");
+  b.id="offlineBanner";
+  b.style.cssText="background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:10px 16px;border-radius:10px;margin:0 0 14px;font-size:13px";
+  b.textContent="⚠️ 离线缓存模式: 读数非实时校准(最后在线更新 "+(DASH_DATA.generated||"—")+")。FRED_API_KEY 缺失或网络不可用时会降级。";
+  const wrap=document.querySelector(".header");
+  if(wrap&&wrap.parentNode){wrap.parentNode.insertBefore(b,wrap);}
+}
+
 document.getElementById("open40").classList.add("active");
 document.getElementById("open40").onclick=function(){polOpen=0.40;document.getElementById("open40").classList.add("active");document.getElementById("open25").classList.remove("active");renderPolicy();};
 document.getElementById("open25").onclick=function(){polOpen=0.25;document.getElementById("open25").classList.add("active");document.getElementById("open40").classList.remove("active");renderPolicy();};

@@ -1,5 +1,7 @@
 # RMB-Macro-Sim · Macro Simulation of RMB Appreciation
 
+> ⚠️ Research framework. Contains normative value judgments (the "Lu three principles"); not objective forecasts — not investment advice.
+
 > **Quantify the macro impact of a controlled RMB (CNY) appreciation** —
 > Monte Carlo transmission model, real-data calibration, interactive dashboard,
 > and bilingual research reports.

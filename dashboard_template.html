@@ -549,7 +549,19 @@ function renderPolicy(){
   if(note){ note.textContent=P.insight||""; }
 }
 
-renderChips();renderAll();renderLink();renderPolicy();
+renderChips();renderAll();renderLink();renderPolicy();renderBanner();
+function renderBanner(){
+  const LV=DASH_DATA.live||{};
+  if(LV.live){return;}
+  if(document.getElementById("offlineBanner")){return;}
+  const b=document.createElement("div");
+  b.id="offlineBanner";
+  b.style.cssText="background:#fffbeb;border:1px solid #fde68a;color:#92400e;padding:10px 16px;border-radius:10px;margin:0 0 14px;font-size:13px";
+  b.textContent="⚠️ 离线缓存模式: 读数非实时校准(最后在线更新 "+(DASH_DATA.generated||"—")+")。FRED_API_KEY 缺失或网络不可用时会降级。";
+  const wrap=document.querySelector(".header");
+  if(wrap&&wrap.parentNode){wrap.parentNode.insertBefore(b,wrap);}
+}
+
 document.getElementById("open40").classList.add("active");
 document.getElementById("open40").onclick=function(){polOpen=0.40;document.getElementById("open40").classList.add("active");document.getElementById("open25").classList.remove("active");renderPolicy();};
 document.getElementById("open25").onclick=function(){polOpen=0.25;document.getElementById("open25").classList.add("active");document.getElementById("open40").classList.remove("active");renderPolicy();};

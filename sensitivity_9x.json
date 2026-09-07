@@ -1,0 +1,27 @@
+{
+ "base_net": 3.288,
+ "net_pct": [
+  2.652,
+  3.254,
+  3.69,
+  4.239,
+  4.954
+ ],
+ "ratio_9x_pct": [
+  6.97,
+  8.56,
+  9.7,
+  11.15,
+  13.03
+ ],
+ "note": "固定6%路径的确定性代理(800采样); 用于话术区间, 非新点估计",
+ "top_effects_spearman": {
+  "fdi_inflow_rate": 0.646,
+  "dollar_drain_boost": 0.429,
+  "equity_inflow_rate": 0.397,
+  "deepen_return": 0.287,
+  "bond_inflow_rate": 0.286,
+  "lam_e_scale": 0.074,
+  "exporter_margin": 0.057
+ }
+}
