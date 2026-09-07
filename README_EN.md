@@ -1,5 +1,7 @@
 # RMB-Macro-Sim · Macro Simulation of RMB Appreciation
 
+> 🎯 **Positioning**: a macro-policy sandbox for fiscal × monetary × industrial policy under great-power games (core: state asset management, weak-FX strong-CNY, industrial upgrading) — pace control, tool choice, extreme-case resilience, winners & losers. See [VISION.md](docs/VISION.md) | [STRUCTURE.md](docs/STRUCTURE.md).
+
 > ⚠️ Research framework. Contains normative value judgments (the "Lu three principles"); not objective forecasts — not investment advice.
 
 > **Quantify the macro impact of a controlled RMB (CNY) appreciation** —

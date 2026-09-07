@@ -9,6 +9,9 @@ sensitivity_9x.py - G1 修复: 给"净效益/9x"装置信区间
 说明: 敏感性代理(固定 6% 路径, 不重跑 MC), 用于话术区间, 非新点估计。
 Run: python sensitivity_9x.py
 """
+import sys, os as _os
+sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
 import os
 import json
 import sys

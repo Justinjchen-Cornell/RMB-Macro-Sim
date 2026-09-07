@@ -1,5 +1,7 @@
 # RMB-Macro-Sim · 人民币升值宏观模拟 (v3.0)
 
+> 🎯 **定位**:大国博弈下的财政·货币·产业一体化**宏观政策沙盒**(内核:国家资管·弱汇强币·产业升级·大国博弈)→ 回答:节奏怎么控 / 工具怎么选 / 极端扛不扛得住 / 谁疼谁赚。详见 [VISION.md](docs/VISION.md) ｜ 文件地图 [STRUCTURE.md](docs/STRUCTURE.md)
+
 > 📖 中文文档 | **[English README → README_EN.md](README_EN.md)**
 > ⚠️ 研究框架: 含规范性价值判断(卢氏三原则), 非客观预测, 不构成投资建议。
 

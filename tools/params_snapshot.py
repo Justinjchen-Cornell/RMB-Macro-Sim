@@ -10,6 +10,9 @@ params_snapshot.py - Phase 1: params/ 库(生成物, 非真源)
 
 Run: python params_snapshot.py   (建议每次校准后重跑/追加 log)
 """
+import sys, os as _os
+sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
 import csv
 import json
 import os

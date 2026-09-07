@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """draw_maps.py - RMB-Macro-Sim v3.0 simplified system map (zh/en)."""
+import sys, os as _os
+sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
