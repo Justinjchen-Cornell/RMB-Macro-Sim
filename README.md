@@ -1,4 +1,6 @@
-# RMB-Macro-Sim · 人民币升值宏观模拟
+# RMB-Macro-Sim · 人民币升值宏观模拟 (v3.0)
+
+> 📖 中文文档 | **[English README → README_EN.md](README_EN.md)**
 
 <p align="center">
   <a href="https://justinjchen-cornell.github.io/RMB-Macro-Sim/"><img src="https://img.shields.io/badge/交互仪表盘-LIVE-2563eb?logo=github" alt="dashboard"></a>
