@@ -93,6 +93,8 @@ pip install fredapi akshare                             # optional real data
 
 python run_all.py                  # config.yaml → 7 charts + waterfall summary
 python run_real.py --charts        # real-data calibration + 3-scenario wall
+python policy_engine.py            # v3.0 policy layer: Lu 3 principles unified
+                                   # (dual-metric redlines, min-policy-k, reserves)
 python export_dashboard.py         # interactive dashboard (single file)
 python backtest.py                 # diagnostics: northbound-FX regression,
                                    # FX-episode sector check, flatness analysis
@@ -128,6 +130,7 @@ data_loader.py / calibrate.py   real data (FRED/Tencent/northbound) + estimators
 backtest.py                     empirical diagnostics (northbound-FX, episodes)
 outlook.py + news_watch.yaml    yearly outlook: inertia + news-event scoring
 run_all.py / run_real.py        scenario pipelines (assumption & real-data)
+policy_engine.py                v3.0 unified policy engine (V2a x V2b x V3 x V4)
 export_dashboard.py             dashboard generator (8 presets + 41-grid slider)
 social_cards.py                 daily reading + opinion cards (assets/, social/)
 build_report.py / _en.py        Chinese & English report builders (HTML→PDF)
@@ -148,3 +151,4 @@ Sources: FRED, Tencent Finance, akshare.
 
 Apache-2.0 · © 2026 Justinjchen · Built with collaborative AI-assisted research.
 v2.1 (2026-09-06): propagation & utility pack, −5%…+15% slider, backtest-driven parameter revision — see docs/backtest_2026-09.md.
+v3.0 (2026-09): unified policy layer (policy_engine.py) - Lu-three-principles quantified (dual-metric redlines, layered oil-CPI, S-curve capital, reserves floor, 4 import tools, min-policy-k). Policy band 5-7%/yr; @6% k=0.05 (policy 16% / speed 84%). Legacy v2/v3 archived.

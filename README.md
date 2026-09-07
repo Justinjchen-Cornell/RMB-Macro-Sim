@@ -11,8 +11,9 @@
 
 <p align="center"><img src="assets/dashboard_preview.png" alt="dashboard preview" width="85%"></p>
 
-> ✨ **功能总览 (v2.1)**：
+> ✨ **功能总览 (v3.0 · 政策模拟系统)**：
 > - 🎚️ **升贬幅度滑块 -5% ~ +15%**(41 档预跑 MC,拖动实时联动行业/FX/瀑布/宏观风险)
+> - 🏛️ **政策算法层(policy_engine.py, v3.0 一等公民)**:卢氏三原则统一系统(双口径去工业/分层通胀/S型资本/外储底线/四进口工具/最小政策度 k),与市场情景层并列
 > - 🏛️ **GDP 当量 + 就业风险暴露 + 风险等级**逐档量化
 > - 🗺️ **行业 × 年份热力图** · 🧭 **信号→动作对照表**(5 条阈值规则,联动 GOR)
 > - 🔮 **年度展望三包络**(模型 × news_watch 新闻事件表,逐年 USD/CNY + 每万美元金额变动)
@@ -138,7 +139,10 @@ python run_real.py --charts
 # 3. 交互仪表盘 (单文件, 8 预设情景, 双击即用 / GitHub Pages)
 python export_dashboard.py
 
-# 4. 详细中文研报 (HTML + PDF, report/)
+# 4. 政策算法(卢氏三原则统一系统: 双口径/最小政策k/联合读数)
+python policy_engine.py
+
+# 5. 详细中文研报 (HTML + PDF, report/)
 python build_report.py
 python build_report_en.py     # English edition (RMB_Appreciation_Impact_Report_*.pdf)
 
@@ -164,6 +168,7 @@ macro_sim/
 ├── config.yaml         # ★ 参数唯一真源 (被 run_all/run_real 读取)
 ├── run_all.py          # 一键: 多情景 + 图表 + 瀑布摘要
 ├── run_real.py         # 真实数据管线: 校准 → A/B/C 三情景
+├── policy_engine.py    # ★ 政策算法统一引擎 (v3.0 canonical, 旧 policy_algo 已归档)
 ├── export_dashboard.py # 8 预设 + 21档滑块网格 + 宏观风险 + 展望 → dashboard.html
 ├── outlook.py / news_watch.yaml # 年度展望: 惯性漂移 + 新闻事件评分
 ├── build_report.py     # 中文研报 → report/*.html + *.pdf
@@ -301,6 +306,7 @@ dashboard.html → 自动提交 → Pages 自动重建。**需在仓库 Settings
 | v2.1 打磨 | 浅色研报风; 情景巨幕图; config 真源化; dashboard v1; 中/英 PDF 报告; 每日管道(GitHub Actions); README_EN |
 | v2.1 传播+实用 | 三包络展望 + 信号→动作表 + 日卡/结论卡 + 标题库; 滑块扩至 **-5%~15%**; 代码审查 8×P1 修复 |
 | v2.1 回测修订 | backtest.py 诊断 → 修复 ±30% 截断/吸引力封顶/缺失 carry 通道; 流入率重锚(0.1088/0.0890/0.0475); 6% 头版不变; 档位区分度 ×3 |
+| **v3.0 全面升级** | 政策系统去碎片化: policy_engine.py 统一 V2a/V2b/V3/V4(双口径并立、走资 v2 标定、报复博弈、外储底线);旧 policy_algo/v2/v3 归档;dashboard 政策卡切统一引擎;政策带 5-7%(6%: k=0.05, 政策16%/速度84%) |
 
 **参数修订依据**: docs/backtest_2026-09.md ｜ **代码审查**: docs/code_review_2026-09-06.md ｜
 **校准说明**: real_data_report_2026-09-06.md ｜ **spec**: docs/superpowers/specs/
