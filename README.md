@@ -5,7 +5,8 @@
 > 📖 中文文档 | **[English README → README_EN.md](README_EN.md)**
 > ⚠️ 研究框架: 含规范性价值判断(卢氏三原则), 非客观预测, 不构成投资建议。
 
-<p align="center">
+<p align="center"><a href="https://justinjchen-cornell.github.io/RMB-Macro-Sim/index_en.html"><img src="https://img.shields.io/badge/Dashboard-English-0ea5e9" alt="EN dashboard"></a>
+  
   <a href="https://justinjchen-cornell.github.io/RMB-Macro-Sim/"><img src="https://img.shields.io/badge/交互仪表盘-LIVE-2563eb?logo=github" alt="dashboard"></a>
   <img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="license">
   <img src="https://img.shields.io/badge/tests-20%2F20-green" alt="tests">

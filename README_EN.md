@@ -17,7 +17,7 @@
 
 ## 🖥️ Live dashboard
 
-Click the badge above, or run locally:
+Click the badge above (中文: [index.html](https://justinjchen-cornell.github.io/RMB-Macro-Sim/index.html) · English: [index_en.html](https://justinjchen-cornell.github.io/RMB-Macro-Sim/index_en.html)), or run locally:
 
 ```bash
 python export_dashboard.py     # writes dashboard.html (self-contained)

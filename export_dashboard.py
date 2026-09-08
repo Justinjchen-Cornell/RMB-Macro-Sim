@@ -123,10 +123,23 @@ def build_presets(n_sim: int = N, seed: int = SEED, live: dict = None) -> list:
                          cny_vol=live.get("vol3y", REAL_VOL))
     presets = []
 
+    EN = {
+        "p0": ("No appreciation 0%", "base params, zero-drift control"),
+        "p3": ("Slow 3%", "base params, mild appreciation"),
+        "p6": ("Base 6%", "base params (config.yaml), policy-driven"),
+        "p10": ("Fast 10%", "aggressive, accelerated transition"),
+        "p6c": ("6% + conservative capital", "inflow at historical norm (6.5%/yr, weak drain)"),
+        "p6x": ("6% + aggressive drain", "peak dollar-scarcity (15%/yr, strong drain)"),
+        "p6r": ("Real-calibrated 6%", "calibrated: spot 6.71 + 3y vol 2.84%"),
+        "piv": ("Realized inertia 2.7%", "realized 3y drift 2.7%/yr"),
+    }
+
     def add(key, label, params, cap_cfg=None, note=""):
         r = ScenarioEngine(params, capital_cfg=cap_cfg or base_cap).run()
         s = snapshot(r)
-        s.update({"key": key, "label": label, "note": note})
+        en = EN.get(key, (label, note))
+        s.update({"key": key, "label": label, "note": note,
+                  "label_en": en[0], "note_en": en[1]})
         presets.append(s)
 
     p0 = replace(base_p, cny_annual_apprec=0.00, n_simulations=n_sim, seed=seed)
@@ -173,7 +186,9 @@ def build_grid(step: float = 0.005, n_sim: int = GRID_N, seed: int = GRID_SEED,
         s = snapshot(r)
         s.update({"key": "custom", "rate_pct": round(float(rate) * 100, 1),
                   "label": "自定义 %.1f%%" % (rate * 100),
-                  "note": "基准参数 + 升值速度 %.1f%% (600 次 MC)" % (rate * 100)})
+                  "note": "基准参数 + 升值速度 %.1f%% (400 次 MC)" % (rate * 100),
+                  "label_en": "Custom %.1f%%" % (rate * 100),
+                  "note_en": "base params + speed %.1f%% (400 MC)" % (rate * 100)})
         out.append(s)
     return out
 
@@ -253,7 +268,8 @@ def _policy_rows(grid):
             "insight": ("[政策带前提: 以升值为主动力, 进口政策只补足差额] 统一引擎(V2a利润 x V2b GDP x V3工具 x V4外储): 双口径红线均35 - "
                         "利润口径 6%=28.8 带内 / 8%=40.5 破线; GDP侵蚀口径 6%=2.9。"
                         "固定速度带最小政策度: 6% 只需 k=0.05(政策承担16%, 速度84%, "
-                        "财政0.04%GDP); 5% 需 k=0.10(政策30%)。8%+ 去工业化(利润)超限。")}
+                        "财政0.04%GDP); 5% 需 k=0.10(政策30%)。8%+ 去工业化(利润)超限。"),
+            "insight_en": ("[Premise: appreciation-led; import policy only tops up] Unified engine (V2a profit x V2b GDP x V3 tools x V4 reserves): dual redlines at 35 - profit basis 6%=28.8 inside / 8%=40.5 breach; GDP-erosion 6%=2.9. Fixed-speed min-policy-k: 6% needs k=0.05 (policy 16%, speed 84%, fiscal 0.04%GDP); 5% needs k=0.10 (policy 30%). 8%+ breaches deindustrialization (profit).")}
 
 
 def _outlook(live):
@@ -281,6 +297,7 @@ def export(html_out: str = None, live: dict = None) -> dict:
         "grid_n": GRID_N,
         "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。"
                       "GDP/就业为利润冲击的当量近似(利润率8%、就业弹性0.5), 非预测。",
+        "disclaimer_en": "Research framework, not investment advice. Sources: FRED / Tencent / akshare, as of 2026-09. GDP/employment are profit-shock equivalents (8% margin, 0.5 elasticity), not forecasts.",
         "macro_meta": {"margin": MARGIN, "emp_elast": EMP_ELAST,
                        "urban_emp_wan": URBAN_EMP_WAN,
                        "note": "GDP当量 = 增加值权重×利润冲击×利润率; 就业当量 = 就业权重×冲击×弹性"},
@@ -295,16 +312,28 @@ def export(html_out: str = None, live: dict = None) -> dict:
     }
     if html_out is None:
         html_out = os.path.join(BASE, "dashboard.html")
-    tpl = os.path.join(BASE, "dashboard_template.html")
-    with open(tpl, encoding="utf-8") as f:
-        html = f.read()
     token = "/*__DASH_DATA__*/"
+    blob = "const DASH_DATA = " + json.dumps(payload, ensure_ascii=False,
+                                             indent=1) + ";"
+    # zh
+    with open(os.path.join(BASE, "dashboard_template.html"),
+              encoding="utf-8") as f:
+        html = f.read()
     assert token in html, "template token missing"
-    html = html.replace(token, "const DASH_DATA = " + json.dumps(
-        payload, ensure_ascii=False, indent=1) + ";")
+    html = html.replace(token, blob)
     for out_name in (html_out, os.path.join(BASE, "index.html")):
         with open(out_name, "w", encoding="utf-8") as f:
             f.write(html)
+    # en
+    en_tpl = os.path.join(BASE, "dashboard_template_en.html")
+    if os.path.exists(en_tpl):
+        with open(en_tpl, encoding="utf-8") as f:
+            en_html = f.read()
+        en_html = en_html.replace(token, blob)
+        for out_name in (os.path.join(BASE, "dashboard_en.html"),
+                         os.path.join(BASE, "index_en.html")):
+            with open(out_name, "w", encoding="utf-8") as f:
+                f.write(en_html)
     with open(os.path.join(BASE, "dashboard_data.json"), "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=1)
     print("dashboard written: %.1f KB | presets=%d grid=%d"

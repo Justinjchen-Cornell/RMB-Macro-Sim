@@ -100,7 +100,7 @@ svg{width:100%;height:auto;display:block}
 #outlooknews{margin-top:8px;font-size:11px;color:var(--muted)}
 </style>
 </head>
-<body>
+<body><div style="position:absolute;top:14px;right:18px;font-size:12px"><a href="index_en.html" style="color:#2563eb;text-decoration:none">🌐 English</a></div>
 <div class="header">
   <h1>RMB-Macro-Sim <span class="sub">人民币升值宏观情景模拟 · 研究仪表盘</span></h1>
   <span class="badge">Monte Carlo · 2000 次 × 8 情景</span>
@@ -197,10 +197,11 @@ svg{width:100%;height:auto;display:block}
 
 <script>
 const DASH_DATA = {
- "generated": "2026-09-08 07:18",
+ "generated": "2026-09-08 21:59",
  "n_simulations": 2000,
  "grid_n": 400,
  "disclaimer": "研究框架, 不构成投资建议。数据源: FRED / 腾讯行情 / akshare, 截至 2026-09。GDP/就业为利润冲击的当量近似(利润率8%、就业弹性0.5), 非预测。",
+ "disclaimer_en": "Research framework, not investment advice. Sources: FRED / Tencent / akshare, as of 2026-09. GDP/employment are profit-shock equivalents (8% margin, 0.5 elasticity), not forecasts.",
  "macro_meta": {
   "margin": 0.08,
   "emp_elast": 0.5,
@@ -417,7 +418,9 @@ const DASH_DATA = {
    },
    "key": "p0",
    "label": "不升值 0%",
-   "note": "基准参数, 汇率零漂移对照"
+   "note": "基准参数, 汇率零漂移对照",
+   "label_en": "No appreciation 0%",
+   "note_en": "base params, zero-drift control"
   },
   {
    "fx_median": [
@@ -628,7 +631,9 @@ const DASH_DATA = {
    },
    "key": "p3",
    "label": "慢速升值 3%",
-   "note": "基准参数, 温和升值"
+   "note": "基准参数, 温和升值",
+   "label_en": "Slow 3%",
+   "note_en": "base params, mild appreciation"
   },
   {
    "fx_median": [
@@ -839,7 +844,9 @@ const DASH_DATA = {
    },
    "key": "p6",
    "label": "基准情景 6%",
-   "note": "基准参数 (config.yaml), 政策驱动升值"
+   "note": "基准参数 (config.yaml), 政策驱动升值",
+   "label_en": "Base 6%",
+   "note_en": "base params (config.yaml), policy-driven"
   },
   {
    "fx_median": [
@@ -1050,7 +1057,9 @@ const DASH_DATA = {
    },
    "key": "p10",
    "label": "快速升值 10%",
-   "note": "激进升值, 转型加速情景"
+   "note": "激进升值, 转型加速情景",
+   "label_en": "Fast 10%",
+   "note_en": "aggressive, accelerated transition"
   },
   {
    "fx_median": [
@@ -1261,7 +1270,9 @@ const DASH_DATA = {
    },
    "key": "p6c",
    "label": "6% + 保守资本",
-   "note": "资本流入按北向历史常态 (6.5%/年, 弱美元荒)"
+   "note": "资本流入按北向历史常态 (6.5%/年, 弱美元荒)",
+   "label_en": "6% + conservative capital",
+   "note_en": "inflow at historical norm (6.5%/yr, weak drain)"
   },
   {
    "fx_median": [
@@ -1472,7 +1483,9 @@ const DASH_DATA = {
    },
    "key": "p6x",
    "label": "6% + 激进美元荒",
-   "note": "美元流动性稀缺峰值情景 (15%/年, 强美元荒)"
+   "note": "美元流动性稀缺峰值情景 (15%/年, 强美元荒)",
+   "label_en": "6% + aggressive drain",
+   "note_en": "peak dollar-scarcity (15%/yr, strong drain)"
   },
   {
    "fx_median": [
@@ -1683,7 +1696,9 @@ const DASH_DATA = {
    },
    "key": "p6r",
    "label": "实测校准 6%",
-   "note": "实测: 即期6.71 + 3y波动2.84%, 6%情景"
+   "note": "实测: 即期6.71 + 3y波动2.84%, 6%情景",
+   "label_en": "Real-calibrated 6%",
+   "note_en": "calibrated: spot 6.71 + 3y vol 2.84%"
   },
   {
    "fx_median": [
@@ -1894,7 +1909,9 @@ const DASH_DATA = {
    },
    "key": "piv",
    "label": "现实惯性 2.7%",
-   "note": "实测: 近3年实际升值漂移 2.7%/年"
+   "note": "实测: 近3年实际升值漂移 2.7%/年",
+   "label_en": "Realized inertia 2.7%",
+   "note_en": "realized 3y drift 2.7%/yr"
   }
  ],
  "grid": [
@@ -2108,7 +2125,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -5.0,
    "label": "自定义 -5.0%",
-   "note": "基准参数 + 升值速度 -5.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -5.0% (400 次 MC)",
+   "label_en": "Custom -5.0%",
+   "note_en": "base params + speed -5.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -2320,7 +2339,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -4.5,
    "label": "自定义 -4.5%",
-   "note": "基准参数 + 升值速度 -4.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -4.5% (400 次 MC)",
+   "label_en": "Custom -4.5%",
+   "note_en": "base params + speed -4.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -2532,7 +2553,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -4.0,
    "label": "自定义 -4.0%",
-   "note": "基准参数 + 升值速度 -4.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -4.0% (400 次 MC)",
+   "label_en": "Custom -4.0%",
+   "note_en": "base params + speed -4.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -2744,7 +2767,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -3.5,
    "label": "自定义 -3.5%",
-   "note": "基准参数 + 升值速度 -3.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -3.5% (400 次 MC)",
+   "label_en": "Custom -3.5%",
+   "note_en": "base params + speed -3.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -2956,7 +2981,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -3.0,
    "label": "自定义 -3.0%",
-   "note": "基准参数 + 升值速度 -3.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -3.0% (400 次 MC)",
+   "label_en": "Custom -3.0%",
+   "note_en": "base params + speed -3.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -3168,7 +3195,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -2.5,
    "label": "自定义 -2.5%",
-   "note": "基准参数 + 升值速度 -2.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -2.5% (400 次 MC)",
+   "label_en": "Custom -2.5%",
+   "note_en": "base params + speed -2.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -3380,7 +3409,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -2.0,
    "label": "自定义 -2.0%",
-   "note": "基准参数 + 升值速度 -2.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -2.0% (400 次 MC)",
+   "label_en": "Custom -2.0%",
+   "note_en": "base params + speed -2.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -3592,7 +3623,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -1.5,
    "label": "自定义 -1.5%",
-   "note": "基准参数 + 升值速度 -1.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -1.5% (400 次 MC)",
+   "label_en": "Custom -1.5%",
+   "note_en": "base params + speed -1.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -3804,7 +3837,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -1.0,
    "label": "自定义 -1.0%",
-   "note": "基准参数 + 升值速度 -1.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -1.0% (400 次 MC)",
+   "label_en": "Custom -1.0%",
+   "note_en": "base params + speed -1.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -4016,7 +4051,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -0.5,
    "label": "自定义 -0.5%",
-   "note": "基准参数 + 升值速度 -0.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -0.5% (400 次 MC)",
+   "label_en": "Custom -0.5%",
+   "note_en": "base params + speed -0.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -4228,7 +4265,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": -0.0,
    "label": "自定义 -0.0%",
-   "note": "基准参数 + 升值速度 -0.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 -0.0% (400 次 MC)",
+   "label_en": "Custom -0.0%",
+   "note_en": "base params + speed -0.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -4440,7 +4479,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 0.5,
    "label": "自定义 0.5%",
-   "note": "基准参数 + 升值速度 0.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 0.5% (400 次 MC)",
+   "label_en": "Custom 0.5%",
+   "note_en": "base params + speed 0.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -4652,7 +4693,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 1.0,
    "label": "自定义 1.0%",
-   "note": "基准参数 + 升值速度 1.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 1.0% (400 次 MC)",
+   "label_en": "Custom 1.0%",
+   "note_en": "base params + speed 1.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -4864,7 +4907,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 1.5,
    "label": "自定义 1.5%",
-   "note": "基准参数 + 升值速度 1.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 1.5% (400 次 MC)",
+   "label_en": "Custom 1.5%",
+   "note_en": "base params + speed 1.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -5076,7 +5121,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 2.0,
    "label": "自定义 2.0%",
-   "note": "基准参数 + 升值速度 2.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 2.0% (400 次 MC)",
+   "label_en": "Custom 2.0%",
+   "note_en": "base params + speed 2.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -5288,7 +5335,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 2.5,
    "label": "自定义 2.5%",
-   "note": "基准参数 + 升值速度 2.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 2.5% (400 次 MC)",
+   "label_en": "Custom 2.5%",
+   "note_en": "base params + speed 2.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -5500,7 +5549,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 3.0,
    "label": "自定义 3.0%",
-   "note": "基准参数 + 升值速度 3.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 3.0% (400 次 MC)",
+   "label_en": "Custom 3.0%",
+   "note_en": "base params + speed 3.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -5712,7 +5763,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 3.5,
    "label": "自定义 3.5%",
-   "note": "基准参数 + 升值速度 3.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 3.5% (400 次 MC)",
+   "label_en": "Custom 3.5%",
+   "note_en": "base params + speed 3.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -5924,7 +5977,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 4.0,
    "label": "自定义 4.0%",
-   "note": "基准参数 + 升值速度 4.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 4.0% (400 次 MC)",
+   "label_en": "Custom 4.0%",
+   "note_en": "base params + speed 4.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -6136,7 +6191,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 4.5,
    "label": "自定义 4.5%",
-   "note": "基准参数 + 升值速度 4.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 4.5% (400 次 MC)",
+   "label_en": "Custom 4.5%",
+   "note_en": "base params + speed 4.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -6348,7 +6405,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 5.0,
    "label": "自定义 5.0%",
-   "note": "基准参数 + 升值速度 5.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 5.0% (400 次 MC)",
+   "label_en": "Custom 5.0%",
+   "note_en": "base params + speed 5.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -6560,7 +6619,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 5.5,
    "label": "自定义 5.5%",
-   "note": "基准参数 + 升值速度 5.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 5.5% (400 次 MC)",
+   "label_en": "Custom 5.5%",
+   "note_en": "base params + speed 5.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -6772,7 +6833,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 6.0,
    "label": "自定义 6.0%",
-   "note": "基准参数 + 升值速度 6.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 6.0% (400 次 MC)",
+   "label_en": "Custom 6.0%",
+   "note_en": "base params + speed 6.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -6984,7 +7047,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 6.5,
    "label": "自定义 6.5%",
-   "note": "基准参数 + 升值速度 6.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 6.5% (400 次 MC)",
+   "label_en": "Custom 6.5%",
+   "note_en": "base params + speed 6.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -7196,7 +7261,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 7.0,
    "label": "自定义 7.0%",
-   "note": "基准参数 + 升值速度 7.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 7.0% (400 次 MC)",
+   "label_en": "Custom 7.0%",
+   "note_en": "base params + speed 7.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -7408,7 +7475,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 7.5,
    "label": "自定义 7.5%",
-   "note": "基准参数 + 升值速度 7.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 7.5% (400 次 MC)",
+   "label_en": "Custom 7.5%",
+   "note_en": "base params + speed 7.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -7620,7 +7689,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 8.0,
    "label": "自定义 8.0%",
-   "note": "基准参数 + 升值速度 8.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 8.0% (400 次 MC)",
+   "label_en": "Custom 8.0%",
+   "note_en": "base params + speed 8.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -7832,7 +7903,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 8.5,
    "label": "自定义 8.5%",
-   "note": "基准参数 + 升值速度 8.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 8.5% (400 次 MC)",
+   "label_en": "Custom 8.5%",
+   "note_en": "base params + speed 8.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -8044,7 +8117,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 9.0,
    "label": "自定义 9.0%",
-   "note": "基准参数 + 升值速度 9.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 9.0% (400 次 MC)",
+   "label_en": "Custom 9.0%",
+   "note_en": "base params + speed 9.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -8256,7 +8331,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 9.5,
    "label": "自定义 9.5%",
-   "note": "基准参数 + 升值速度 9.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 9.5% (400 次 MC)",
+   "label_en": "Custom 9.5%",
+   "note_en": "base params + speed 9.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -8468,7 +8545,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 10.0,
    "label": "自定义 10.0%",
-   "note": "基准参数 + 升值速度 10.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 10.0% (400 次 MC)",
+   "label_en": "Custom 10.0%",
+   "note_en": "base params + speed 10.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -8680,7 +8759,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 10.5,
    "label": "自定义 10.5%",
-   "note": "基准参数 + 升值速度 10.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 10.5% (400 次 MC)",
+   "label_en": "Custom 10.5%",
+   "note_en": "base params + speed 10.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -8892,7 +8973,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 11.0,
    "label": "自定义 11.0%",
-   "note": "基准参数 + 升值速度 11.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 11.0% (400 次 MC)",
+   "label_en": "Custom 11.0%",
+   "note_en": "base params + speed 11.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -9104,7 +9187,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 11.5,
    "label": "自定义 11.5%",
-   "note": "基准参数 + 升值速度 11.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 11.5% (400 次 MC)",
+   "label_en": "Custom 11.5%",
+   "note_en": "base params + speed 11.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -9316,7 +9401,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 12.0,
    "label": "自定义 12.0%",
-   "note": "基准参数 + 升值速度 12.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 12.0% (400 次 MC)",
+   "label_en": "Custom 12.0%",
+   "note_en": "base params + speed 12.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -9528,7 +9615,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 12.5,
    "label": "自定义 12.5%",
-   "note": "基准参数 + 升值速度 12.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 12.5% (400 次 MC)",
+   "label_en": "Custom 12.5%",
+   "note_en": "base params + speed 12.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -9740,7 +9829,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 13.0,
    "label": "自定义 13.0%",
-   "note": "基准参数 + 升值速度 13.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 13.0% (400 次 MC)",
+   "label_en": "Custom 13.0%",
+   "note_en": "base params + speed 13.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -9952,7 +10043,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 13.5,
    "label": "自定义 13.5%",
-   "note": "基准参数 + 升值速度 13.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 13.5% (400 次 MC)",
+   "label_en": "Custom 13.5%",
+   "note_en": "base params + speed 13.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -10164,7 +10257,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 14.0,
    "label": "自定义 14.0%",
-   "note": "基准参数 + 升值速度 14.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 14.0% (400 次 MC)",
+   "label_en": "Custom 14.0%",
+   "note_en": "base params + speed 14.0% (400 MC)"
   },
   {
    "fx_median": [
@@ -10376,7 +10471,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 14.5,
    "label": "自定义 14.5%",
-   "note": "基准参数 + 升值速度 14.5% (600 次 MC)"
+   "note": "基准参数 + 升值速度 14.5% (400 次 MC)",
+   "label_en": "Custom 14.5%",
+   "note_en": "base params + speed 14.5% (400 MC)"
   },
   {
    "fx_median": [
@@ -10588,7 +10685,9 @@ const DASH_DATA = {
    "key": "custom",
    "rate_pct": 15.0,
    "label": "自定义 15.0%",
-   "note": "基准参数 + 升值速度 15.0% (600 次 MC)"
+   "note": "基准参数 + 升值速度 15.0% (400 次 MC)",
+   "label_en": "Custom 15.0%",
+   "note_en": "base params + speed 15.0% (400 MC)"
   }
  ],
  "policy": {
@@ -11128,7 +11227,8 @@ const DASH_DATA = {
    }
   ],
   "oil_scen": "油价+30%, 5y; EPT 0.35 分层",
-  "insight": "[政策带前提: 以升值为主动力, 进口政策只补足差额] 统一引擎(V2a利润 x V2b GDP x V3工具 x V4外储): 双口径红线均35 - 利润口径 6%=28.8 带内 / 8%=40.5 破线; GDP侵蚀口径 6%=2.9。固定速度带最小政策度: 6% 只需 k=0.05(政策承担16%, 速度84%, 财政0.04%GDP); 5% 需 k=0.10(政策30%)。8%+ 去工业化(利润)超限。"
+  "insight": "[政策带前提: 以升值为主动力, 进口政策只补足差额] 统一引擎(V2a利润 x V2b GDP x V3工具 x V4外储): 双口径红线均35 - 利润口径 6%=28.8 带内 / 8%=40.5 破线; GDP侵蚀口径 6%=2.9。固定速度带最小政策度: 6% 只需 k=0.05(政策承担16%, 速度84%, 财政0.04%GDP); 5% 需 k=0.10(政策30%)。8%+ 去工业化(利润)超限。",
+  "insight_en": "[Premise: appreciation-led; import policy only tops up] Unified engine (V2a profit x V2b GDP x V3 tools x V4 reserves): dual redlines at 35 - profit basis 6%=28.8 inside / 8%=40.5 breach; GDP-erosion 6%=2.9. Fixed-speed min-policy-k: 6% needs k=0.05 (policy 16%, speed 84%, fiscal 0.04%GDP); 5% needs k=0.10 (policy 30%). 8%+ breaches deindustrialization (profit)."
  },
  "net_band": {
   "lo": 6.97,
@@ -11289,9 +11389,8 @@ const DASH_DATA = {
   "spot": 6.7108,
   "vol3y": 0.0284,
   "inertia_apprec": 0.027,
-  "as_of": null,
   "live": false,
-  "note": "live failed (RuntimeError) - offline defaults"
+  "note": "offline defaults"
  }
 };
 const PRESETS = DASH_DATA.presets;
@@ -11553,7 +11652,7 @@ function onSlider(){
   const idx=Math.max(0,Math.min(GRID.length-1,Math.round((v+5)/0.5)));
   customRate=idx;
   CUR=GRID[idx];
-  document.getElementById("sliderVal").textContent=CUR.rate_pct.toFixed(1)+"%";
+  document.getElementById("sliderVal").textContent=rate.toFixed(1)+"%";
   renderChips();renderAll();
 }
 document.getElementById("rateSlider").addEventListener("input",onSlider);
@@ -11641,7 +11740,7 @@ function renderPolicy(){
     '<div class="mini"><div class="lbl">③ 走资风险 (open '+polOpen.toFixed(2)+')</div><div class="val" style="color:'+fc+'">'+f.toFixed(0)+'/100</div></div>'+
     '<div class="mini"><div class="lbl">去工业化 (利润/GDP侵蚀)</div><div class="val" style="color:'+dc+'">'+p.di.toFixed(1)+'% <span style="font-size:10px;color:#6b7280">GDP '+p.dg.toFixed(1)+'%</span></div></div>'+
     '</div>'+
-    '<div style="padding:8px 10px;border-left:3px solid '+vc+';background:#f8fafc;border-radius:0 8px 8px 0;font-size:13px;color:#1f2937">判定 @ '+CUR.rate_pct.toFixed(1)+'%/年: <b style="color:'+vc+'">'+v+'</b></div>';
+    '<div style="padding:8px 10px;border-left:3px solid '+vc+';background:#f8fafc;border-radius:0 8px 8px 0;font-size:13px;color:#1f2937">判定 @ '+rate.toFixed(1)+'%/年: <b style="color:'+vc+'">'+v+'</b></div>';
   const note=document.getElementById("polnote");
   if(note){ note.textContent=P.insight||""; }
 }

@@ -10,7 +10,7 @@
 | `scenario_runner.py` | 统一入口: `--mode market\|policy\|oil\|all` |
 | `run_all.py` / `run_real.py` | 市场情景管线(假设参数 / 真实数据校准) |
 | `export_dashboard.py` / `dashboard_template.html` | 生成 dashboard(每日管道引用) |
-| `dashboard.html` / `index.html` / `dashboard_data.json` | 产物(Pages 部署,由 export 重生成) |
+| `dashboard.html` / `index.html` (中文) · `dashboard_en.html` / `index_en.html` (English, 页内切换) / `dashboard_data.json` | 产物(Pages 部署,由 export 重生成; 模板: dashboard_template(_en).html) |
 | `policy_engine.py` | 政策算法门面(canonical;内部在 `modules/`) |
 | `model.py` / `capital_inflow.py` | 市场 6 模块引擎 + 资本流入 |
 | `data_loader.py` / `calibrate.py` / `backtest.py` | 真实数据层与验证 |
